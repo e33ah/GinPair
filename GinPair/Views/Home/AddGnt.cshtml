@@ -1,0 +1,23 @@
+﻿  @model GinPair.Models.AddGntVM 
+  @{ 
+      ViewData["Title"] = "AddGin"; 
+  } 
+
+  <h1>Start adding gin and tonics</h1> 
+
+  @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post)) 
+  { 
+      <p>Gin Name: @Html.TextBoxFor(m => m.GinName) </p> 
+      <p>Gin Distillery: @Html.TextBoxFor(m => m.Distillery) </p> 
+      <p>Description: @Html.TextBoxFor(m => m.GinDescription) </p> 
+      <input type="submit" value="Add Gin"> 
+}
+
+<hr/>
+
+@using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
+{
+    <p>Tonic Brand: @Html.TextBoxFor(m => m.TonicBrand) </p>
+    <p>Tonic Flavour: @Html.TextBoxFor(m => m.TonicFlavour) </p>
+    <input type="submit" value="Add Tonic">
+}
