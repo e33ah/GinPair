@@ -94,7 +94,7 @@ namespace GinPair.Controllers
         {
             return RedirectToAction("AddEvent", "Home");
         }
-        public IActionResult AddGin()
+        public IActionResult AddGnt()
         {
             var vm = new AddGntVM();
             return View(vm);
@@ -159,7 +159,7 @@ namespace GinPair.Controllers
         [HttpPost]
         public IActionResult NotifyUserGin()
         {
-            return RedirectToAction("AddGin", "Home");
+            return RedirectToAction("AddGnt", "Home");
         }
     }
 }
