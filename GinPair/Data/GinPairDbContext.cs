@@ -45,6 +45,8 @@ namespace GinPair.Data
                 .Property(e => e.TonicFlavour)
                 .HasColumnType("varchar")
                 .HasMaxLength(100);
+            
+            SeedData.Seed(modelBuilder);
         }
     }
 }
