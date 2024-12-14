@@ -3,6 +3,7 @@ using System;
 using GinPair.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GinPair.Migrations
 {
     [DbContext(typeof(GinPairDbContext))]
-    partial class GinPairDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241214164830_gntConstraints")]
+    partial class gntConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,35 +110,6 @@ namespace GinPair.Migrations
                     b.ToTable("metas", "gp_schema");
                 });
 
-            modelBuilder.Entity("GinPair.Models.Pairing", b =>
-                {
-                    b.Property<int>("PairingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pairing_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PairingId"));
-
-                    b.Property<int>("PairedGinGinId")
-                        .HasColumnType("integer")
-                        .HasColumnName("paired_gin_gin_id");
-
-                    b.Property<int>("PairedTonicTonicId")
-                        .HasColumnType("integer")
-                        .HasColumnName("paired_tonic_tonic_id");
-
-                    b.HasKey("PairingId")
-                        .HasName("pk_pairings");
-
-                    b.HasIndex("PairedGinGinId")
-                        .HasDatabaseName("ix_pairings_paired_gin_gin_id");
-
-                    b.HasIndex("PairedTonicTonicId")
-                        .HasDatabaseName("ix_pairings_paired_tonic_tonic_id");
-
-                    b.ToTable("pairings", "gp_schema");
-                });
-
             modelBuilder.Entity("GinPair.Models.Tonic", b =>
                 {
                     b.Property<int>("TonicId")
@@ -160,27 +134,6 @@ namespace GinPair.Migrations
                         .HasName("pk_tonics");
 
                     b.ToTable("tonics", "gp_schema");
-                });
-
-            modelBuilder.Entity("GinPair.Models.Pairing", b =>
-                {
-                    b.HasOne("GinPair.Models.Gin", "PairedGin")
-                        .WithMany()
-                        .HasForeignKey("PairedGinGinId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_pairings_gins_paired_gin_gin_id");
-
-                    b.HasOne("GinPair.Models.Tonic", "PairedTonic")
-                        .WithMany()
-                        .HasForeignKey("PairedTonicTonicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_pairings_tonics_paired_tonic_tonic_id");
-
-                    b.Navigation("PairedGin");
-
-                    b.Navigation("PairedTonic");
                 });
 #pragma warning restore 612, 618
         }
