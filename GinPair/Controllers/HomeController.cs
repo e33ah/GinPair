@@ -14,13 +14,22 @@ namespace GinPair.Controllers
         {
             gpdb = ginPairContext;
         }
+
         //public async Task<IActionResult> Index()
         //{
-        //    return View(await gpdb.Gins.ToListAsync());
+        //    var gins = await gpdb.Gins.ToListAsync();
+        //    return View(gins);
         //}
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string searchstring)
         {
-            return View();
+            ViewData["CurrentFilter"] = searchstring;
+            var gins = from g in gpdb.Gins
+                       select g;
+            if (!String.IsNullOrEmpty(searchstring))
+            {
+                gins = gins.Where(s => s.GinName.ToUpper().Contains(searchstring.ToUpper()));
+            }
+            return View(await gins.ToListAsync());
         }
 
         public IActionResult Privacy()
