@@ -15,11 +15,6 @@ namespace GinPair.Controllers
             gpdb = ginPairContext;
         }
 
-        //public async Task<IActionResult> Index()
-        //{
-        //    var gins = await gpdb.Gins.ToListAsync();
-        //    return View(gins);
-        //}
         public async Task<IActionResult> Index(string searchstring)
         {
             ViewData["CurrentFilter"] = searchstring;
