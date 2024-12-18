@@ -6,5 +6,7 @@
         public string GinName { get; set; }
         public string? Distillery { get; set; }
         public string? GinDescription { get; set; }
+
+        public ICollection<Pairing> Pairings { get; set; }
     }
 }

@@ -3,7 +3,9 @@
     public class Pairing
     {
         public int PairingId { get; set; }
-        public required Gin PairedGin { get; set; }
-        public required Tonic PairedTonic { get; set; }
+        public Gin PairedGin { get; set; }
+        public int GinId { get; internal set; }
+        public Tonic PairedTonic { get; set; }
+        public int TonicId { get; internal set; }
     }
 }

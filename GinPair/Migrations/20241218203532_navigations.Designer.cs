@@ -3,6 +3,7 @@ using System;
 using GinPair.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GinPair.Migrations
 {
     [DbContext(typeof(GinPairDbContext))]
-    partial class GinPairDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241218203532_navigations")]
+    partial class navigations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,50 +145,24 @@ namespace GinPair.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PairingId"));
 
-                    b.Property<int>("GinId")
+                    b.Property<int>("PairedGinGinId")
                         .HasColumnType("integer")
-                        .HasColumnName("gin_id");
+                        .HasColumnName("paired_gin_gin_id");
 
-                    b.Property<int>("TonicId")
+                    b.Property<int>("PairedTonicTonicId")
                         .HasColumnType("integer")
-                        .HasColumnName("tonic_id");
+                        .HasColumnName("paired_tonic_tonic_id");
 
                     b.HasKey("PairingId")
                         .HasName("pk_pairings");
 
-                    b.HasIndex("GinId")
-                        .HasDatabaseName("ix_pairings_gin_id");
+                    b.HasIndex("PairedGinGinId")
+                        .HasDatabaseName("ix_pairings_paired_gin_gin_id");
 
-                    b.HasIndex("TonicId")
-                        .HasDatabaseName("ix_pairings_tonic_id");
+                    b.HasIndex("PairedTonicTonicId")
+                        .HasDatabaseName("ix_pairings_paired_tonic_tonic_id");
 
                     b.ToTable("pairings", "gp_schema");
-
-                    b.HasData(
-                        new
-                        {
-                            PairingId = 1,
-                            GinId = 1,
-                            TonicId = 4
-                        },
-                        new
-                        {
-                            PairingId = 2,
-                            GinId = 2,
-                            TonicId = 3
-                        },
-                        new
-                        {
-                            PairingId = 3,
-                            GinId = 3,
-                            TonicId = 3
-                        },
-                        new
-                        {
-                            PairingId = 4,
-                            GinId = 4,
-                            TonicId = 2
-                        });
                 });
 
             modelBuilder.Entity("GinPair.Models.Tonic", b =>
@@ -250,17 +227,17 @@ namespace GinPair.Migrations
                 {
                     b.HasOne("GinPair.Models.Gin", "PairedGin")
                         .WithMany("Pairings")
-                        .HasForeignKey("GinId")
+                        .HasForeignKey("PairedGinGinId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_pairings_gins_gin_id");
+                        .HasConstraintName("fk_pairings_gins_paired_gin_gin_id");
 
                     b.HasOne("GinPair.Models.Tonic", "PairedTonic")
                         .WithMany("Pairings")
-                        .HasForeignKey("TonicId")
+                        .HasForeignKey("PairedTonicTonicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_pairings_tonics_tonic_id");
+                        .HasConstraintName("fk_pairings_tonics_paired_tonic_tonic_id");
 
                     b.Navigation("PairedGin");
 

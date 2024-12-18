@@ -11,7 +11,7 @@ namespace GinPair.Data
                 new Gin { GinId = 1, GinName = "Rhubarb & Ginger", Distillery = "Whitley Neill" },
                 new Gin { GinId = 2, GinName = "Blood Orange", Distillery = "Whitley Neill" },
                 new Gin { GinId = 3, GinName = "Scottish Raspberry", Distillery = "Caorunn" },
-                new Gin { GinId = 4, GinName = "Lantic", Distillery = "Skylark"}
+                new Gin { GinId = 4, GinName = "Lantic", Distillery = "Skylark" }
             );
 
             modelBuilder.Entity<Tonic>().HasData(
@@ -21,6 +21,13 @@ namespace GinPair.Data
                 new Tonic { TonicId = 4, TonicBrand = "FeverTree", TonicFlavour = "ElderFlower" },
                 new Tonic { TonicId = 5, TonicBrand = "FeverTree", TonicFlavour = "Aromatic" }
             );
+
+            modelBuilder.Entity<Pairing>().HasData(
+                new Pairing { PairingId = 1, GinId = 1, TonicId = 4 },
+                new Pairing { PairingId = 2, GinId = 2, TonicId = 3 },
+                new Pairing { PairingId = 3, GinId = 3, TonicId = 3 },
+                new Pairing { PairingId = 4, GinId = 4, TonicId = 2}
+                );
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using GinPair.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GinPair.Migrations
 {
     [DbContext(typeof(GinPairDbContext))]
-    partial class GinPairDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241218204231_pairingFKs")]
+    partial class pairingFKs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,32 +163,6 @@ namespace GinPair.Migrations
                         .HasDatabaseName("ix_pairings_tonic_id");
 
                     b.ToTable("pairings", "gp_schema");
-
-                    b.HasData(
-                        new
-                        {
-                            PairingId = 1,
-                            GinId = 1,
-                            TonicId = 4
-                        },
-                        new
-                        {
-                            PairingId = 2,
-                            GinId = 2,
-                            TonicId = 3
-                        },
-                        new
-                        {
-                            PairingId = 3,
-                            GinId = 3,
-                            TonicId = 3
-                        },
-                        new
-                        {
-                            PairingId = 4,
-                            GinId = 4,
-                            TonicId = 2
-                        });
                 });
 
             modelBuilder.Entity("GinPair.Models.Tonic", b =>
