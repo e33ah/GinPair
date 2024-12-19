@@ -1,4 +1,5 @@
-﻿@model IEnumerable<GinPair.Models.Gin>;
+﻿@model GinPair.Models.PairingVM
+
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -10,39 +11,11 @@
 <div>
 <form asp-action="Index" method="get" class="form-inline">
     <div class="form-group mb-2"> 
-        <input type="text" name="searchString" class="form-control col-md-4" placeholder="Search for gin name" value="@ViewData["CurrentFilter"]" /> 
+        <input type="text" name="searchString" class="form-control col-md-4" placeholder="Search for a gin to discover pairings" value="@ViewData["CurrentFilter"]" /> 
     </div> 
-    <button type="submit" class="btn btn-primary mb-2">Search</button>
-    <a asp-action="Index" class="btn btn-secondary mb-2">Clear</a>
+    <button id="ginSearchButton" type="submit" class="btn btn-primary mb-2">Search</button>
  </form>
 </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(Model => Model.GinName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(Model => Model.Distillery)
-            </th>
-            <th>
-                @Html.DisplayNameFor(Model => Model.GinDescription)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var f in Model){
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => f.GinName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => f.Distillery)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => f.GinDescription)
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+<p>Try pairing @Model.Distillery @Model.GinName with a @Model.TonicBrand @Model.TonicFlavour!</p>
+

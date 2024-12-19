@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using GinPair.Data;
+using GinPair.Migrations;
 using GinPair.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,17 @@ namespace GinPair.Controllers
             gpdb = ginPairContext;
         }
 
+        //public async Task<IActionResult> Index(string searchstring)
+        //{
+        //    ViewData["CurrentFilter"] = searchstring;
+        //    var gins = from g in gpdb.Gins
+        //               select g;
+        //    if (!String.IsNullOrEmpty(searchstring))
+        //    {
+        //        gins = gins.Where(s => s.GinName.ToUpper().Contains(searchstring.ToUpper()));
+        //    }
+        //    return View(await gins.ToListAsync());
+        //}
         public async Task<IActionResult> Index(string searchstring)
         {
             ViewData["CurrentFilter"] = searchstring;
@@ -23,9 +35,36 @@ namespace GinPair.Controllers
             if (!String.IsNullOrEmpty(searchstring))
             {
                 gins = gins.Where(s => s.GinName.ToUpper().Contains(searchstring.ToUpper()));
+                var ginList = gins.ToList();
+                int ginId1 = ginList[0].GinId; //TODO: this is currently hard coded. needs fixing for multiple returns
+
+                var result = await (from tonic in gpdb.Tonics
+                                    join pairing in gpdb.Pairings on tonic.TonicId equals pairing.TonicId
+                                    join gin in gpdb.Gins on pairing.GinId equals gin.GinId
+                                    where gin.GinId == ginId1
+                                    select new
+                                    {
+                                        tonic.TonicBrand,
+                                        tonic.TonicFlavour
+                                    }).ToListAsync();
+
+                var vm = result.Select(r => new PairingVM()
+                {
+                    TonicBrand = r.TonicBrand,
+                    TonicFlavour = r.TonicFlavour,
+                    GinName = ginList[0].GinName,
+                    Distillery = ginList[0].Distillery
+                }).ToList();
+
+                //TODO: fix this result return to not be a list
+                return View(vm[0]);
             }
-            return View(await gins.ToListAsync());
+            else { 
+                var vm = new PairingVM();
+                return View(vm);
+            }
         }
+
 
         public IActionResult Privacy()
         {
