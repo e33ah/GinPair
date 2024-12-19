@@ -5,17 +5,26 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome to Gin Pair!</h1>
-    <p>Your ultimate guide to the perfect gin and tonic pairing! Discover the art of balancing flavors with our expertly curated recommendations.</p>
-</div>
-<div>
-<form asp-action="Index" method="get" class="form-inline">
-    <div class="form-group mb-2"> 
-        <input type="text" name="searchString" class="form-control col-md-4" placeholder="Search for a gin to discover pairings" value="@ViewData["CurrentFilter"]" /> 
-    </div> 
-    <button id="ginSearchButton" type="submit" class="btn btn-primary mb-2">Search</button>
- </form>
+    <h1 class="display-4">Welcome to Gin Pair</h1>
+    <p class="mt-4">Your ultimate guide to the perfect gin and tonic pairing! <br>
+        Discover the art of balancing flavors with our expertly curated recommendations.</p>
+    <div style="vertical-align: central">
+        <form asp-action="Index" method="get" class="form-horizontal">
+            <div class="form-group mb-2"> 
+                <input type="text" name="searchString" placeholder="Start typing a gin name..." value="@ViewData["CurrentFilter"]" style="padding:6px; width:300px" />
+                <button id="ginSearchButton" type="submit" class="btn btn-primary mb-2">Search</button>
+            </div> 
+        </form>
+    </div>
+    <p id="searchResult" style="display: none;" class="mt-4">Try pairing @Model.Distillery @Model.GinName gin with a @Model.TonicBrand @Model.TonicFlavour tonic!</p>
 </div>
 
-<p>Try pairing @Model.Distillery @Model.GinName with a @Model.TonicBrand @Model.TonicFlavour!</p>
+
+@if (!String.IsNullOrEmpty(Model.TonicFlavour))
+{
+    <script>
+        document.getElementById("searchResult").style.display = "block";
+    </script>
+
+}
 
