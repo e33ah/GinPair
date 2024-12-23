@@ -1,30 +1,34 @@
 ﻿@model GinPair.Models.PairingVM
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome to Gin Pair</h1>
-    <p class="mt-4">Your ultimate guide to the perfect gin and tonic pairing! <br>
-        Discover the art of balancing flavors with our expertly curated recommendations.</p>
-    <div style="vertical-align: central">
-        <form asp-action="Index" method="get" class="form-horizontal">
+    <p class="mt-4">Your ultimate guide to the perfect gin and tonic pairing!<br>
+        Find your favorite gin, and we'll show you the perfect tonic pairing.</p>
+    <div>
+        <form asp-action="Index" method="get">
             <div class="form-group mb-2"> 
-                <input type="text" name="searchString" placeholder="Start typing a gin name..." value="@ViewData["CurrentFilter"]" style="padding:6px; width:300px" />
-                <button id="ginSearchButton" type="submit" class="btn btn-primary mb-2">Search</button>
+                <input id="ginSearchBox" type="text" name="searchString" placeholder="Start typing a gin..." value="@ViewData["CurrentFilter"]" style="padding:6px; width:300px" />
+                <button id="ginSearchButton" type="submit" class="btn btn-primary ms-2 mb-1">Search</button>
             </div> 
         </form>
     </div>
-    <p id="searchResult" style="display: none;" class="mt-4">Try pairing @Model.Distillery @Model.GinName gin with a @Model.TonicBrand @Model.TonicFlavour tonic!</p>
+    @if (!String.IsNullOrEmpty(Model.Message))
+    {
+        <p class="mt-4">@Model.Message</p>
+    }
 </div>
 
-
-@if (!String.IsNullOrEmpty(Model.TonicFlavour))
-{
-    <script>
-        document.getElementById("searchResult").style.display = "block";
-    </script>
-
-}
-
+<script>    
+    document.getElementById("ginSearchBox").addEventListener("input", function (e) { 
+        var regex = /^[a-zA-Z0-9' ]*$/; 
+        var input = e.target.value; 
+        if (!regex.test(input)) 
+        { 
+            e.target.value = input.slice(0, -1); 
+        } 
+    });
+</script>

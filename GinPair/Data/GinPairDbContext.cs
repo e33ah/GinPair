@@ -7,18 +7,11 @@ namespace GinPair.Data
 {
     public class GinPairDbContext : DbContext
     {
-        public DbSet<Meta> Metas {  get; set; }
-        public DbSet<LifeEvent> Events { get; set; }
         public DbSet<Gin> Gins { get; set; }
         public DbSet<Tonic> Tonics { get; set; }
         public DbSet<Pairing> Pairings { get; set; }
 
         public GinPairDbContext(DbContextOptions<GinPairDbContext> options) : base(options) { }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.EnableSensitiveDataLogging().LogTo(Console.WriteLine, LogLevel.Information);
-        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
