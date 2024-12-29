@@ -14,10 +14,10 @@ The app enables users to input the name of a gin and receive back a suggested to
 Update the connection string in appsettings.json with your PostgreSQL database
 3. Apply ef migrations
 To create the database schema and apply existing migrations run:
-        dotnet ef database update
+>dotnet ef database update
 4. Run the app
 Press F5 on visual studio or using the command line, navigate to the folder which contains the solution and run:
-        dotnet run
+>dotnet run
 Navigate to http://localhost:5260
 
 ## Unit tests
