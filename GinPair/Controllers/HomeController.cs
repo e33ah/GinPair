@@ -110,6 +110,7 @@ namespace GinPair.Controllers
         [HttpPost]
         public IActionResult AddGnt(AddGntVM vm)
         {
+            // Add Gin
             if (vm.GinName != null && vm.Distillery != null)
             {
                 Gin gn = new()
@@ -139,6 +140,7 @@ namespace GinPair.Controllers
                 _ = gpdb.SaveChanges();
                 return RedirectToAction("NotifyUserGin", "Home", new { id = gn.GinId });
             }
+            // Add Tonic
             else if (vm.TonicFlavour != null)
             {
                 Tonic ton = new()
@@ -156,6 +158,7 @@ namespace GinPair.Controllers
                 _ = gpdb.SaveChanges();
                 return RedirectToAction("NotifyUserTonic", "Home", new { id = ton.TonicId });
             }
+            // Add Pairing
             else if (vm.GinId.ToString() != null)
             {
                 Pairing p = new()
@@ -228,22 +231,20 @@ namespace GinPair.Controllers
         {
             return RedirectToAction("AddGnt", "Home");
         }
-        //TODO: logic below needs reviewing 
         public bool IsGinPresent(string ginName, string distillery)
         {
-            bool ginExists = gpdb.Gins.Any(m => m.GinName == ginName) && gpdb.Gins.Any(m => m.Distillery == distillery);
+            bool ginExists = gpdb.Gins.Any(m => m.GinName == ginName && m.Distillery == distillery);
             return ginExists;
         }
         public bool IsTonicPresent(string tonicBrand, string tonicFlavour)
         {
-            bool tonicExists = gpdb.Tonics.Any(m => m.TonicBrand == tonicBrand) && gpdb.Tonics.Any(m => m.TonicFlavour == tonicFlavour);
+            bool tonicExists = gpdb.Tonics.Any(m => m.TonicBrand == tonicBrand && m.TonicFlavour == tonicFlavour);
             return tonicExists;
         }        
         public bool IsPairingPresent(int ginId, int tonicId)
         {
-            bool pairingExists = gpdb.Pairings.Any(m => m.GinId == ginId) && gpdb.Pairings.Any(m => m.TonicId == tonicId);
+            bool pairingExists = gpdb.Pairings.Any(m => m.GinId == ginId && m.TonicId == tonicId);
             return pairingExists;
         }
-
     }
 }
