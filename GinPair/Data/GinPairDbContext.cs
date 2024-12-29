@@ -16,29 +16,6 @@ namespace GinPair.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.HasDefaultSchema("gp_schema");
-
-            modelBuilder.Entity<Gin>()
-                .Property(e => e.GinName)
-                .HasColumnType("varchar")
-                .HasMaxLength(100);
-            modelBuilder.Entity<Gin>()
-                .Property(e => e.GinDescription)
-                .HasColumnType("varchar")
-                .HasMaxLength(500);
-            modelBuilder.Entity<Gin>()
-                .Property(e => e.Distillery)
-                .HasColumnType("varchar")
-                .HasMaxLength(100);
-
-            modelBuilder.Entity<Tonic>()
-                .Property(e => e.TonicBrand)
-                .HasColumnType("varchar")
-                .HasMaxLength(100);
-            modelBuilder.Entity<Tonic>()
-                .Property(e => e.TonicFlavour)
-                .HasColumnType("varchar")
-                .HasMaxLength(100);
-            
             SeedData.Seed(modelBuilder);
         }
     }
