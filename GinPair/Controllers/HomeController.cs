@@ -2,7 +2,9 @@ using System.Diagnostics;
 using GinPair.Data;
 using GinPair.Migrations;
 using GinPair.Models;
+using GinPair.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace GinPair.Controllers
@@ -27,7 +29,7 @@ namespace GinPair.Controllers
             }
             else
             {
-                gins = gins.Where(s => s.GinName.ToUpper().Contains(searchstring.ToUpper()));
+                gins = gins.Where(s => s.GinName.ToUpper().Contains(searchstring.ToUpper()) || s.Distillery.ToUpper().Contains(searchstring.ToUpper()));
                 var ginList = gins.ToList();
                 if (ginList.Count == 0)
                 {
@@ -38,33 +40,34 @@ namespace GinPair.Controllers
                 }
                 else
                 {
-                    int ginId1 = ginList[0].GinId; //TODO: this is currently hard coded. needs fixing for multiple returns
+                    Gin firstMatch = ginList.FirstOrDefault();
+                    int ginId = firstMatch.GinId; //TODO: this is currently hard coded. needs fixing for multiple returns
                     var result = await (from tonic in gpdb.Tonics
                                         join pairing in gpdb.Pairings on tonic.TonicId equals pairing.TonicId
                                         join gin in gpdb.Gins on pairing.GinId equals gin.GinId
-                                        where gin.GinId == ginId1
+                                        where gin.GinId == ginId
                                         select new
                                         {
                                             tonic.TonicBrand,
                                             tonic.TonicFlavour
                                         }).ToListAsync();
 
-                    //TODO: fix this result return to not be a list
-                    var vm = result.Select(r => new PairingVM()
+                    var vm = result.Select(p => new PairingVM()
                     {
-                        TonicBrand = r.TonicBrand,
-                        TonicFlavour = r.TonicFlavour,
-                        GinName = ginList[0].GinName,
-                        Distillery = ginList[0].Distillery
+                        TonicBrand = p.TonicBrand,
+                        TonicFlavour = p.TonicFlavour,
+                        GinName = firstMatch.GinName,
+                        Distillery = firstMatch.Distillery
                     }).ToList();
 
-                    ViewData["CurrentFilter"] = vm[0].GinName;
-                    vm[0].Message = $"Try pairing {vm[0].Distillery} {vm[0].GinName} gin with a {vm[0].TonicBrand} {vm[0].TonicFlavour} tonic!";
-                    return View(vm[0]);
+                    Random random = new Random();
+                    int r = random.Next(0, vm.Count);
+                    ViewData["CurrentFilter"] = vm[r].Distillery + " " + vm[r].GinName;
+                    vm[r].Message = $"Try pairing {vm[r].Distillery} {vm[r].GinName} gin with a {vm[r].TonicBrand} {vm[r].TonicFlavour} tonic!";
+                    return View(vm[r]);
                 }
             }
         }
-
 
         public IActionResult Privacy()
         {
@@ -75,15 +78,31 @@ namespace GinPair.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        public IActionResult AddGnt()
+        public IActionResult AddGnt(bool isGinInvalid, bool isTonicInvalid)
         {
-            var vm = new AddGntVM();
+            var tonicList = gpdb.Tonics.Select(t => new SelectListItem
+            {
+                Value = t.TonicId.ToString(),
+                Text = t.TonicBrand.ToString() + " " + t.TonicFlavour.ToString()
+            }).ToList();
+            var ginList = gpdb.Gins.Select(g => new SelectListItem
+            {
+                Value = g.GinId.ToString(),
+                Text = g.Distillery.ToString() + " " + g.GinName.ToString()
+            }).ToList();
+            var vm = new AddGntVM
+            {
+                TonicFlavours = tonicList,
+                Gins = ginList,
+                IsGinInvalid = isGinInvalid,
+                IsTonicInvalid = isTonicInvalid
+            };
             return View(vm);
         }
         [HttpPost]
         public IActionResult AddGnt(AddGntVM vm)
         {
-            if (vm.GinName != null)
+            if (vm.GinName != null && vm.Distillery != null)
             {
                 Gin gn = new()
                 {
@@ -91,7 +110,24 @@ namespace GinPair.Controllers
                     Distillery = vm.Distillery,
                     GinDescription = vm.GinDescription
                 };
+                if (IsGinPresent(gn.GinName, gn.Distillery))
+                {
+                    bool isGinInvalid = true;
+                    return RedirectToAction("AddGnt", "Home", new { isGinInvalid = isGinInvalid });
+
+                }
                 _ = gpdb.Gins.Add(gn);
+                if (!vm.AddPairingLater)
+                {
+                    Tonic t = gpdb.Tonics.Find(vm.TonicId);
+                    Pairing pr = new()
+                    {
+                        PairedGin = gn,
+                        PairedTonic = t
+                    };
+                    _ = gpdb.Pairings.Add(pr);
+                }
+
                 _ = gpdb.SaveChanges();
                 return RedirectToAction("NotifyUserGin", "Home", new { id = gn.GinId });
             }
@@ -102,13 +138,30 @@ namespace GinPair.Controllers
                     TonicBrand = vm.TonicBrand,
                     TonicFlavour = vm.TonicFlavour,
                 };
+                if (IsTonicPresent(ton.TonicBrand, ton.TonicFlavour))
+                {
+                    bool isTonicInvalid = true;
+                    return RedirectToAction("AddGnt", "Home", new { isTonicInvalid = isTonicInvalid });
+
+                }
                 _ = gpdb.Tonics.Add(ton);
                 _ = gpdb.SaveChanges();
                 return RedirectToAction("NotifyUserTonic", "Home", new { id = ton.TonicId });
             }
+            else if (vm.GinId.ToString() != null)
+            {
+                Pairing p = new()
+                {
+                    GinId = vm.GinId,
+                    TonicId = vm.TonicId
+                };
+                _ = gpdb.Pairings.Add(p);
+                _ = gpdb.SaveChanges();
+                return RedirectToAction("NotifyUserPairing", "Home", new { id = p.PairingId });
+            }
             else
             {
-                return View(vm);
+                return RedirectToAction("AddGnt", "Home");
             }
         }
         public IActionResult NotifyUserGin(int id = 0)
@@ -119,11 +172,11 @@ namespace GinPair.Controllers
                 var f = gpdb.Gins.FirstOrDefault(e => e.GinId == id);
                 if (f != null)
                 {
-                    vm.Message = $"Gin \"{f.GinName}\" was added successfully!";
+                    vm.Message = $"\"{f.Distillery} {f.GinName}\" gin was added successfully!";
                 }
             }
             return View(vm);
-        }        
+        }
         public IActionResult NotifyUserTonic(int id = 0)
         {
             NotifyUserTonicVM vm = new();
@@ -137,10 +190,51 @@ namespace GinPair.Controllers
             }
             return View(vm);
         }
+        public IActionResult NotifyUserPairing(int id = 0)
+        {
+            NotifyUserPairingVM vm = new();
+            if (id != 0)
+            {
+                var f = gpdb.Pairings.FirstOrDefault(e => e.PairingId == id);
+                if (f != null)
+                {
+                    Tonic pairedTonic = gpdb.Tonics.Find(f.TonicId);
+                    Gin pairedGin = gpdb.Gins.Find(f.GinId);
+                    vm.Message = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+                }
+            }
+            return View(vm);
+        }
         [HttpPost]
         public IActionResult NotifyUserGin()
         {
             return RedirectToAction("AddGnt", "Home");
+        }        
+        [HttpPost]
+        public IActionResult NotifyUserTonic()
+        {
+            return RedirectToAction("AddGnt", "Home");
+        }        
+        [HttpPost]
+        public IActionResult NotifyUserPairing()
+        {
+            return RedirectToAction("AddGnt", "Home");
         }
+        public bool IsGinPresent(string ginName, string distillery)
+        {
+            bool ginExists = gpdb.Gins.Any(m => m.GinName == ginName) && gpdb.Gins.Any(m => m.Distillery == distillery);
+            return ginExists;
+        }
+        public bool IsTonicPresent(string tonicBrand, string tonicFlavour)
+        {
+            bool tonicExists = gpdb.Tonics.Any(m => m.TonicBrand == tonicBrand) && gpdb.Tonics.Any(m => m.TonicFlavour == tonicFlavour);
+            return tonicExists;
+        }        
+        public bool IsPairingPresent(int ginId, int tonicId)
+        {
+            bool pairingExists = gpdb.Pairings.Any(m => m.GinId == ginId) && gpdb.Pairings.Any(m => m.TonicId == tonicId);
+            return pairingExists;
+        }
+
     }
 }

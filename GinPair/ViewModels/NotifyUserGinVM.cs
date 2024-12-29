@@ -2,6 +2,6 @@
 {
     internal class NotifyUserGinVM
     {
-        public string Message { get; internal set; }
+        public string? Message { get; internal set; }
     }
 }

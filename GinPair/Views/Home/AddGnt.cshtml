@@ -3,22 +3,87 @@
       ViewData["Title"] = "Add"; 
   }
 
-<h1>Found a gin not in our collection?</h1>
+<h1>Found something missing?</h1>
 <h2>Add it here!</h2>
+<div class="container mt-4">
+	<div id="accordian">
+        <div class="card">
+            <div class="card-header" id="addGinHeader">
+                <button class="btn" type="button" data-toggle="collapse" data-target="#addGinForm" aria-expanded="true" aria-controls="addGinForm">
+                    <h4 class="mb-0">Add Gin</h4>
+                </button>
+            </div>
+            <div class="collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-parent="#acccordian">
+                <div class="card-body">
+                    @if(Model.IsGinInvalid){
+                        <p class="text-danger">This gin is already part of our collection!</p>
+                    }
+                    Add a gin to our collection
 
-  @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post)) 
-  { 
-      <p>Gin Name: @Html.TextBoxFor(m => m.GinName) </p> 
-      <p>Gin Distillery: @Html.TextBoxFor(m => m.Distillery) </p> 
-      <p>Description: @Html.TextBoxFor(m => m.GinDescription) </p> 
-      <input type="submit" value="Add Gin"> 
-}
+                    @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
+                    { 
+                        <p>Distillery / Brand:  *<br />
+                            @Html.TextBoxFor(m => m.Distillery, new { @placeholder = "e.g. Hendrick's" }) </p>
+                        <p>Gin Name / Flavour:  *<br />
+                            @Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original" }) </p>
+                        <p>Short Description: <br />
+                            @Html.TextAreaFor(m => m.GinDescription) </p> 
+                        <p>Tonic Pairing: <br />
+                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours,"Select a tonic", new { id = "tonicPairing" } ) <br />
+                            If you want to add a tonic pairing later, check the box @Html.CheckBoxFor(m => m.AddPairingLater, new {@class="form-control-check", id="pairLater"}) </p>
+                        <input class="btn btn-primary" type="submit" value="Add Gin"> 
+                    }
+                    <script>
+                        document.getElementById("pairLater").addEventListener("change", function () {
+                            document.getElementById("tonicPairing").disabled = this.checked;
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="card-header" id="addPairingHeader">
+                <button class ="btn" type="button" data-toggle="collapse" data-target="#addTonicForm" aria-expanded="true" aria-controls="addPairingForm">
+                    <h4 class="mb-0">Add Pairing</h4>
+                </button>
+            </div>
+            <div class="accordion-collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-parent="#acccordian">
+                <div class="card-body">
+                    <p class="mb-2">Select a gin and tonic to pair together</p>
+                    @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
+                    {
+                        <p>Gin to pair: <br />
+                            @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin") </p>
+                        <p>Tonic: <br />
+                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic") </p>
+                           
+                        <input class="btn btn-primary" type="submit" value="Pair">
+                    }
+                </div>
+            </div>
+            <div class="card-header" id="addTonicHeader">
+                <button class ="btn" type="button" data-toggle="collapse" data-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
+                    <h4 class="mb-0">Add Tonic</h4>
+                </button>
+            </div>
+            <div class="collapse show" id="addTonicForm" aria-labelledby="addTonicHeader" data-parent="#acccordian">
+                <div class="card-body">
+                    @if (Model.IsTonicInvalid)
+                    {
+                        <p class="text-danger">This tonic is already part of our collection!</p>
+                    }
+                    <p class="mb-2">Add a new tonic to our collection</p>
+                    @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
+                    {
+                        <p>Tonic Brand: <br />
+                            @Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree" })
+                        </p>
+                        <p>Tonic Flavour: <br />
+                            @Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian" })
+                        </p>
+                        <input class="btn btn-primary" type="submit" value="Add Tonic">
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<hr/>
-
-@using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-{
-    <p>Tonic Brand: @Html.TextBoxFor(m => m.TonicBrand) </p>
-    <p>Tonic Flavour: @Html.TextBoxFor(m => m.TonicFlavour) </p>
-    <input type="submit" value="Add Tonic">
-}
