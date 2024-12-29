@@ -35,7 +35,7 @@ namespace GinPair.Controllers
                 {
                     var vm = new PairingVM();
                     ViewData["CurrentFilter"] = string.Empty;
-                    vm.Message = $"Sorry, a gin matching \"{searchstring}\" was not found! \n Try searching for again, or add it to our collection.";
+                    vm.Message = $"Sorry, a gin matching \"{searchstring}\" was not found! \n Try searching again, or add it to our collection.";
                     return View(vm);
                 }
                 else
@@ -51,20 +51,28 @@ namespace GinPair.Controllers
                                             tonic.TonicBrand,
                                             tonic.TonicFlavour
                                         }).ToListAsync();
-
-                    var vm = result.Select(p => new PairingVM()
+                    if (result.Count == 0) {
+                        var vm = new PairingVM();
+                        ViewData["CurrentFilter"] = string.Empty;
+                        vm.Message = $"Sorry, there is no pairing available for \"{firstMatch.Distillery} {firstMatch.GinName}\". \n Try searching again, or add one to our collection.";
+                        return View(vm);
+                    }
+                    else
                     {
-                        TonicBrand = p.TonicBrand,
-                        TonicFlavour = p.TonicFlavour,
-                        GinName = firstMatch.GinName,
-                        Distillery = firstMatch.Distillery
-                    }).ToList();
-
-                    Random random = new Random();
-                    int r = random.Next(0, vm.Count);
-                    ViewData["CurrentFilter"] = vm[r].Distillery + " " + vm[r].GinName;
-                    vm[r].Message = $"Try pairing {vm[r].Distillery} {vm[r].GinName} gin with a {vm[r].TonicBrand} {vm[r].TonicFlavour} tonic!";
-                    return View(vm[r]);
+                        var vm = result.Select(p => new PairingVM()
+                        {
+                            TonicBrand = p.TonicBrand,
+                            TonicFlavour = p.TonicFlavour,
+                            GinName = firstMatch.GinName,
+                            Distillery = firstMatch.Distillery
+                        }).ToList();
+                    
+                        Random random = new Random();
+                        int r = random.Next(0, vm.Count);
+                        ViewData["CurrentFilter"] = vm[r].Distillery + " " + vm[r].GinName;
+                        vm[r].Message = $"Try pairing {vm[r].Distillery} {vm[r].GinName} gin with a {vm[r].TonicBrand} {vm[r].TonicFlavour} tonic!";
+                        return View(vm[r]);
+                    }
                 }
             }
         }
@@ -220,6 +228,7 @@ namespace GinPair.Controllers
         {
             return RedirectToAction("AddGnt", "Home");
         }
+        //TODO: logic below needs reviewing 
         public bool IsGinPresent(string ginName, string distillery)
         {
             bool ginExists = gpdb.Gins.Any(m => m.GinName == ginName) && gpdb.Gins.Any(m => m.Distillery == distillery);
