@@ -1,0 +1,19 @@
+﻿  @model GinPair.Models.NotifyUserPairingVM  
+  @{  
+      ViewData["Title"] = "NotifyUserPairing";  
+  }  
+
+  <h1>Submission successful</h1>  
+  <hr/>  
+
+  <div class="text-center">  
+      <h1 class="display-4">Thank you</h1>  
+      @if(!string.IsNullOrEmpty(@Model.Message)){  
+          <p>@Model.Message</p>  
+      }  
+
+      @using (Html.BeginForm("NotifyUserPairing", "Home", FormMethod.Post))  
+      {  
+          <input class="btn btn-primary" type="submit" value="Pair another gin and tonic">  
+      }  
+  </div>  

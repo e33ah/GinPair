@@ -2,7 +2,6 @@ using System.Diagnostics;
 using GinPair.Data;
 using GinPair.Migrations;
 using GinPair.Models;
-using GinPair.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;

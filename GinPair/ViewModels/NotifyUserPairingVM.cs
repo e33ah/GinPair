@@ -1,4 +1,4 @@
-﻿namespace GinPair.ViewModels
+﻿namespace GinPair.Models
 {
     internal class NotifyUserPairingVM
     {
