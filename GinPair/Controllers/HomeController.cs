@@ -159,7 +159,7 @@ namespace GinPair.Controllers
                 return RedirectToAction("NotifyUserTonic", "Home", new { id = ton.TonicId });
             }
             // Add Pairing
-            else if (vm.GinId.ToString() != null)
+            else if (vm.GinId != 0)
             {
                 Pairing p = new()
                 {
