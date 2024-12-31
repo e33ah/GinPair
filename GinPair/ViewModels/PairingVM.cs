@@ -1,6 +1,6 @@
 ﻿namespace GinPair.Models
 {
-    internal class PairingVM
+    public class PairingVM
     {
         public string GinName { get; set; }
         public string Distillery { get; set; }
