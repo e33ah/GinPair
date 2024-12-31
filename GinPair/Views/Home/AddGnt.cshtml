@@ -28,16 +28,8 @@
                             @Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original" }) </p>
                         <p>Short Description: <br />
                             @Html.TextAreaFor(m => m.GinDescription) </p> 
-                        <p>Tonic Pairing: <br />
-                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours,"Select a tonic", new { id = "tonicPairing" } ) <br />
-                            If you want to add a tonic pairing later, check the box @Html.CheckBoxFor(m => m.AddPairingLater, new {@class="form-control-check", id="pairLater"}) </p>
-                        <input class="btn btn-primary" type="submit" value="Add Gin"> 
+                         <input class="btn btn-primary" type="submit" value="Add Gin"> 
                     }
-                    <script>
-                        document.getElementById("pairLater").addEventListener("change", function () {
-                            document.getElementById("tonicPairing").disabled = this.checked;
-                        });
-                    </script>
                 </div>
             </div>
         </div>
