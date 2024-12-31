@@ -6,15 +6,15 @@
 <h1>Found something missing?</h1>
 <h2>Add it here!</h2>
 <div class="container mt-4">
-	<div id="accordian">
-        <div class="card">
-            <div class="card-header" id="addGinHeader">
-                <button class="btn" type="button" data-toggle="collapse" data-target="#addGinForm" aria-expanded="true" aria-controls="addGinForm">
-                    <h4 class="mb-0">Add Gin</h4>
-                </button>
-            </div>
-            <div class="collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-parent="#acccordian">
-                <div class="card-body">
+	<div class="accordion" id="accordion">
+        <div class="accordion-item">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addGinForm" aria-expanded="true" aria-controls="addGinForm">
+			    <h4 class="accordion-header" id="addGinHeader">
+                    Add Gin
+                </h4>
+            </button>
+            <div class="collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#acccordion">
+                <div class="accordion-body">
                     @if(Model.IsGinInvalid){
                         <p class="text-danger">This gin is already part of our collection!</p>
                     }
@@ -40,13 +40,15 @@
                     </script>
                 </div>
             </div>
-            <div class="card-header" id="addPairingHeader">
-                <button class ="btn" type="button" data-toggle="collapse" data-target="#addTonicForm" aria-expanded="true" aria-controls="addPairingForm">
-                    <h4 class="mb-0">Add Pairing</h4>
-                </button>
-            </div>
-            <div class="accordion-collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-parent="#acccordian">
-                <div class="card-body">
+        </div>
+        <div class="accordion-item">
+            <button class ="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="false" aria-controls="addPairingForm">
+                <h4 class="accordion-header" id="addPairingHeader">
+                    Add Pairing
+                </h4>
+            </button>
+            <div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#acccordian">
+                <div class="accordion-body">
                     <p class="mb-2">Select a gin and tonic to pair together</p>
                     @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
                     {
@@ -59,13 +61,15 @@
                     }
                 </div>
             </div>
-            <div class="card-header" id="addTonicHeader">
-                <button class ="btn" type="button" data-toggle="collapse" data-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
-                    <h4 class="mb-0">Add Tonic</h4>
-                </button>
-            </div>
-            <div class="collapse show" id="addTonicForm" aria-labelledby="addTonicHeader" data-parent="#acccordian">
-                <div class="card-body">
+        </div>
+        <div class="accordion-item">
+            <button class ="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
+                <h4 class="accordion-header" id="addTonicHeader">
+                    Add Tonic
+                </h4>
+            </button>
+            <div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#acccordion">
+                 <div class="accordion-body">
                     @if (Model.IsTonicInvalid)
                     {
                         <p class="text-danger">This tonic is already part of our collection!</p>
@@ -86,4 +90,5 @@
         </div>
     </div>
 </div>
+
 
