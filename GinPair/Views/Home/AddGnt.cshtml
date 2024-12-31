@@ -18,8 +18,7 @@
                     @if(Model.IsGinInvalid){
                         <p class="text-danger">This gin is already part of our collection!</p>
                     }
-                    Add a gin to our collection
-
+                    <p class="mb-2">Add a gin to our collection</p>
                     @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
                     { 
                         <p>Distillery / Brand:  *<br />
@@ -28,7 +27,7 @@
                             @Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original" }) </p>
                         <p>Short Description: <br />
                             @Html.TextAreaFor(m => m.GinDescription) </p> 
-                         <input class="btn btn-primary" type="submit" value="Add Gin"> 
+                        <input class="btn btn-primary" type="submit" value="Add Gin"> 
                     }
                 </div>
             </div>
@@ -47,8 +46,7 @@
                         <p>Gin to pair: <br />
                             @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin") </p>
                         <p>Tonic: <br />
-                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic") </p>
-                           
+                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic") </p>  
                         <input class="btn btn-primary" type="submit" value="Pair">
                     }
                 </div>
@@ -69,10 +67,10 @@
                     <p class="mb-2">Add a new tonic to our collection</p>
                     @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
                     {
-                        <p>Tonic Brand: <br />
+                        <p>Tonic Brand:    *<br />
                             @Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree" })
                         </p>
-                        <p>Tonic Flavour: <br />
+                        <p>Tonic Flavour:  *<br />
                             @Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian" })
                         </p>
                         <input class="btn btn-primary" type="submit" value="Add Tonic">
