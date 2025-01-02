@@ -1,0 +1,115 @@
+﻿@model GinPair.Models.DeleteGntVM
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Found something wrong?</h1>
+<h2>Remove it here!</h2>
+<div class="container mt-4">
+    <div class="accordion" id="accordion">
+        <div class="accordion-item">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deleteGinForm" aria-expanded="true" aria-controls="deleteGinForm">
+				<h4 class ="accordion-header" id="deleteGinHeader">
+                    Remove Gin
+                </h4>
+            </button>
+            <div class="accordion-collapse collapse show" id="deleteGinForm" aria-labelledby="deleteGinHeader" data-bs-parent="#accordion">
+                <div class="accordion-body">
+                    <p>Gin to remove: <br />
+                        @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin", new { @id = "ginDropDown", @class = "form-select mt-1 w-50" })
+                    </p>
+                     <button class="btn btn-danger" id="ginDeleteButton" data-bs-toggle="modal" data-bs-target="#deleteGinModal">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deleteTonicForm" aria-expanded="true" aria-controls="deleteTonicForm">
+				<h4 class ="accordion-header" id="deleteTonicHeader">
+                    Remove Tonic
+                </h4>
+            </button>
+            <div class="accordion-collapse collapse" id="deleteTonicForm" aria-labelledby="deleteTonicHeader" data-bs-parent="#accordion">
+                <div class="accordion-body">
+                    <p>Tonic to remove: <br />
+                        @Html.DropDownListFor(m => m.TonicId, Model.Tonics, "Select tonic", new { @id = "tonicDropDown", @class = "form-select mt-1 w-50" })
+                    </p>
+                     <button class="btn btn-danger" id="tonicDeleteButton" data-bs-toggle="modal" data-bs-target="#deleteTonicModal">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteGinModal" tabindex="-1" role="dialog" aria-labelledby="deleteGinModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGinModalLabel">Remove Gin</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are sure you wish to remove "<span id="selectedGinText"></span>" gin from the collection?</p>
+                @using (Html.BeginForm("DeleteGnt", "Home", FormMethod.Post))
+                {
+                    @Html.HiddenFor(m => Model.GinId, new { @id = "hiddenGinIdToDelete" })
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-danger" value="Remove">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteTonicModal" tabindex="-1" role="dialog" aria-labelledby="deleteTonicModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTonicModalLabel">Remove Tonic</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are sure you wish to remove "<span id="selectedTonicText"></span>" tonic from the collection?</p>
+                @using (Html.BeginForm("DeleteGnt", "Home", FormMethod.Post))
+                {
+                    @Html.HiddenFor(m => Model.TonicId, new { @id = "hiddenTonicIdToDelete" })
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-danger" value="Remove">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("ginDropDown").addEventListener("change", function ()
+    {
+        var selectedGinId = this.value;
+        document.getElementById("hiddenGinIdToDelete").value = selectedGinId;
+
+        var selectedGinText = $("#ginDropDown option:selected").text();
+        $("#selectedGinText").text(selectedGinText);
+    });
+</script>
+
+<script>
+    document.getElementById("tonicDropDown").addEventListener("change", function ()
+    {
+        var selectedTonicId = this.value;
+        document.getElementById("hiddenTonicIdToDelete").value = selectedTonicId;
+
+        var selectedTonicText = $("#tonicDropDown option:selected").text();
+        $("#selectedTonicText").text(selectedTonicText);
+    });
+</script>

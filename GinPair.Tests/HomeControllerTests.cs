@@ -64,7 +64,7 @@ namespace GinPair.Tests
             var viewResult = Assert.IsType<ViewResult>(result);
             var modelResult = Assert.IsType<PairingVM>(viewResult.Model);
             Assert.Equal(
-                "Sorry, a gin matching \"NonExistant\" was not found! \n Try searching again, or add it to our collection.", 
+                "Sorry, a gin matching \"NonExistant\" was not found!<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.", 
                 modelResult.Message
                 );
         }
