@@ -13,52 +13,57 @@
                     Add Gin
                 </h4>
             </button>
-            <div class="collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#acccordion">
+            <div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
                 <div class="accordion-body">
                     @if(Model.IsGinInvalid){
                         <p class="text-danger">This gin is already part of our collection!</p>
                     }
                     <p class="mb-2">Add a gin to our collection</p>
                     @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-                    { 
+                    {
                         <p>Distillery / Brand:  *<br />
-                            @Html.TextBoxFor(m => m.Distillery, new { @placeholder = "e.g. Hendrick's" }) </p>
+                            @Html.TextBoxFor(m => m.Distillery, new { @placeholder = "e.g. Hendrick's", @class = "form-control mt-1 w-50" })
+                        </p>
                         <p>Gin Name / Flavour:  *<br />
-                            @Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original" }) </p>
+                            @Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original", @class = "form-control mt-1 w-50" })
+                        </p>
                         <p>Short Description: <br />
-                            @Html.TextAreaFor(m => m.GinDescription) </p> 
+                            @Html.TextAreaFor(m => m.GinDescription, new { @class = "form-control mt-1 w-50" })
+                        </p>
                         <input class="btn btn-primary" type="submit" value="Add Gin"> 
                     }
                 </div>
             </div>
         </div>
         <div class="accordion-item">
-            <button class ="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="false" aria-controls="addPairingForm">
+            <button class ="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="false" aria-controls="addPairingForm">
                 <h4 class="accordion-header" id="addPairingHeader">
                     Add Pairing
                 </h4>
             </button>
-            <div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#acccordian">
+            <div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
                 <div class="accordion-body">
                     <p class="mb-2">Select a gin and tonic to pair together</p>
                     @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
                     {
                         <p>Gin to pair: <br />
-                            @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin") </p>
-                        <p>Tonic: <br />
-                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic") </p>  
+                            @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin", new { @class = "form-select mt-1 w-50" })
+                        </p>
+                        <p>Tonic to pair: <br />
+                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic", new { @class = "form-select mt-1 w-50" })
+                        </p>
                         <input class="btn btn-primary" type="submit" value="Pair">
                     }
                 </div>
             </div>
         </div>
         <div class="accordion-item">
-            <button class ="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
+            <button class ="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
                 <h4 class="accordion-header" id="addTonicHeader">
                     Add Tonic
                 </h4>
             </button>
-            <div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#acccordion">
+            <div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#accordion">
                  <div class="accordion-body">
                     @if (Model.IsTonicInvalid)
                     {
@@ -68,10 +73,10 @@
                     @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
                     {
                         <p>Tonic Brand:    *<br />
-                            @Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree" })
+                            @Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree", @class = "form-control mt-1 w-50" })
                         </p>
                         <p>Tonic Flavour:  *<br />
-                            @Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian" })
+                            @Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian", @class = "form-control mt-1 w-50" })
                         </p>
                         <input class="btn btn-primary" type="submit" value="Add Tonic">
                     }

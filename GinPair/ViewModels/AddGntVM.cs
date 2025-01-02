@@ -7,7 +7,7 @@ namespace GinPair.Models
         public AddGntVM() { }
         public int GinId { get; set; }
         public string GinName {  get; set; }
-        public string Distillery { get; set; } = string.Empty;
+        public string Distillery { get; set; }
         public string GinDescription { get; set; } = string.Empty;
         public IEnumerable<SelectListItem> Gins { get; set;}
         public Tonic Tonic { get; set; }

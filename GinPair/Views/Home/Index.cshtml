@@ -4,27 +4,28 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
+<div class="container text-center">
     <h1 class="display-4">Welcome to Gin Pair</h1>
     <p class="mt-4">Your ultimate guide to the perfect gin and tonic pairing!<br>
         Find your favorite gin, and we'll show you the perfect tonic pairing.</p>
-    <div>
-        <form asp-action="Index" method="get">
-            <div class="form-group mb-2"> 
-                <input id="ginSearchBox" type="text" name="searchString" placeholder="Start typing a gin..." value="@ViewData["CurrentFilter"]" style="padding:6px; width:300px" />
-                <button id="ginSearchButton" type="submit" class="btn btn-primary ms-2 mb-1">Search</button>
-            </div> 
-        </form>
-    </div>
+    <form asp-action="Index" method="get" class="row d-flex flex-row align-items-center mb-2 justify-content-center">
+        <div class="col-4">
+            <input id="ginSearchBox" type="text" name="searchString" placeholder="Start typing a gin..." value="@ViewData["CurrentFilter"]" class="form-control p-2" />
+        </div>
+        <div class="col-auto">
+            <button id="ginSearchButton" type="submit" class="btn btn-primary">Search</button>
+        </div> 
+    </form>
+    
     @if (!String.IsNullOrEmpty(Model.Message))
     {
-        <p class="mt-4">@Model.Message</p>
+        <p class="mt-4">@Html.Raw(Model.Message)</p>
     }
 </div>
 
 <script>    
     document.getElementById("ginSearchBox").addEventListener("input", function (e) { 
-        var regex = /^[a-zA-Z0-9' ]*$/; 
+        var regex = /^[a-zA-Z0-9'& ]*$/; 
         var input = e.target.value; 
         if (!regex.test(input)) 
         { 

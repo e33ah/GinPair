@@ -7,14 +7,13 @@ namespace GinPair.Models
         public int GinId { get; set; }
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z0-9' ]*$")]
+        [RegularExpression(@"^[a-zA-Z0-9'& ]*$")]
         public string GinName { get; set; }
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z0-9' ]*$")] 
+        [RegularExpression(@"^[a-zA-Z0-9'& ]*$")] 
         public string Distillery { get; set; }
         [StringLength(500)]
-        [RegularExpression(@"^[A-Z]+[a-zA-Z]*$")]
         public string? GinDescription { get; set; }
 
         public ICollection<Pairing> Pairings { get; set; }
