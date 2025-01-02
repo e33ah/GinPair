@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GinPair", "GinPair\GinPair.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GinPair.Tests", "GinPair.Tests\GinPair.Tests.csproj", "{4BEEB98F-8862-4C03-8140-56766BACED7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_Dependencies", "_Dependencies\_Dependencies.csproj", "{88709193-20EF-4880-9DCE-B16FBE699371}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4BEEB98F-8862-4C03-8140-56766BACED7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BEEB98F-8862-4C03-8140-56766BACED7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BEEB98F-8862-4C03-8140-56766BACED7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
