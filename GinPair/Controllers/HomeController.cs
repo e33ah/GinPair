@@ -122,7 +122,8 @@ namespace GinPair.Controllers
                 }
                 _ = gpdb.Gins.Add(gn);
                 _ = gpdb.SaveChanges();
-                return RedirectToAction("NotifyUserGin", "Home", new { id = gn.GinId });
+                TempData["Message"] = $"\"{gn.Distillery} {gn.GinName}\" gin was added successfully!";
+                return RedirectToAction("NotifyUserGin", "Home");
             }
             // Add Tonic
             else if (vm.TonicFlavour != null)
@@ -140,7 +141,8 @@ namespace GinPair.Controllers
                 }
                 _ = gpdb.Tonics.Add(ton);
                 _ = gpdb.SaveChanges();
-                return RedirectToAction("NotifyUserTonic", "Home", new { id = ton.TonicId });
+                TempData["Message"] = $"\"{ton.TonicBrand} {ton.TonicFlavour}\" tonic was added successfully!";
+                return RedirectToAction("NotifyUserGin", "Home");
             }
             // Add Pairing
             else if (vm.GinId != 0)
@@ -152,7 +154,10 @@ namespace GinPair.Controllers
                 };
                 _ = gpdb.Pairings.Add(p);
                 _ = gpdb.SaveChanges();
-                return RedirectToAction("NotifyUserPairing", "Home", new { id = p.PairingId });
+                Tonic pairedTonic = gpdb.Tonics.Find(p.TonicId);
+                Gin pairedGin = gpdb.Gins.Find(p.GinId);
+                TempData["Message"] = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+                return RedirectToAction("NotifyUserGin", "Home");
             }
             else
             {
@@ -204,44 +209,13 @@ namespace GinPair.Controllers
                 return RedirectToAction("DeleteGnt", "Home");
             }
         }
-        public IActionResult NotifyUserGin(int id = 0)
+        public IActionResult NotifyUserGin()
         {
             NotifyUserGinVM vm = new();
-            if (id != 0)
+            string? message = (string)TempData["Message"];
+            if (!string.IsNullOrEmpty(message))
             {
-                var f = gpdb.Gins.FirstOrDefault(e => e.GinId == id);
-                if (f != null)
-                {
-                    vm.Message = $"\"{f.Distillery} {f.GinName}\" gin was added successfully!";
-                }
-            }
-            return View(vm);
-        }
-        public IActionResult NotifyUserTonic(int id = 0)
-        {
-            NotifyUserGinVM vm = new();
-            if (id != 0)
-            {
-                var f = gpdb.Tonics.FirstOrDefault(e => e.TonicId == id);
-                if (f != null)
-                {
-                    vm.Message = $"\"{f.TonicBrand} {f.TonicFlavour}\" tonic was added successfully!";
-                }
-            }
-            return View(vm);
-        }
-        public IActionResult NotifyUserPairing(int id = 0)
-        {
-            NotifyUserGinVM vm = new();
-            if (id != 0)
-            {
-                var f = gpdb.Pairings.FirstOrDefault(e => e.PairingId == id);
-                if (f != null)
-                {
-                    Tonic pairedTonic = gpdb.Tonics.Find(f.TonicId);
-                    Gin pairedGin = gpdb.Gins.Find(f.GinId);
-                    vm.Message = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
-                }
+                vm.Message = message;
             }
             return View(vm);
         }
@@ -255,22 +229,12 @@ namespace GinPair.Controllers
             return View(vm);
         }
         [HttpPost]
-        public IActionResult NotifyUserGin()
-        {
-            return RedirectToAction("AddGnt", "Home");
-        }        
-        [HttpPost]
-        public IActionResult NotifyUserTonic()
-        {
-            return RedirectToAction("AddGnt", "Home");
-        }        
-        [HttpPost]
-        public IActionResult NotifyUserPairing()
+        public IActionResult NotifyUserAddButton()
         {
             return RedirectToAction("AddGnt", "Home");
         }
         [HttpPost]
-        public IActionResult NotifyUserDeleteGin()
+        public IActionResult NotifyUserDeleteButton()
         {
             return RedirectToAction("DeleteGnt", "Home");
         }
