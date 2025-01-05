@@ -33,3 +33,57 @@
         } 
     });
 </script>
+
+<hr />
+<h3><a href="/api/ginapi/">Go to API get</a></h3>
+
+<div>
+    <div id="data"></div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            url: '/api/ginapi',
+            type: 'GET',
+            success: function(response) {
+                $(#data).html(response);
+            },
+            error: function(xhr, status, error){
+                $("#data").html("An error occured: " + error);
+            }
+        });
+    });
+</script>
+    
+
+
+<hr />
+<div>
+    <h3><a href="/api/ginapi/search">Go to API search</a></h3>
+    <input type="text" id="searchbox" />
+    <button id="searchbutton">search</button>
+    <div id="searchresult"></div>
+</div>
+<script>
+    $(document).ready(function(){
+        $("#searchbutton").click(function(){
+            var query1 = $("#searchbox").val();
+            $.ajax({
+                url: '/api/ginapi/search',
+                type: 'GET',
+                data: { query: query1 },
+                success: function(response) {
+                    var resultsHtml = "";
+                    response.forEach(function(item){
+                        resultsHtml += "<p>" + item.name + "</p>";
+                    });
+                    $("#searchresult").html(resultsHtml);
+                },
+                error: function(xhr, status, error){
+                    $("#searchresult").text("An error occured: " + error);
+                }
+            });
+        });
+    });
+</script>

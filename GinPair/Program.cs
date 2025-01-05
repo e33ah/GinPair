@@ -41,6 +41,8 @@ namespace GinPair
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            app.MapControllers();
+
             app.Run();
         }
     }
