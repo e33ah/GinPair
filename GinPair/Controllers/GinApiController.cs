@@ -1,4 +1,5 @@
-﻿using GinPair.Data;
+﻿using System;
+using GinPair.Data;
 using GinPair.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,31 +16,22 @@ namespace GinPair.Controllers
         {
             _context = ginPairContext;
         }
-        //    [HttpGet("{id}")]
-        //    public async Task<ActionResult<Gin>> GetGinById(int id)
-        //    {
-        //        var gin = await _context.Gins.FindAsync(id);
-
-        //        if (gin == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        return Ok(gin);
-        //    }
+        
         [HttpGet]
         public ActionResult Get()
         {
             string message = "Hello World";
             return Ok(message);
         }
-        [HttpGet("search")]
-        public IActionResult Search(string query)
+        [HttpGet("matchGin")]
+        public async Task<IActionResult> MatchGin(string partial)
         {
-            var gins = from g in _context.Gins
-                select g;
-            var results = gins.Where(s => s.GinName.ToUpper().Contains(query.ToUpper())).ToList();
+            var results = await _context.Gins
+                .Where(s => s.GinName.ToUpper().Contains(partial.ToUpper()) || s.Distillery.ToUpper().Contains(partial.ToUpper()))
+                .Take(10)
+                .ToListAsync();
             return Ok(results);
-
         }
+        //TODO: Add get method to get pairing by gin id. Bug: that search will not work with full gin+distillery input
     }
 }
