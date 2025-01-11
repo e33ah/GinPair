@@ -9,277 +9,276 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace GinPair.Migrations
+namespace GinPair.Migrations;
+
+[DbContext(typeof(GinPairDbContext))]
+[Migration("20241218204936_pairingSeedData")]
+partial class pairingSeedData
 {
-    [DbContext(typeof(GinPairDbContext))]
-    [Migration("20241218204936_pairingSeedData")]
-    partial class pairingSeedData
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasDefaultSchema("gp_schema")
-                .HasAnnotation("ProductVersion", "9.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+        modelBuilder
+            .HasDefaultSchema("gp_schema")
+            .HasAnnotation("ProductVersion", "9.0.0")
+            .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+        NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("GinPair.Models.Gin", b =>
-                {
-                    b.Property<int>("GinId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("gin_id");
+        modelBuilder.Entity("GinPair.Models.Gin", b =>
+            {
+                b.Property<int>("GinId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer")
+                    .HasColumnName("gin_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("GinId"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("GinId"));
 
-                    b.Property<string>("Distillery")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar")
-                        .HasColumnName("distillery");
+                b.Property<string>("Distillery")
+                    .HasMaxLength(100)
+                    .HasColumnType("varchar")
+                    .HasColumnName("distillery");
 
-                    b.Property<string>("GinDescription")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar")
-                        .HasColumnName("gin_description");
+                b.Property<string>("GinDescription")
+                    .HasMaxLength(500)
+                    .HasColumnType("varchar")
+                    .HasColumnName("gin_description");
 
-                    b.Property<string>("GinName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar")
-                        .HasColumnName("gin_name");
+                b.Property<string>("GinName")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("varchar")
+                    .HasColumnName("gin_name");
 
-                    b.HasKey("GinId")
-                        .HasName("pk_gins");
+                b.HasKey("GinId")
+                    .HasName("pk_gins");
 
-                    b.ToTable("gins", "gp_schema");
+                b.ToTable("gins", "gp_schema");
 
-                    b.HasData(
-                        new
-                        {
-                            GinId = 1,
-                            Distillery = "Whitley Neill",
-                            GinName = "Rhubarb & Ginger"
-                        },
-                        new
-                        {
-                            GinId = 2,
-                            Distillery = "Whitley Neill",
-                            GinName = "Blood Orange"
-                        },
-                        new
-                        {
-                            GinId = 3,
-                            Distillery = "Caorunn",
-                            GinName = "Scottish Raspberry"
-                        },
-                        new
-                        {
-                            GinId = 4,
-                            Distillery = "Skylark",
-                            GinName = "Lantic"
-                        });
-                });
+                b.HasData(
+                    new
+                    {
+                        GinId = 1,
+                        Distillery = "Whitley Neill",
+                        GinName = "Rhubarb & Ginger"
+                    },
+                    new
+                    {
+                        GinId = 2,
+                        Distillery = "Whitley Neill",
+                        GinName = "Blood Orange"
+                    },
+                    new
+                    {
+                        GinId = 3,
+                        Distillery = "Caorunn",
+                        GinName = "Scottish Raspberry"
+                    },
+                    new
+                    {
+                        GinId = 4,
+                        Distillery = "Skylark",
+                        GinName = "Lantic"
+                    });
+            });
 
-            modelBuilder.Entity("GinPair.Models.LifeEvent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+        modelBuilder.Entity("GinPair.Models.LifeEvent", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer")
+                    .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("EventName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("event_name");
+                b.Property<string>("EventName")
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasColumnName("event_name");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
+                b.Property<int>("Type")
+                    .HasColumnType("integer")
+                    .HasColumnName("type");
 
-                    b.Property<DateTime>("When")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("when");
+                b.Property<DateTime>("When")
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("when");
 
-                    b.HasKey("Id")
-                        .HasName("pk_events");
+                b.HasKey("Id")
+                    .HasName("pk_events");
 
-                    b.ToTable("events", "gp_schema");
-                });
+                b.ToTable("events", "gp_schema");
+            });
 
-            modelBuilder.Entity("GinPair.Models.Meta", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
+        modelBuilder.Entity("GinPair.Models.Meta", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer")
+                    .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasColumnName("description");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("text")
+                    .HasColumnName("name");
 
-                    b.HasKey("Id")
-                        .HasName("pk_metas");
+                b.HasKey("Id")
+                    .HasName("pk_metas");
 
-                    b.ToTable("metas", "gp_schema");
-                });
+                b.ToTable("metas", "gp_schema");
+            });
 
-            modelBuilder.Entity("GinPair.Models.Pairing", b =>
-                {
-                    b.Property<int>("PairingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pairing_id");
+        modelBuilder.Entity("GinPair.Models.Pairing", b =>
+            {
+                b.Property<int>("PairingId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer")
+                    .HasColumnName("pairing_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PairingId"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PairingId"));
 
-                    b.Property<int>("GinId")
-                        .HasColumnType("integer")
-                        .HasColumnName("gin_id");
+                b.Property<int>("GinId")
+                    .HasColumnType("integer")
+                    .HasColumnName("gin_id");
 
-                    b.Property<int>("TonicId")
-                        .HasColumnType("integer")
-                        .HasColumnName("tonic_id");
+                b.Property<int>("TonicId")
+                    .HasColumnType("integer")
+                    .HasColumnName("tonic_id");
 
-                    b.HasKey("PairingId")
-                        .HasName("pk_pairings");
+                b.HasKey("PairingId")
+                    .HasName("pk_pairings");
 
-                    b.HasIndex("GinId")
-                        .HasDatabaseName("ix_pairings_gin_id");
+                b.HasIndex("GinId")
+                    .HasDatabaseName("ix_pairings_gin_id");
 
-                    b.HasIndex("TonicId")
-                        .HasDatabaseName("ix_pairings_tonic_id");
+                b.HasIndex("TonicId")
+                    .HasDatabaseName("ix_pairings_tonic_id");
 
-                    b.ToTable("pairings", "gp_schema");
+                b.ToTable("pairings", "gp_schema");
 
-                    b.HasData(
-                        new
-                        {
-                            PairingId = 1,
-                            GinId = 1,
-                            TonicId = 4
-                        },
-                        new
-                        {
-                            PairingId = 2,
-                            GinId = 2,
-                            TonicId = 3
-                        },
-                        new
-                        {
-                            PairingId = 3,
-                            GinId = 3,
-                            TonicId = 3
-                        },
-                        new
-                        {
-                            PairingId = 4,
-                            GinId = 4,
-                            TonicId = 2
-                        });
-                });
+                b.HasData(
+                    new
+                    {
+                        PairingId = 1,
+                        GinId = 1,
+                        TonicId = 4
+                    },
+                    new
+                    {
+                        PairingId = 2,
+                        GinId = 2,
+                        TonicId = 3
+                    },
+                    new
+                    {
+                        PairingId = 3,
+                        GinId = 3,
+                        TonicId = 3
+                    },
+                    new
+                    {
+                        PairingId = 4,
+                        GinId = 4,
+                        TonicId = 2
+                    });
+            });
 
-            modelBuilder.Entity("GinPair.Models.Tonic", b =>
-                {
-                    b.Property<int>("TonicId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("tonic_id");
+        modelBuilder.Entity("GinPair.Models.Tonic", b =>
+            {
+                b.Property<int>("TonicId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer")
+                    .HasColumnName("tonic_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TonicId"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TonicId"));
 
-                    b.Property<string>("TonicBrand")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar")
-                        .HasColumnName("tonic_brand");
+                b.Property<string>("TonicBrand")
+                    .HasMaxLength(100)
+                    .HasColumnType("varchar")
+                    .HasColumnName("tonic_brand");
 
-                    b.Property<string>("TonicFlavour")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar")
-                        .HasColumnName("tonic_flavour");
+                b.Property<string>("TonicFlavour")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("varchar")
+                    .HasColumnName("tonic_flavour");
 
-                    b.HasKey("TonicId")
-                        .HasName("pk_tonics");
+                b.HasKey("TonicId")
+                    .HasName("pk_tonics");
 
-                    b.ToTable("tonics", "gp_schema");
+                b.ToTable("tonics", "gp_schema");
 
-                    b.HasData(
-                        new
-                        {
-                            TonicId = 1,
-                            TonicBrand = "FeverTree",
-                            TonicFlavour = "Indian"
-                        },
-                        new
-                        {
-                            TonicId = 2,
-                            TonicBrand = "FeverTree",
-                            TonicFlavour = "Light"
-                        },
-                        new
-                        {
-                            TonicId = 3,
-                            TonicBrand = "FeverTree",
-                            TonicFlavour = "Mediterranean"
-                        },
-                        new
-                        {
-                            TonicId = 4,
-                            TonicBrand = "FeverTree",
-                            TonicFlavour = "ElderFlower"
-                        },
-                        new
-                        {
-                            TonicId = 5,
-                            TonicBrand = "FeverTree",
-                            TonicFlavour = "Aromatic"
-                        });
-                });
+                b.HasData(
+                    new
+                    {
+                        TonicId = 1,
+                        TonicBrand = "FeverTree",
+                        TonicFlavour = "Indian"
+                    },
+                    new
+                    {
+                        TonicId = 2,
+                        TonicBrand = "FeverTree",
+                        TonicFlavour = "Light"
+                    },
+                    new
+                    {
+                        TonicId = 3,
+                        TonicBrand = "FeverTree",
+                        TonicFlavour = "Mediterranean"
+                    },
+                    new
+                    {
+                        TonicId = 4,
+                        TonicBrand = "FeverTree",
+                        TonicFlavour = "ElderFlower"
+                    },
+                    new
+                    {
+                        TonicId = 5,
+                        TonicBrand = "FeverTree",
+                        TonicFlavour = "Aromatic"
+                    });
+            });
 
-            modelBuilder.Entity("GinPair.Models.Pairing", b =>
-                {
-                    b.HasOne("GinPair.Models.Gin", "PairedGin")
-                        .WithMany("Pairings")
-                        .HasForeignKey("GinId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_pairings_gins_gin_id");
+        modelBuilder.Entity("GinPair.Models.Pairing", b =>
+            {
+                b.HasOne("GinPair.Models.Gin", "PairedGin")
+                    .WithMany("Pairings")
+                    .HasForeignKey("GinId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired()
+                    .HasConstraintName("fk_pairings_gins_gin_id");
 
-                    b.HasOne("GinPair.Models.Tonic", "PairedTonic")
-                        .WithMany("Pairings")
-                        .HasForeignKey("TonicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_pairings_tonics_tonic_id");
+                b.HasOne("GinPair.Models.Tonic", "PairedTonic")
+                    .WithMany("Pairings")
+                    .HasForeignKey("TonicId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired()
+                    .HasConstraintName("fk_pairings_tonics_tonic_id");
 
-                    b.Navigation("PairedGin");
+                b.Navigation("PairedGin");
 
-                    b.Navigation("PairedTonic");
-                });
+                b.Navigation("PairedTonic");
+            });
 
-            modelBuilder.Entity("GinPair.Models.Gin", b =>
-                {
-                    b.Navigation("Pairings");
-                });
+        modelBuilder.Entity("GinPair.Models.Gin", b =>
+            {
+                b.Navigation("Pairings");
+            });
 
-            modelBuilder.Entity("GinPair.Models.Tonic", b =>
-                {
-                    b.Navigation("Pairings");
-                });
+        modelBuilder.Entity("GinPair.Models.Tonic", b =>
+            {
+                b.Navigation("Pairings");
+            });
 #pragma warning restore 612, 618
-        }
     }
 }

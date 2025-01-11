@@ -11,11 +11,13 @@
     <form asp-action="Index" method="get" class="row d-flex flex-row align-items-center mb-2 justify-content-center">
         <div class="col-4">
             <input id="ginSearchBox" type="text" name="searchString" placeholder="Start typing a gin..." value="@ViewData["CurrentFilter"]" class="form-control p-2" />
+            <input id="ginSelectedId" type="hidden" name="searchId" />
         </div>
         <div class="col-auto">
-            <button id="ginSearchButton" type="submit" class="btn btn-primary">Search</button>
+            <button id="ginSearchButton" type="button" class="btn btn-primary">Search</button>
         </div> 
     </form>
+    <div id="searchResult"></div>
     
     @if (!String.IsNullOrEmpty(Model.Message))
     {
@@ -23,13 +25,83 @@
     }
 </div>
 
-<script>    
-    document.getElementById("ginSearchBox").addEventListener("input", function (e) { 
-        var regex = /^[a-zA-Z0-9'& ]*$/; 
-        var input = e.target.value; 
-        if (!regex.test(input)) 
-        { 
-            e.target.value = input.slice(0, -1); 
-        } 
-    });
+
+@section Scripts 
+{
+    <script type="text/javascript"> 
+        // Validate input
+        document.getElementById("ginSearchBox").addEventListener("input", function (e) { 
+            var regex = /^[a-zA-Z0-9'& ]*$/; 
+            var input = e.target.value; 
+            if (!regex.test(input)) 
+            { 
+                e.target.value = input.slice(0, -1); 
+            } 
+        });
+        // Reset search box and message 
+        document.getElementById("ginSearchBox").addEventListener("click", function(){
+            this.value = "";
+            document.getElementById("searchResult").innerText = "";
+            document.getElementById("ginSelectedId").value = "";
+        });
+        // Enable enter key to trigger search
+        document.getElementById("ginSearchBox").addEventListener("keypress", function(){
+            if(event.key === "Enter"){
+                event.preventDefault();
+                document.getElementById("ginSearchButton").focus();
+                document.getElementById("ginSearchButton").click();
+            }
+        });
+        // Auto complete gin as user types
+        $(document).ready(function(){
+            $("#ginSearchBox").autocomplete({
+                source: function(request, response){
+                    $.ajax({
+                        url: "/api/ginapi/matchGin",
+                        type: "GET",
+                        data: { partial: request.term },
+                        success: function(data) {
+                            response($.map(data, function(item) {
+                                return{
+                                    label: item.distillery + " " + item.ginName,
+                                    value: item.distillery + " " + item.ginName,
+                                    id: item.ginId
+                                };
+                            }));
+                        },
+                        error: function(xhr, status, error){
+                            $("#searchResult").text("An error occured: " + error);
+                        }
+                    });
+                },
+                minLength: 2,
+                autoFocus: true,
+                select: function(event, ui) {
+                    selectedId = ui.item.id;
+                    console.log("selected ginid: "+ selectedId);
+                    $("#ginSelectedId").val(selectedId);
+                }
+            });
+        });
+        // Use ginId to get pairing
+        $("#ginSearchButton").click(function() {
+            var ginSelectedId = $("#ginSelectedId").val();
+            console.log("selected ginid onclick: "+ ginSelectedId);
+            if(ginSelectedId){
+                $.ajax({
+                    url: "/api/ginapi/getPairing/" + ginSelectedId,
+                    type: "GET",
+                    success: function(response){
+                        $("#searchResult").html(response)
+                    },
+                    error: function(){
+                        console.error("An error occured when retrieving pairing");
+                    }
+                });
+            } 
+            else {
+                document.getElementById("searchResult").innerHTML = "<p>Sorry, a gin matching \"" +  document.getElementById("ginSearchBox").value + "\" was not found!<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
+            }
+        });
 </script>
+}

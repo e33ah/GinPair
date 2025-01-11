@@ -1,7 +1,6 @@
-﻿namespace GinPair.Models
+﻿namespace GinPair.Models;
+
+internal class NotifyUserGinVM
 {
-    internal class NotifyUserGinVM
-    {
-        public string? Message { get; internal set; }
-    }
+    public string? Message { get; internal set; }
 }
