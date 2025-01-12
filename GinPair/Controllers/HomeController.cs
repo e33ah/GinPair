@@ -6,13 +6,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace GinPair.Controllers;
-public class HomeController : Controller
+public class HomeController(GinPairDbContext ginPairContext) : Controller
 {
-    protected GinPairDbContext gpdb;
-    public HomeController(GinPairDbContext ginPairContext)
-    {
-        gpdb = ginPairContext;
-    }
+    protected GinPairDbContext gpdb = ginPairContext;
 
     public async Task<IActionResult> Index(string searchstring)
     {
@@ -162,7 +158,10 @@ public class HomeController : Controller
             _ = gpdb.SaveChanges();
             var pairedTonic = gpdb.Tonics.Find(p.TonicId);
             var pairedGin = gpdb.Gins.Find(p.GinId);
-            TempData["Message"] = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+            if (pairedTonic != null && pairedGin != null)
+            {
+                TempData["Message"] = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+            }
             return RedirectToAction("NotifyUserGin", "Home");
         }
         else

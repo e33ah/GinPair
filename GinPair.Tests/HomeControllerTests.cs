@@ -10,7 +10,7 @@ namespace GinPair.Tests;
 
 public class HomeControllerTests
 {
-    private DbContextOptions<GinPairDbContext> GetDbContextOptions()
+    private static DbContextOptions<GinPairDbContext> GetDbContextOptions()
     {
         return new DbContextOptionsBuilder<GinPairDbContext>().UseInMemoryDatabase(databaseName: "TestDatabase").Options;
     }
@@ -52,8 +52,8 @@ public class HomeControllerTests
 
         context.Gins.AddRange(new List<Gin>
         {
-            new Gin {GinId = 1, GinName = "TestName1", Distillery = "TestDis1"},
-            new Gin {GinId = 2, GinName = "TestName2", Distillery = "TestDis2"}
+            new() {GinName = "TestName1", Distillery = "TestDis1"},
+            new() {GinName = "TestName2", Distillery = "TestDis2"}
         });
         context.SaveChanges();
 

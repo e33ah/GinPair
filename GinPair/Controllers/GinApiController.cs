@@ -21,9 +21,13 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
         return Ok(results);
     }
     [HttpGet("getPairing/{ginId}")]
-    public async Task<ActionResult<Gin>> GetPairingByGinId(int ginId)
+    public async Task<IActionResult> GetPairingByGinId(int ginId)
     {
         var ginfind = await _context.Gins.FindAsync(ginId);
+        if (ginfind == null)
+        {
+            return BadRequest();
+        }
         var result = await (from tonic in _context.Tonics
                             join pairing in _context.Pairings on tonic.TonicId equals pairing.TonicId
                             join gin in _context.Gins on pairing.GinId equals gin.GinId

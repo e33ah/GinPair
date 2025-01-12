@@ -45,7 +45,7 @@
             document.getElementById("ginSelectedId").value = "";
         });
         // Enable enter key to trigger search
-        document.getElementById("ginSearchBox").addEventListener("keypress", function(){
+        document.getElementById("ginSearchBox").addEventListener("keypress", function(event){
             if(event.key === "Enter"){
                 event.preventDefault();
                 document.getElementById("ginSearchButton").focus();
@@ -103,5 +103,5 @@
                 document.getElementById("searchResult").innerHTML = "<p>Sorry, a gin matching \"" +  document.getElementById("ginSearchBox").value + "\" was not found!<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
             }
         });
-</script>
+    </script>
 }
