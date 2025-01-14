@@ -9,7 +9,9 @@ public class GetGinTests
 {
     private static DbContextOptions<GinPairDbContext> GetDbContextOptions()
     {
-        return new DbContextOptionsBuilder<GinPairDbContext>().UseInMemoryDatabase(databaseName: "TestDatabase").Options;
+        return new DbContextOptionsBuilder<GinPairDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
     }
 
     [Fact]
@@ -17,6 +19,7 @@ public class GetGinTests
     {
         var options = GetDbContextOptions();
         using var mockContext = new GinPairDbContext(options);
+        mockContext.Gins.RemoveRange(mockContext.Gins);
         mockContext.Gins.AddRange(new List<Gin>
         {
             new() {GinId = 1, GinName = "TestName1", Distillery = "TestDis1"},
@@ -49,6 +52,6 @@ public class GetGinTests
 
         Assert.NotNull(result);
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var message = Assert.IsType<string>(okResult.Value);
+        Assert.IsType<ApiResponse>(okResult.Value);
     }
 }

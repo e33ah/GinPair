@@ -78,7 +78,6 @@
                 autoFocus: true,
                 select: function(event, ui) {
                     selectedId = ui.item.id;
-                    console.log("selected ginid: "+ selectedId);
                     $("#ginSelectedId").val(selectedId);
                 }
             });
@@ -86,13 +85,12 @@
         // Use ginId to get pairing
         $("#ginSearchButton").click(function() {
             var ginSelectedId = $("#ginSelectedId").val();
-            console.log("selected ginid onclick: "+ ginSelectedId);
             if(ginSelectedId){
                 $.ajax({
                     url: "/api/ginapi/getPairing/" + ginSelectedId,
                     type: "GET",
                     success: function(response){
-                        $("#searchResult").html(response)
+                        $("#searchResult").html(response.statusMessage)
                     },
                     error: function(){
                         console.error("An error occured when retrieving pairing");

@@ -1,6 +1,7 @@
 ﻿using GinPair.Data;
 using GinPair.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 
 namespace GinPair.Controllers;
@@ -24,10 +25,13 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
     public async Task<IActionResult> GetPairingByGinId(int ginId)
     {
         var ginfind = await _context.Gins.FindAsync(ginId);
+        var response = new ApiResponse();
+
         if (ginfind == null)
         {
             return BadRequest();
         }
+
         var result = await (from tonic in _context.Tonics
                             join pairing in _context.Pairings on tonic.TonicId equals pairing.TonicId
                             join gin in _context.Gins on pairing.GinId equals gin.GinId
@@ -38,10 +42,9 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
                                 tonic.TonicBrand,
                                 tonic.TonicFlavour
                             }).ToListAsync();
-        string matchMessage = "";
         if (result.Count == 0)
         {
-            matchMessage = $"<p>Sorry, there is no pairing available for \"{ginfind.Distillery} {ginfind.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
+            response.StatusMessage = $"<p>Sorry, there is no pairing available for \"{ginfind.Distillery} {ginfind.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
         }
         else
         {
@@ -55,8 +58,8 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
                 TonicBrand = result[r].TonicBrand,
                 TonicFlavour = result[r].TonicFlavour,
             };
-            matchMessage = $"Try pairing {pairingResult.Distillery} {pairingResult.GinName} gin with<br>a {pairingResult.TonicBrand} {pairingResult.TonicFlavour} tonic!";
+            response.StatusMessage = $"Try pairing {pairingResult.Distillery} {pairingResult.GinName} gin with<br>a {pairingResult.TonicBrand} {pairingResult.TonicFlavour} tonic!";
         }
-        return Ok(matchMessage);
+        return Ok(response);
     }
 }
