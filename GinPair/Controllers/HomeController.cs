@@ -10,61 +10,12 @@ public class HomeController(GinPairDbContext ginPairContext) : Controller
 {
     protected GinPairDbContext gpdb = ginPairContext;
 
-    public async Task<IActionResult> Index(string searchstring)
+    public IActionResult Index(string? searchString)
     {
         var gins = from g in gpdb.Gins
                    select g;
-        //if (String.IsNullOrEmpty(searchstring))
-        //{
         var vm = new PairingVM();
         return View(vm);
-        // TO BE DELETED?
-        //}
-        //else
-        //{
-        //    gins = gins.Where(s => s.GinName.ToUpper().Contains(searchstring.ToUpper()) || s.Distillery.ToUpper().Contains(searchstring.ToUpper()));
-        //    var ginList = gins.ToList();
-        //    if (ginList.Count == 0)
-        //    {
-        //        var vm = new PairingVM();
-        //        vm.Message = $"Sorry, a gin matching \"{searchstring}\" was not found!<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.";
-        //        return View(vm);
-        //    }
-        //    else
-        //    {
-        //        Gin firstMatch = ginList.FirstOrDefault();
-        //        int ginId = firstMatch.GinId; //TODO: this is currently hard coded. needs fixing for multiple returns
-        //        var result = await (from tonic in gpdb.Tonics
-        //                            join pairing in gpdb.Pairings on tonic.TonicId equals pairing.TonicId
-        //                            join gin in gpdb.Gins on pairing.GinId equals gin.GinId
-        //                            where gin.GinId == ginId
-        //                            select new
-        //                            {
-        //                                tonic.TonicBrand,
-        //                                tonic.TonicFlavour
-        //                            }).ToListAsync();
-        //        if (result.Count == 0) {
-        //            var vm = new PairingVM();
-        //            vm.Message = $"Sorry, there is no pairing available for \"{firstMatch.Distillery} {firstMatch.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.";
-        //            return View(vm);
-        //        }
-        //        else
-        //        {
-        //            var vm = result.Select(p => new PairingVM()
-        //            {
-        //                TonicBrand = p.TonicBrand,
-        //                TonicFlavour = p.TonicFlavour,
-        //                GinName = firstMatch.GinName,
-        //                Distillery = firstMatch.Distillery
-        //            }).ToList();
-                
-        //            Random random = new Random();
-        //            int r = random.Next(0, vm.Count);
-        //            vm[r].Message = $"Try pairing {vm[r].Distillery} {vm[r].GinName} gin with <br>a {vm[r].TonicBrand} {vm[r].TonicFlavour} tonic!";
-        //            return View(vm[r]);
-        //        }
-        //    }
-        //}
     }
 
     public IActionResult Privacy()

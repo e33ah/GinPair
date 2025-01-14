@@ -31,7 +31,7 @@ public class GetGinTests
         var result = await controller.MatchGin("Test");
 
         Assert.NotNull(result);
-        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.IsType<OkObjectResult>(result);
     }
     [Fact]
     public async Task GetPairingById_ReturnsOk()
