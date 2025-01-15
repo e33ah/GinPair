@@ -17,12 +17,7 @@
             <button id="ginSearchButton" type="button" class="btn btn-primary">Search</button>
         </div> 
     </form>
-    <div id="searchResult"></div>
-    
-    @if (!String.IsNullOrEmpty(Model.Message))
-    {
-        <p class="mt-4">@Html.Raw(Model.Message)</p>
-    }
+    <div id="searchResult" class="container mt-4 col-4"></div>
 </div>
 
 
@@ -43,6 +38,7 @@
             this.value = "";
             document.getElementById("searchResult").innerText = "";
             document.getElementById("ginSelectedId").value = "";
+            $("#searchResult").removeClass("alert alert-warning alert-primary");
         });
         // Enable enter key to trigger search
         document.getElementById("ginSearchBox").addEventListener("keypress", function(event){
@@ -90,7 +86,8 @@
                     url: "/api/ginapi/getPairing/" + ginSelectedId,
                     type: "GET",
                     success: function(response){
-                        $("#searchResult").html(response.statusMessage)
+                        $("#searchResult").html(response.statusMessage);
+                        $("#searchResult").addClass("alert alert-primary");
                     },
                     error: function(){
                         console.error("An error occured when retrieving pairing");
@@ -99,6 +96,7 @@
             } 
             else {
                 document.getElementById("searchResult").innerHTML = "<p>Sorry, a gin matching \"" +  document.getElementById("ginSearchBox").value + "\" was not found!<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
+                $("#searchResult").addClass("alert alert-warning");
             }
         });
     </script>
