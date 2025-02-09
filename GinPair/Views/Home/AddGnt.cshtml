@@ -107,7 +107,7 @@
 			var distillery = $("#distilleryInput").val();
 			console.log("button clicked");
 			$.ajax({
-				url: "api/ginapi/addGin/",
+				url: "/api/ginapi/addGin/",
 				type: "POST",
 				success: function(response){
 					$("#addGinResult").html(response.statusMessage);
