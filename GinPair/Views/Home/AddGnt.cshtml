@@ -1,89 +1,121 @@
-﻿  @model GinPair.Models.AddGntVM 
-  @{ 
-      ViewData["Title"] = "Add"; 
-  }
+﻿  @model GinPair.Models.AddGntVM
+@{
+	ViewData["Title"] = "Add";
+}
 
 <h1>Found something missing?</h1>
 <h2>Add it here!</h2>
 <div class="container mt-4">
 	<div class="accordion" id="accordion">
-        <div class="accordion-item">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addGinForm" aria-expanded="true" aria-controls="addGinForm">
-			    <h4 class="accordion-header" id="addGinHeader">
-                    Add Gin
-                </h4>
-            </button>
-            <div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
-                <div class="accordion-body">
-                    @if(Model.IsGinInvalid){
-                        <p class="text-danger">This gin is already part of our collection!</p>
-                    }
-                    <p class="mb-2">Add a gin to our collection</p>
-                    @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-                    {
-                        <p>Distillery / Brand:  *<br />
-                            @Html.TextBoxFor(m => m.Distillery, new { @placeholder = "e.g. Hendrick's", @class = "form-control mt-1 w-50" })
-                        </p>
-                        <p>Gin Name / Flavour:  *<br />
-                            @Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original", @class = "form-control mt-1 w-50" })
-                        </p>
-                        <p>Short Description: <br />
-                            @Html.TextAreaFor(m => m.GinDescription, new { @class = "form-control mt-1 w-50" })
-                        </p>
-                        <input class="btn btn-primary" type="submit" value="Add Gin"> 
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <button class ="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="false" aria-controls="addPairingForm">
-                <h4 class="accordion-header" id="addPairingHeader">
-                    Add Pairing
-                </h4>
-            </button>
-            <div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
-                <div class="accordion-body">
-                    <p class="mb-2">Select a gin and tonic to pair together</p>
-                    @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-                    {
-                        <p>Gin to pair: <br />
-                            @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin", new { @class = "form-select mt-1 w-50" })
-                        </p>
-                        <p>Tonic to pair: <br />
-                            @Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic", new { @class = "form-select mt-1 w-50" })
-                        </p>
-                        <input class="btn btn-primary" type="submit" value="Pair">
-                    }
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <button class ="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
-                <h4 class="accordion-header" id="addTonicHeader">
-                    Add Tonic
-                </h4>
-            </button>
-            <div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#accordion">
-                 <div class="accordion-body">
-                    @if (Model.IsTonicInvalid)
-                    {
-                        <p class="text-danger">This tonic is already part of our collection!</p>
-                    }
-                    <p class="mb-2">Add a new tonic to our collection</p>
-                    @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-                    {
-                        <p>Tonic Brand:    *<br />
-                            @Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree", @class = "form-control mt-1 w-50" })
-                        </p>
-                        <p>Tonic Flavour:  *<br />
-                            @Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian", @class = "form-control mt-1 w-50" })
-                        </p>
-                        <input class="btn btn-primary" type="submit" value="Add Tonic">
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addGinForm" aria-expanded="true" aria-controls="addGinForm">
+				<h4 class="accordion-header" id="addGinHeader">
+					Add Gin
+				</h4>
+			</button>
+			<div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
+				<div id="addGinResult" class="container mt-4 col-4"></div>
+				<div class="accordion-body">
+					@if (Model.IsGinInvalid)
+					{
+						<p class="text-danger">This gin is already part of our collection!</p>
+					}
+					<p class="mb-2">Add a gin to our collection</p>
+					@* @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post)) *@
+					<form asp-action="AddGin" method="post">
+
+
+						<p>
+							Distillery / Brand:  *<br />
+							@* @Html.TextBoxFor(m => m.Distillery, new { @placeholder = "e.g. Hendrick's", @class = "form-control mt-1 w-50" }) *@
+							<input id="distilleryInput" type="text" placeholder="e.g. Hendrick's" class="form-control mt-1 w-50" />
+
+						</p>
+						<p>
+							Gin Name / Flavour:  *<br />
+							@Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original", @class = "form-control mt-1 w-50" })
+						</p>
+						<p>
+							Short Description: <br />
+							@Html.TextAreaFor(m => m.GinDescription, new { @class = "form-control mt-1 w-50" })
+						</p>
+
+						@* <input class="btn btn-primary" id="addGinButton" type="submit" value="Add Gin"> *@
+						<button id="addGinButton" type="button" class="btn btn-primary">Add</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="false" aria-controls="addPairingForm">
+				<h4 class="accordion-header" id="addPairingHeader">
+					Add Pairing
+				</h4>
+			</button>
+			<div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
+				<div class="accordion-body">
+					<p class="mb-2">Select a gin and tonic to pair together</p>
+					@using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
+					{
+						<p>
+							Gin to pair: <br />
+							@Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin", new { @class = "form-select mt-1 w-50" })
+						</p>
+						<p>
+							Tonic to pair: <br />
+							@Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic", new { @class = "form-select mt-1 w-50" })
+						</p>
+						<input class="btn btn-primary" type="submit" value="Pair">
+					}
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addTonicForm" aria-expanded="false" aria-controls="addTonicForm">
+				<h4 class="accordion-header" id="addTonicHeader">
+					Add Tonic
+				</h4>
+			</button>
+			<div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#accordion">
+				<div class="accordion-body">
+					@if (Model.IsTonicInvalid)
+					{
+						<p class="text-danger">This tonic is already part of our collection!</p>
+					}
+					<p class="mb-2">Add a new tonic to our collection</p>
+					@using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
+					{
+						<p>
+							Tonic Brand:    *<br />
+							@Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree", @class = "form-control mt-1 w-50" })
+						</p>
+						<p>
+							Tonic Flavour:  *<br />
+							@Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian", @class = "form-control mt-1 w-50" })
+						</p>
+						<input class="btn btn-primary" type="submit" value="Add Tonic">
+					}
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
-
+@section Scripts {
+	<script type="text/javascript">
+		$("#addGinButton").click(function() {
+			var distillery = $("#distilleryInput").val();
+			console.log("button clicked");
+			$.ajax({
+				url: "api/ginapi/addGin/",
+				type: "POST",
+				success: function(response){
+					$("#addGinResult").html(response.statusMessage);
+				},
+				error: function(){
+					console.log("An error occured in api.")
+				}
+			});
+		});
+	</script>
+}
