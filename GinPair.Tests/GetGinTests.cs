@@ -1,10 +1,4 @@
-﻿using GinPair.Controllers;
-using GinPair.Data;
-using GinPair.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-namespace GinPair.Tests;
+﻿namespace GinPair.Tests;
 public class GetGinTests
 {
     private static DbContextOptions<GinPairDbContext> GetDbContextOptions()

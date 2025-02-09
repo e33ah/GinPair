@@ -1,11 +1,4 @@
-using GinPair.Controllers;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GinPair.Models;
-using GinPair.Data;
-
 namespace GinPair.Tests;
-
 public class HomeControllerTests
 {
     private static DbContextOptions<GinPairDbContext> GetDbContextOptions()
@@ -45,5 +38,3 @@ public class HomeControllerTests
         Assert.Null(viewResult.ViewName); 
     }
 }
-
-
