@@ -14,33 +14,26 @@
 				</h4>
 			</button>
 			<div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
-				<div id="addGinResult" class="container mt-4 col-4"></div>
 				<div class="accordion-body">
 					@if (Model.IsGinInvalid)
 					{
 						<p class="text-danger">This gin is already part of our collection!</p>
 					}
+					<p id="addGinResult" class="container text-warning"></p>
 					<p class="mb-2">Add a gin to our collection</p>
-					@* @using (Html.BeginForm("AddGnt", "Home", FormMethod.Post)) *@
 					<form asp-action="AddGin" method="post">
-
-
 						<p>
-							Distillery / Brand:  *<br />
-							@* @Html.TextBoxFor(m => m.Distillery, new { @placeholder = "e.g. Hendrick's", @class = "form-control mt-1 w-50" }) *@
-							<input id="distilleryInput" type="text" placeholder="e.g. Hendrick's" class="form-control mt-1 w-50" />
-
+							Distillery / Brand:  *
+							<input id="distilleryInput" type="text" placeholder="e.g. Hendrick's" class="form-control w-50" />
 						</p>
 						<p>
-							Gin Name / Flavour:  *<br />
-							@Html.TextBoxFor(m => m.GinName, new { @placeholder = "e.g. Original", @class = "form-control mt-1 w-50" })
+							Gin Name / Flavour:  *
+							<input id="ginNameInput" type="text" placeholder="e.g. Original" class="form-control w-50" />
 						</p>
 						<p>
-							Short Description: <br />
-							@Html.TextAreaFor(m => m.GinDescription, new { @class = "form-control mt-1 w-50" })
+							Short Description:
+							<textarea id="descriptionInput" type="text" class="form-control mt-1 w-50" ></textarea>
 						</p>
-
-						@* <input class="btn btn-primary" id="addGinButton" type="submit" value="Add Gin"> *@
 						<button id="addGinButton" type="button" class="btn btn-primary">Add</button>
 					</form>
 				</div>
@@ -103,12 +96,22 @@
 
 @section Scripts {
 	<script type="text/javascript">
-		$("#addGinButton").click(function() {
+		$("#addGinButton").click(function(data) {
+			var ginName = $("#ginNameInput").val();
+			console.log(ginName);
 			var distillery = $("#distilleryInput").val();
+			console.log(distillery);
+			var description = $("#descriptionInput").val();
 			console.log("button clicked");
 			$.ajax({
 				url: "/api/ginapi/addGin/",
 				type: "POST",
+				contentType: "application/problem+json; charset=utf-8",
+				data: JSON.stringify({
+					ginName: ginName,
+					distillery: distillery,
+					description: description
+				}),
 				success: function(response){
 					$("#addGinResult").html(response.statusMessage);
 				},

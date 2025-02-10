@@ -1,7 +1,7 @@
-﻿using GinPair.Data;
+﻿using System.Text.Json;
+using GinPair.Data;
 using GinPair.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 
 namespace GinPair.Controllers;
@@ -61,44 +61,50 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
         }
         return Ok(response);
     }
-    [HttpPost("addGin")]
-    public IActionResult AddGin()
-    {
-        return Ok();
-    }
-
     //[HttpPost("addGin")]
-    //public IActionResult AddGin(string ginName, string distillery, string ginDescription)
+    //public IActionResult AddGin(string ginName/*, string distillery, string? ginDescription*/)
+    //public IActionResult AddGin([FromBody] JsonElement data/*string ginName, string distillery, string? ginDescription*/)
     //{
-    //    Gin gn = new()
-    //    {
-    //        GinName = ginName,
-    //        Distillery = distillery,
-    //        GinDescription = ginDescription
-    //    };
-    //    var response = new ApiResponse();
-    //    if (IsGinPresent(gn.GinName, gn.Distillery))
-    //    {
-    //        response.StatusMessage = "This gin is already part of our collection!";
-    //        return Ok(response);
-    //        // TODO: still return a notify user page or just have a success message appear?
-    //    }
-    //    try
-    //    {
-    //        _ = _context.Gins.Add(gn);
-    //        _ = _context.SaveChanges();
-    //        response.StatusMessage = $"\"{gn.Distillery} {gn.GinName}\" gin was added successfully!";
-    //        return Ok(response);
-    //    }
-    //    catch (DbUpdateException ex)
-    //    {
-    //        Console.WriteLine(ex.Message);
-    //        return BadRequest();
-    //    }
+    //    return Ok();
     //}
-    //public bool IsGinPresent(string ginName, string distillery)
-    //{
-    //    bool ginExists = _context.Gins.Any(m => m.GinName == ginName && m.Distillery == distillery);
-    //    return ginExists;
-    //}
+
+    [HttpPost("addGin")]
+    public IActionResult AddGin([FromBody] JsonElement data)
+    {
+        if (!data.TryGetProperty("ginName", out JsonElement ginNameElement) ||
+            !data.TryGetProperty("distillery", out JsonElement distilleryElement))
+        {
+            return BadRequest();
+        }
+        Gin gn = new()
+        {
+            GinName = data.GetProperty("ginName").GetString(),
+            Distillery = data.GetProperty("distillery").GetString(),
+            GinDescription = data.GetProperty("description").GetString()
+        };
+        var response = new ApiResponse();
+        if (IsGinPresent(gn.GinName, gn.Distillery))
+        {
+            response.StatusMessage = "This gin is already part of our collection!";
+            return Ok(response);
+            // TODO: still return a notify user page or just have a success message appear?
+        }
+        try
+        {
+            _ = _context.Gins.Add(gn);
+            _ = _context.SaveChanges();
+            response.StatusMessage = $"\"{gn.Distillery} {gn.GinName}\" gin was added successfully!";
+            return Ok(response);
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
+    }
+    public bool IsGinPresent(string ginName, string distillery)
+    {
+        bool ginExists = _context.Gins.Any(m => m.GinName == ginName && m.Distillery == distillery);
+        return ginExists;
+    }
 }
