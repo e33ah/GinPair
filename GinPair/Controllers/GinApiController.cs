@@ -1,7 +1,7 @@
-﻿using GinPair.Data;
+﻿using System.Text.Json;
+using GinPair.Data;
 using GinPair.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 
 namespace GinPair.Controllers;
@@ -38,7 +38,6 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
                             where gin.GinId == ginfind.GinId
                             select new
                             {
-                                tonic.TonicId,
                                 tonic.TonicBrand,
                                 tonic.TonicFlavour
                             }).ToListAsync();
@@ -61,5 +60,45 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
             response.StatusMessage = $"Try pairing {pairingResult.Distillery} {pairingResult.GinName} gin with<br>a {pairingResult.TonicBrand} {pairingResult.TonicFlavour} tonic!";
         }
         return Ok(response);
+    }
+
+    [HttpPost("addGin")]
+    public IActionResult AddGin([FromBody] JsonElement data)
+    {
+        var response = new ApiResponse();
+        string? ginName = data.GetProperty("ginName").GetString();
+        string? distillery = data.GetProperty("distillery").GetString();
+        string? description = data.GetProperty("description").GetString();
+
+        if (string.IsNullOrEmpty(ginName) || string.IsNullOrEmpty(distillery)) {
+            response.StatusMessage = "Please provide the name of the Distillery and Gin.";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+        if (IsGinPresent(ginName, distillery)) {
+            response.StatusMessage = "Sorry this gin cannot be added as it is already part of our collection!";
+            response.BsColor = BsColor.Danger;
+            return Ok(response);
+        }
+        try {
+            _ = _context.Gins.Add(new Gin {
+                GinName = ginName,
+                Distillery = distillery,
+                GinDescription = description
+            });
+            _ = _context.SaveChanges();
+            response.StatusMessage = $"✅ Success! \"{distillery} {ginName}\" gin was added!";
+            response.BsColor = BsColor.Success;
+            return Ok(response);
+        }
+        catch (DbUpdateException ex) {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
+    }
+    public bool IsGinPresent(string ginName, string distillery)
+    {
+        bool ginExists = _context.Gins.Any(m => m.GinName == ginName && m.Distillery == distillery);
+        return ginExists;
     }
 }
