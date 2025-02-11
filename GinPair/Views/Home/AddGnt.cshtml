@@ -15,11 +15,7 @@
 			</button>
 			<div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
-					@if (Model.IsGinInvalid)
-					{
-						<p class="text-danger">This gin is already part of our collection!</p>
-					}
-					<p id="addGinResult" class="container text-warning"></p>
+					<p id="addGinResult" class="container"></p>
 					<p class="mb-2">Add a gin to our collection</p>
 					<form asp-action="AddGin" method="post">
 						<p>
@@ -32,7 +28,7 @@
 						</p>
 						<p>
 							Short Description:
-							<textarea id="descriptionInput" type="text" class="form-control mt-1 w-50" ></textarea>
+							<textarea id="descriptionInput" type="text" class="form-control mt-1 w-50"></textarea>
 						</p>
 						<button id="addGinButton" type="button" class="btn btn-primary">Add</button>
 					</form>
@@ -96,6 +92,15 @@
 
 @section Scripts {
 	<script type="text/javascript">
+		// Reset message
+		function ResetMessage() {
+			document.getElementById("addGinResult").innerText = "";
+			$("#addGinResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+		};
+		document.getElementById("ginNameInput").addEventListener("click", ResetMessage);
+		document.getElementById("distilleryInput").addEventListener("click", ResetMessage);
+		document.getElementById("descriptionInput").addEventListener("click", ResetMessage);
+		// Add Gin
 		$("#addGinButton").click(function(data) {
 			var ginName = $("#ginNameInput").val();
 			console.log(ginName);
@@ -114,6 +119,20 @@
 				}),
 				success: function(response){
 					$("#addGinResult").html(response.statusMessage);
+					switch(response.bsColor){
+						case 1:
+							$("#addGinResult").addClass("alert alert-success");
+							$("#ginNameInput").val("");
+							$("#distilleryInput").val("");
+							$("#descriptionInput").val("");
+							break;
+						case 2:
+							$("#addGinResult").addClass("alert alert-warning");
+							break;
+						case 3:
+							$("#addGinResult").addClass("alert alert-danger");
+							break;
+					}
 				},
 				error: function(){
 					console.log("An error occured in api.")

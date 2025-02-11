@@ -61,43 +61,37 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
         }
         return Ok(response);
     }
-    //[HttpPost("addGin")]
-    //public IActionResult AddGin(string ginName/*, string distillery, string? ginDescription*/)
-    //public IActionResult AddGin([FromBody] JsonElement data/*string ginName, string distillery, string? ginDescription*/)
-    //{
-    //    return Ok();
-    //}
 
     [HttpPost("addGin")]
     public IActionResult AddGin([FromBody] JsonElement data)
     {
-        if (!data.TryGetProperty("ginName", out JsonElement ginNameElement) ||
-            !data.TryGetProperty("distillery", out JsonElement distilleryElement))
-        {
-            return BadRequest();
-        }
-        Gin gn = new()
-        {
-            GinName = data.GetProperty("ginName").GetString(),
-            Distillery = data.GetProperty("distillery").GetString(),
-            GinDescription = data.GetProperty("description").GetString()
-        };
         var response = new ApiResponse();
-        if (IsGinPresent(gn.GinName, gn.Distillery))
-        {
-            response.StatusMessage = "This gin is already part of our collection!";
+        string? ginName = data.GetProperty("ginName").GetString();
+        string? distillery = data.GetProperty("distillery").GetString();
+        string? description = data.GetProperty("description").GetString();
+
+        if (string.IsNullOrEmpty(ginName) || string.IsNullOrEmpty(distillery)) {
+            response.StatusMessage = "Please provide the name of the Distillery and Gin.";
+            response.BsColor = BsColor.Warning;
             return Ok(response);
-            // TODO: still return a notify user page or just have a success message appear?
         }
-        try
-        {
-            _ = _context.Gins.Add(gn);
+        if (IsGinPresent(ginName, distillery)) {
+            response.StatusMessage = "Sorry this gin cannot be added as it is already part of our collection!";
+            response.BsColor = BsColor.Danger;
+            return Ok(response);
+        }
+        try {
+            _ = _context.Gins.Add(new Gin {
+                GinName = ginName,
+                Distillery = distillery,
+                GinDescription = description
+            });
             _ = _context.SaveChanges();
-            response.StatusMessage = $"\"{gn.Distillery} {gn.GinName}\" gin was added successfully!";
+            response.StatusMessage = $"✅ Success! \"{distillery} {ginName}\" gin was added!";
+            response.BsColor = BsColor.Success;
             return Ok(response);
         }
-        catch (DbUpdateException ex)
-        {
+        catch (DbUpdateException ex) {
             Console.WriteLine(ex.Message);
             return BadRequest();
         }
