@@ -1,10 +1,4 @@
-﻿using System.Text.Json;
-using GinPair.Data;
-using GinPair.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-namespace GinPair.Controllers;
+﻿namespace GinPair.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -61,6 +55,32 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
         }
         return Ok(response);
     }
+    [HttpGet("getGinList")]
+    public IActionResult GetGinList()
+    {
+        var ginList = _context.Gins.Select(g => new SelectListItem
+        {
+            Value = g.GinId.ToString(),
+            Text = g.Distillery.ToString() + " " + g.GinName.ToString()
+        })
+            .ToList().
+            OrderBy(o => o.Text);
+        return Ok(ginList);
+    }
+
+    [HttpGet("getTonicList")]
+    public IActionResult GetTonicList()
+    {
+        var tonicList = _context.Tonics.Select(t => new SelectListItem
+        {
+            Value = t.TonicId.ToString(),
+            Text = t.TonicBrand.ToString() + " " + t.TonicFlavour.ToString()
+        })
+            .ToList()
+            .OrderBy(o => o.Text);
+
+        return Ok(tonicList);
+    }
 
     [HttpPost("addGin")]
     public IActionResult AddGin([FromBody] JsonElement data)
@@ -70,18 +90,22 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
         string? distillery = data.GetProperty("distillery").GetString();
         string? description = data.GetProperty("description").GetString();
 
-        if (string.IsNullOrEmpty(ginName) || string.IsNullOrEmpty(distillery)) {
+        if (string.IsNullOrEmpty(ginName) || string.IsNullOrEmpty(distillery))
+        {
             response.StatusMessage = "Please provide the name of the Distillery and Gin.";
             response.BsColor = BsColor.Warning;
             return Ok(response);
         }
-        if (IsGinPresent(ginName, distillery)) {
+        if (IsGinPresent(ginName, distillery))
+        {
             response.StatusMessage = "Sorry this gin cannot be added as it is already part of our collection!";
             response.BsColor = BsColor.Danger;
             return Ok(response);
         }
-        try {
-            _ = _context.Gins.Add(new Gin {
+        try
+        {
+            _ = _context.Gins.Add(new Gin
+            {
                 GinName = ginName,
                 Distillery = distillery,
                 GinDescription = description
@@ -91,14 +115,99 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase
             response.BsColor = BsColor.Success;
             return Ok(response);
         }
-        catch (DbUpdateException ex) {
+        catch (DbUpdateException ex)
+        {
             Console.WriteLine(ex.Message);
             return BadRequest();
         }
     }
     public bool IsGinPresent(string ginName, string distillery)
     {
-        bool ginExists = _context.Gins.Any(m => m.GinName == ginName && m.Distillery == distillery);
+        bool ginExists = _context.Gins.Any(m => m.GinName.ToLower() == ginName.ToLower() && m.Distillery.ToLower() == distillery.ToLower());
         return ginExists;
+    }
+    [HttpPost("addTonic")]
+    public IActionResult AddTonic([FromBody] JsonElement data)
+    {
+        var response = new ApiResponse();
+        string? tonicBrand = data.GetProperty("tonicBrand").GetString();
+        string? tonicFlavour = data.GetProperty("tonicFlavour").GetString();
+        if (string.IsNullOrEmpty(tonicBrand) || string.IsNullOrEmpty(tonicFlavour))
+        {
+            response.StatusMessage = "Please provide the tonic brand and flavour/name.";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+        if (IsTonicPresent(tonicBrand, tonicFlavour))
+        {
+            response.StatusMessage = "Sorry this tonic cannot be added as it is already part of our collection!";
+            response.BsColor = BsColor.Danger;
+            return Ok(response);
+        }
+        try
+        {
+            _ = _context.Tonics.Add(new()
+            {
+                TonicBrand = tonicBrand,
+                TonicFlavour = tonicFlavour,
+            });
+            _ = _context.SaveChanges();
+            response.StatusMessage = $"\"{tonicBrand} {tonicFlavour}\" tonic was added successfully!";
+            response.BsColor = BsColor.Success;
+            return Ok(response);
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
+    }
+    public bool IsTonicPresent(string tonicBrand, string tonicFlavour)
+    {
+        bool tonicExists = _context.Tonics.Any(m => m.TonicBrand.ToLower() == tonicBrand.ToLower() && m.TonicFlavour.ToLower() == tonicFlavour.ToLower());
+        return tonicExists;
+    }
+    [HttpPost("addPairing")]
+    public IActionResult AddPairing([FromBody] JsonElement data)
+    {
+        var response = new ApiResponse();
+        string? ginId = data.GetProperty("ginId").GetString();
+        string? tonicId = data.GetProperty("tonicId").GetString();
+
+        if (string.IsNullOrEmpty(ginId) || string.IsNullOrEmpty(tonicId))
+        {
+            response.StatusMessage = "Please select the gin and tonic to pair";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+
+        var pairedTonic = _context.Tonics.Find(Int32.Parse(tonicId));
+        var pairedGin = _context.Gins.Find(Int32.Parse(ginId));
+
+        if (pairedTonic == null || pairedGin == null)
+        {
+            response.StatusMessage = "Please select the gin and tonic to pair";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+
+        try
+        {
+            _ = _context.Pairings.Add(new()
+            {
+                GinId = pairedGin.GinId,
+                TonicId = pairedTonic.TonicId,
+
+            });
+            _ = _context.SaveChanges();
+            response.StatusMessage = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+            response.BsColor = BsColor.Success;
+            return Ok(response);
+        }
+        catch (DbUpdateException ex)
+        {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
     }
 }

@@ -43,19 +43,19 @@
 			</button>
 			<div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
+					<p id="addPairingResult" class="container"></p>
 					<p class="mb-2">Select a gin and tonic to pair together</p>
-					@using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-					{
+					<form asp-action="AddPairing" method="post">
 						<p>
-							Gin to pair: <br />
-							@Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin", new { @class = "form-select mt-1 w-50" })
+							Gin to pair:
+							<select id="ginDropDown" class="form-select mt-1 w-50"></select>
 						</p>
 						<p>
-							Tonic to pair: <br />
-							@Html.DropDownListFor(m => m.TonicId, Model.TonicFlavours, "Select tonic", new { @class = "form-select mt-1 w-50" })
+							Tonic to pair:
+							<select id="tonicDropDown" class="form-select mt-1 w-50"></select>
 						</p>
-						<input class="btn btn-primary" type="submit" value="Pair">
-					}
+						<button id="addPairingButton" type="button" class="btn btn-primary">Pair</button>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -67,23 +67,19 @@
 			</button>
 			<div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
-					@if (Model.IsTonicInvalid)
-					{
-						<p class="text-danger">This tonic is already part of our collection!</p>
-					}
+					<p id="addTonicResult" class="container"></p>
 					<p class="mb-2">Add a new tonic to our collection</p>
-					@using (Html.BeginForm("AddGnt", "Home", FormMethod.Post))
-					{
+					<form asp-action="AddTonic" method="post">
 						<p>
-							Tonic Brand:    *<br />
-							@Html.TextBoxFor(m => m.TonicBrand, new { @placeholder = "e.g. FeverTree", @class = "form-control mt-1 w-50" })
+							Tonic Brand:    *
+							<input id="tonicBrandInput" type="text" placeholder="e.g. Fever Tree" class="form-control mt-1 w-50" />
 						</p>
 						<p>
-							Tonic Flavour:  *<br />
-							@Html.TextBoxFor(m => m.TonicFlavour, new { @placeholder = "e.g. Indian", @class = "form-control mt-1 w-50" })
+							Tonic Flavour:  *
+							<input id="tonicFlavourInput" type="text" placeholder="e.g. Indian" class="form-control mt-1 w-50" />
 						</p>
-						<input class="btn btn-primary" type="submit" value="Add Tonic">
-					}
+						<button id="addTonicButton" type="button" class="btn btn-primary">Add</button>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -92,14 +88,58 @@
 
 @section Scripts {
 	<script type="text/javascript">
+		// Get lists of gins and tonics
+		function PopulateLists() {
+			$.ajax({
+				url: "/api/ginapi/getGinList/",
+				type: "GET",
+				success: function (data) {
+					var dropdown = $("#ginDropDown");
+					dropdown.empty();
+					dropdown.append("<option selected='true' disabled>Choose Gin</option>");
+					dropdown.prop("selectedIndex", 0);
+
+					$.each(data, function (key, entry) {
+						dropdown.append($('<option></option>').attr('value', entry.value).text(entry.text));
+					});
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+			$.ajax({
+				url: "/api/ginapi/getTonicList/",
+				type: "GET",
+				success: function (data) {
+					var dropdown = $("#tonicDropDown");
+					dropdown.empty();
+					dropdown.append("<option selected='true' disabled>Choose Tonic</option>");
+					dropdown.prop("selectedIndex", 0);
+
+					$.each(data, function (key, entry) {
+						dropdown.append($('<option></option>').attr('value', entry.value).text(entry.text));
+					});
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+		}
+		$(document).ready(function(){
+			PopulateLists();
+		});
+
 		// Reset message
 		function ResetMessage() {
 			document.getElementById("addGinResult").innerText = "";
 			$("#addGinResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+			$("#addTonicResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+			$("#addPairingResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
 		};
 		document.getElementById("ginNameInput").addEventListener("click", ResetMessage);
 		document.getElementById("distilleryInput").addEventListener("click", ResetMessage);
 		document.getElementById("descriptionInput").addEventListener("click", ResetMessage);
+
 		// Add Gin
 		$("#addGinButton").click(function(data) {
 			var ginName = $("#ginNameInput").val();
@@ -125,12 +165,85 @@
 							$("#ginNameInput").val("");
 							$("#distilleryInput").val("");
 							$("#descriptionInput").val("");
+							PopulateLists();
 							break;
 						case 2:
 							$("#addGinResult").addClass("alert alert-warning");
 							break;
 						case 3:
 							$("#addGinResult").addClass("alert alert-danger");
+							break;
+					}
+				},
+				error: function(){
+					console.log("An error occured in api.")
+				}
+			});
+		});
+		// Add Paring
+		$("#addPairingButton").click(function(data) {
+			console.log("button clicked");
+			var ginId = $("#ginDropDown").val();
+			console.log(ginId);
+			var tonicId = $("#tonicDropDown").val();
+			console.log(tonicId);
+			$.ajax({
+				url: "/api/ginapi/addPairing/",
+				type: "POST",
+				contentType: "application/problem+json; charset=utf-8",
+				data: JSON.stringify({
+					ginId: ginId,
+					tonicId: tonicId
+				}),
+				success: function(response){
+					$("#addPairingResult").html(response.statusMessage);
+					switch(response.bsColor){
+						case 1:
+							$("#addPairingResult").addClass("alert alert-success");
+							PopulateLists();
+							break;
+						case 2:
+							$("#addPairingResult").addClass("alert alert-warning");
+							break;
+						case 3:
+							$("#addPairingResult").addClass("alert alert-danger");
+							break;
+					}
+				},
+				error: function(){
+					console.log("An error occured in api.")
+				}
+			});
+		});
+		// Add Tonic
+		$("#addTonicButton").click(function(data) {
+			console.log("button clicked");
+			var tonicBrand = $("#tonicBrandInput").val();
+			console.log(tonicBrand);
+			var tonicFlavour = $("#tonicFlavourInput").val();
+			console.log(tonicFlavour);
+			$.ajax({
+				url: "/api/ginapi/addTonic/",
+				type: "POST",
+				contentType: "application/problem+json; charset=utf-8",
+				data: JSON.stringify({
+					tonicBrand: tonicBrand,
+					tonicFlavour: tonicFlavour
+				}),
+				success: function(response){
+					$("#addTonicResult").html(response.statusMessage);
+					switch(response.bsColor){
+						case 1:
+							$("#addTonicResult").addClass("alert alert-success");
+							$("#tonicBrandInput").val("");
+							$("#tonicFlavourInput").val("");
+							PopulateLists();
+							break;
+						case 2:
+							$("#addTonicResult").addClass("alert alert-warning");
+							break;
+						case 3:
+							$("#addTonicResult").addClass("alert alert-danger");
 							break;
 					}
 				},

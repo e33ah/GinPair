@@ -1,10 +1,3 @@
-using System.Diagnostics;
-using GinPair.Data;
-using GinPair.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-
 namespace GinPair.Controllers;
 public class HomeController(GinPairDbContext ginPairContext) : Controller
 {
@@ -48,78 +41,80 @@ public class HomeController(GinPairDbContext ginPairContext) : Controller
         };
         return View(vm);
     }
-    [HttpPost]
-    public IActionResult AddGnt(AddGntVM vm)
-    {
+    //[HttpPost]
+    //public IActionResult AddGnt(AddGntVM vm)
+    //{
         // Add Gin
-        if (vm.GinName != null && vm.Distillery != null)
-        {
-            Gin gn = new()
-            {
-                GinName = vm.GinName,
-                Distillery = vm.Distillery,
-                GinDescription = vm.GinDescription
-            };
-            if (IsGinPresent(gn.GinName, gn.Distillery))
-            {
-                bool isGinInvalid = true;
-                return RedirectToAction("AddGnt", "Home", new { isGinInvalid });
+        //if (vm.GinName != null && vm.Distillery != null)
+        //{
+        //    Gin gn = new()
+        //    {
+        //        GinName = vm.GinName,
+        //        Distillery = vm.Distillery,
+        //        GinDescription = vm.GinDescription
+        //    };
+        //    if (IsGinPresent(gn.GinName, gn.Distillery))
+        //    {
+        //        bool isGinInvalid = true;
+        //        return RedirectToAction("AddGnt", "Home", new { isGinInvalid });
 
-            }
-            try
-            {
-                _ = gpdb.Gins.Add(gn);
-                _ = gpdb.SaveChanges();
-                TempData["Message"] = $"\"{gn.Distillery} {gn.GinName}\" gin was added successfully!";
-                return RedirectToAction("NotifyUserGin", "Home");
-            }
-            catch (DbUpdateException ex) {
-                Console.WriteLine(ex.Message);
-                return RedirectToAction("AddGnt", "Home");
-            }
-        }
+        //    }
+        //    try
+        //    {
+        //        _ = gpdb.Gins.Add(gn);
+        //        _ = gpdb.SaveChanges();
+        //        TempData["Message"] = $"\"{gn.Distillery} {gn.GinName}\" gin was added successfully!";
+        //        return RedirectToAction("NotifyUserGin", "Home");
+        //    }
+        //    catch (DbUpdateException ex) {
+        //        Console.WriteLine(ex.Message);
+        //        return RedirectToAction("AddGnt", "Home");
+        //    }
+        //}
         // Add Tonic
-        else if (vm.TonicFlavour != null)
-        {
-            Tonic ton = new()
-            {
-                TonicBrand = vm.TonicBrand,
-                TonicFlavour = vm.TonicFlavour,
-            };
-            if (IsTonicPresent(ton.TonicBrand, ton.TonicFlavour))
-            {
-                bool isTonicInvalid = true;
-                return RedirectToAction("AddGnt", "Home", new { isTonicInvalid });
+        //else 
+        //if (vm.TonicFlavour != null)
+        //{
+        //    Tonic ton = new()
+        //    {
+        //        TonicBrand = vm.TonicBrand,
+        //        TonicFlavour = vm.TonicFlavour,
+        //    };
+        //    if (IsTonicPresent(ton.TonicBrand, ton.TonicFlavour))
+        //    {
+        //        bool isTonicInvalid = true;
+        //        return RedirectToAction("AddGnt", "Home", new { isTonicInvalid });
 
-            }
-            _ = gpdb.Tonics.Add(ton);
-            _ = gpdb.SaveChanges();
-            TempData["Message"] = $"\"{ton.TonicBrand} {ton.TonicFlavour}\" tonic was added successfully!";
-            return RedirectToAction("NotifyUserGin", "Home");
-        }
+        //    }
+        //    _ = gpdb.Tonics.Add(ton);
+        //    _ = gpdb.SaveChanges();
+        //    TempData["Message"] = $"\"{ton.TonicBrand} {ton.TonicFlavour}\" tonic was added successfully!";
+        //    return RedirectToAction("NotifyUserGin", "Home");
+        //}
         // Add Pairing
-        else if (vm.GinId != 0)
-        {
-            Pairing p = new()
-            {
-                GinId = vm.GinId,
-                TonicId = vm.TonicId
-            };
-            _ = gpdb.Pairings.Add(p);
-            _ = gpdb.SaveChanges();
-            var pairedTonic = gpdb.Tonics.Find(p.TonicId);
-            var pairedGin = gpdb.Gins.Find(p.GinId);
-            if (pairedTonic != null && pairedGin != null)
-            {
-                TempData["Message"] = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
-            }
-            return RedirectToAction("NotifyUserGin", "Home");
-        }
-        else
-        {
-            return RedirectToAction("AddGnt", "Home");
-        }
-    }
+        //else 
+        //if (vm.GinId != 0)
+        //{
+        //    Pairing p = new()
+        //    {
+        //        GinId = vm.GinId,
+        //        TonicId = vm.TonicId
+        //    };
+        //    _ = gpdb.Pairings.Add(p);
+        //    _ = gpdb.SaveChanges();
+        //    var pairedTonic = gpdb.Tonics.Find(p.TonicId);
+        //    var pairedGin = gpdb.Gins.Find(p.GinId);
+        //    if (pairedTonic != null && pairedGin != null)
+        //    {
+        //        TempData["Message"] = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+        //    }
+        //    return RedirectToAction("NotifyUserGin", "Home");
+        //}
+        //else
+        //{
+        //    return RedirectToAction("AddGnt", "Home");
+        //}
+    //}
     public IActionResult DeleteGnt()
     {
         var ginList = gpdb.Gins.Select(g => new SelectListItem
