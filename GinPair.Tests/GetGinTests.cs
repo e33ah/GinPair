@@ -1,5 +1,13 @@
 ﻿namespace GinPair.Tests;
 public class GetGinTests {
+    private readonly GinPairDbContext mockContext;
+    private readonly GinApiController mockController;
+
+    public GetGinTests() {
+        var options = GetDbContextOptions();
+        mockContext = new GinPairDbContext(options);
+        mockController = new GinApiController(mockContext);
+    }
     private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
         return new DbContextOptionsBuilder<GinPairDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -8,8 +16,6 @@ public class GetGinTests {
 
     [Fact]
     public async Task MatchPartial_ReturnsOk() {
-        var options = GetDbContextOptions();
-        using var mockContext = new GinPairDbContext(options);
         mockContext.Gins.RemoveRange(mockContext.Gins);
         mockContext.Gins.AddRange(new List<Gin>
         {
@@ -17,17 +23,22 @@ public class GetGinTests {
             new() {GinId = 2, GinName = "TestName2", Distillery = "TestDis2"}
         });
         mockContext.SaveChanges();
-        var controller = new GinApiController(mockContext);
 
-        var result = await controller.MatchGin("Test");
+        var result = await mockController.MatchGin("Test");
 
-        Assert.NotNull(result);
-        Assert.IsType<OkObjectResult>(result);
+        result.Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<List<Gin>>()
+            .Which.Should().HaveCount(2);
+
+        result.Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<List<Gin>>()
+            .Which.Should().Contain(g => g.GinName == "TestName1")
+            .And.Contain(g => g.GinName == "TestName2");
+
     }
     [Fact]
     public async Task GetPairingById_ReturnsOk() {
-        var options = GetDbContextOptions();
-        using var mockContext = new GinPairDbContext(options);
+        mockContext.Pairings.RemoveRange(mockContext.Pairings);
         mockContext.Pairings.AddRange(new List<Pairing>
         {
             new() {
@@ -36,18 +47,20 @@ public class GetGinTests {
             }
         });
         mockContext.SaveChanges();
-        var controller = new GinApiController(mockContext);
 
-        var result = await controller.GetPairingByGinId(3);
+        var result = await mockController.GetPairingByGinId(3);
 
-        Assert.NotNull(result);
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.IsType<ApiResponse>(okResult.Value);
+        result.Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<ApiResponse>()
+            .Which.StatusMessage.Should().Contain("Try pairing TestDis3 TestName3 gin with");
+        result.Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<ApiResponse>()
+            .Which.BsColor.Should().Be(BsColor.Primary);
     }
+
     [Fact]
     public async Task GetPairingById_NoGin_Returns_Bad() {
-        var options = GetDbContextOptions();
-        using var mockContext = new GinPairDbContext(options);
+        mockContext.Pairings.RemoveRange(mockContext.Pairings);
         mockContext.Pairings.AddRange(new List<Pairing>
         {
             new() {
@@ -56,10 +69,9 @@ public class GetGinTests {
             }
         });
         mockContext.SaveChanges();
-        var controller = new GinApiController(mockContext);
 
-        var result = await controller.GetPairingByGinId(4);
-        Assert.NotNull(result);
-        Assert.IsType<BadRequestResult>(result);
+        var result = await mockController.GetPairingByGinId(4);
+
+        result.Should().BeOfType<BadRequestResult>();
     }
 }
