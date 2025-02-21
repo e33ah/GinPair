@@ -5,11 +5,9 @@
 namespace GinPair.Migrations;
 
 /// <inheritdoc />
-public partial class gntConstraints : Migration
-{
+public partial class gntConstraints : Migration {
     /// <inheritdoc />
-    protected override void Up(MigrationBuilder migrationBuilder)
-    {
+    protected override void Up(MigrationBuilder migrationBuilder) {
         migrationBuilder.AlterColumn<string>(
             name: "tonic_flavour",
             schema: "gp_schema",
@@ -65,8 +63,7 @@ public partial class gntConstraints : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
+    protected override void Down(MigrationBuilder migrationBuilder) {
         migrationBuilder.AlterColumn<string>(
             name: "tonic_flavour",
             schema: "gp_schema",

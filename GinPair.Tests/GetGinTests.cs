@@ -1,16 +1,13 @@
 ﻿namespace GinPair.Tests;
-public class GetGinTests
-{
-    private static DbContextOptions<GinPairDbContext> GetDbContextOptions()
-    {
+public class GetGinTests {
+    private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
         return new DbContextOptionsBuilder<GinPairDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
     }
 
     [Fact]
-    public async Task MatchPartial_ReturnsOk()
-    {
+    public async Task MatchPartial_ReturnsOk() {
         var options = GetDbContextOptions();
         using var mockContext = new GinPairDbContext(options);
         mockContext.Gins.RemoveRange(mockContext.Gins);
@@ -28,8 +25,7 @@ public class GetGinTests
         Assert.IsType<OkObjectResult>(result);
     }
     [Fact]
-    public async Task GetPairingById_ReturnsOk()
-    {
+    public async Task GetPairingById_ReturnsOk() {
         var options = GetDbContextOptions();
         using var mockContext = new GinPairDbContext(options);
         mockContext.Pairings.AddRange(new List<Pairing>
@@ -49,8 +45,7 @@ public class GetGinTests
         Assert.IsType<ApiResponse>(okResult.Value);
     }
     [Fact]
-    public async Task GetPairingById_NoGin_Returns_Bad()
-    {
+    public async Task GetPairingById_NoGin_Returns_Bad() {
         var options = GetDbContextOptions();
         using var mockContext = new GinPairDbContext(options);
         mockContext.Pairings.AddRange(new List<Pairing>
@@ -66,5 +61,5 @@ public class GetGinTests
         var result = await controller.GetPairingByGinId(4);
         Assert.NotNull(result);
         Assert.IsType<BadRequestResult>(result);
-    } 
+    }
 }

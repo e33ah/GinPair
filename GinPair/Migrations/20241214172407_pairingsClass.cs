@@ -6,23 +6,19 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GinPair.Migrations;
 
 /// <inheritdoc />
-public partial class pairingsClass : Migration
-{
+public partial class pairingsClass : Migration {
     /// <inheritdoc />
-    protected override void Up(MigrationBuilder migrationBuilder)
-    {
+    protected override void Up(MigrationBuilder migrationBuilder) {
         migrationBuilder.CreateTable(
             name: "pairings",
             schema: "gp_schema",
-            columns: table => new
-            {
+            columns: table => new {
                 pairing_id = table.Column<int>(type: "integer", nullable: false)
                     .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                 paired_gin_gin_id = table.Column<int>(type: "integer", nullable: false),
                 paired_tonic_tonic_id = table.Column<int>(type: "integer", nullable: false)
             },
-            constraints: table =>
-            {
+            constraints: table => {
                 table.PrimaryKey("pk_pairings", x => x.pairing_id);
                 table.ForeignKey(
                     name: "fk_pairings_gins_paired_gin_gin_id",
@@ -54,8 +50,7 @@ public partial class pairingsClass : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
+    protected override void Down(MigrationBuilder migrationBuilder) {
         migrationBuilder.DropTable(
             name: "pairings",
             schema: "gp_schema");

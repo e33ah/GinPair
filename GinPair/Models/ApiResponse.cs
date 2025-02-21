@@ -1,9 +1,7 @@
 ﻿namespace GinPair.Models;
 
-public class ApiResponse
-{
-    public ApiResponse()
-    {
+public class ApiResponse {
+    public ApiResponse() {
     }
     public int StatusCode { get; set; } = 200;
     public string StatusMessage { get; set; } = string.Empty;

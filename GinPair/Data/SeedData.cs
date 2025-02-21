@@ -1,12 +1,7 @@
-﻿using GinPair.Models;
-using Microsoft.EntityFrameworkCore;
+﻿namespace GinPair.Data;
 
-namespace GinPair.Data;
-
-public static class SeedData
-{
-    public static void Seed(ModelBuilder modelBuilder)
-    {
+public static class SeedData {
+    public static void Seed(ModelBuilder modelBuilder) {
         modelBuilder.Entity<Gin>().HasData(
             new Gin { GinId = 1, GinName = "Rhubarb & Ginger", Distillery = "Whitley Neill" },
             new Gin { GinId = 2, GinName = "Blood Orange", Distillery = "Whitley Neill" },
@@ -26,7 +21,7 @@ public static class SeedData
             new Pairing { PairingId = 1, GinId = 1, TonicId = 4 },
             new Pairing { PairingId = 2, GinId = 2, TonicId = 3 },
             new Pairing { PairingId = 3, GinId = 3, TonicId = 3 },
-            new Pairing { PairingId = 4, GinId = 4, TonicId = 2}
+            new Pairing { PairingId = 4, GinId = 4, TonicId = 2 }
             );
     }
 }

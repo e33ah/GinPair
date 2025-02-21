@@ -5,11 +5,9 @@
 namespace GinPair.Migrations;
 
 /// <inheritdoc />
-public partial class pairingFKs : Migration
-{
+public partial class pairingFKs : Migration {
     /// <inheritdoc />
-    protected override void Up(MigrationBuilder migrationBuilder)
-    {
+    protected override void Up(MigrationBuilder migrationBuilder) {
         migrationBuilder.DropForeignKey(
             name: "fk_pairings_gins_paired_gin_gin_id",
             schema: "gp_schema",
@@ -66,8 +64,7 @@ public partial class pairingFKs : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
+    protected override void Down(MigrationBuilder migrationBuilder) {
         migrationBuilder.DropForeignKey(
             name: "fk_pairings_gins_gin_id",
             schema: "gp_schema",

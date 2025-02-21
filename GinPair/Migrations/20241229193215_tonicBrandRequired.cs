@@ -5,11 +5,9 @@
 namespace GinPair.Migrations;
 
 /// <inheritdoc />
-public partial class tonicBrandRequired : Migration
-{
+public partial class tonicBrandRequired : Migration {
     /// <inheritdoc />
-    protected override void Up(MigrationBuilder migrationBuilder)
-    {
+    protected override void Up(MigrationBuilder migrationBuilder) {
         migrationBuilder.AlterColumn<string>(
             name: "tonic_brand",
             schema: "gp_schema",
@@ -25,8 +23,7 @@ public partial class tonicBrandRequired : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
+    protected override void Down(MigrationBuilder migrationBuilder) {
         migrationBuilder.AlterColumn<string>(
             name: "tonic_brand",
             schema: "gp_schema",

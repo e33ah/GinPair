@@ -1,8 +1,6 @@
 ﻿namespace GinPair.Models;
 
-
-public enum BsColor
-{
+public enum BsColor {
     Primary,
     Success,
     Warning,

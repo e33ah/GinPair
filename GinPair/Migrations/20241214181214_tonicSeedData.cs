@@ -7,11 +7,9 @@
 namespace GinPair.Migrations;
 
 /// <inheritdoc />
-public partial class tonicSeedData : Migration
-{
+public partial class tonicSeedData : Migration {
     /// <inheritdoc />
-    protected override void Up(MigrationBuilder migrationBuilder)
-    {
+    protected override void Up(MigrationBuilder migrationBuilder) {
         migrationBuilder.InsertData(
             schema: "gp_schema",
             table: "tonics",
@@ -27,8 +25,7 @@ public partial class tonicSeedData : Migration
     }
 
     /// <inheritdoc />
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
+    protected override void Down(MigrationBuilder migrationBuilder) {
         migrationBuilder.DeleteData(
             schema: "gp_schema",
             table: "tonics",
