@@ -13,6 +13,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             .ToListAsync();
         return Ok(results);
     }
+
     [HttpGet("getPairing/{ginId}")]
     public async Task<IActionResult> GetPairingByGinId(int ginId) {
         var ginfind = await gpdb.Gins.FindAsync(ginId);
@@ -32,6 +33,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
                             }).ToListAsync();
         if (result.Count == 0) {
             response.StatusMessage = $"<p>Sorry, there is no pairing available for \"{ginfind.Distillery} {ginfind.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
+            response.BsColor = BsColor.Warning;
         } else {
             Random random = new();
             int r = random.Next(0, result.Count);
@@ -43,6 +45,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
                 TonicFlavour = result[r].TonicFlavour,
             };
             response.StatusMessage = $"Try pairing {pairingResult.Distillery} {pairingResult.GinName} gin with<br>a {pairingResult.TonicBrand} {pairingResult.TonicFlavour} tonic!";
+            response.BsColor = BsColor.Primary;
         }
         return Ok(response);
     }
@@ -79,11 +82,13 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
         if (string.IsNullOrEmpty(ginName) || string.IsNullOrEmpty(distillery)) {
             response.StatusMessage = "Please provide the name of the Distillery and Gin.";
             response.BsColor = BsColor.Warning;
+
             return Ok(response);
         }
         if (IsGinPresent(ginName, distillery)) {
             response.StatusMessage = "Sorry this gin cannot be added as it is already part of our collection!";
             response.BsColor = BsColor.Danger;
+
             return Ok(response);
         }
         try {
@@ -93,31 +98,33 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
                 GinDescription = description
             });
             _ = gpdb.SaveChanges();
+
             response.StatusMessage = $"✅ Success! \"{distillery} {ginName}\" gin was added!";
             response.BsColor = BsColor.Success;
+
             return Ok(response);
         } catch (DbUpdateException ex) {
             Console.WriteLine(ex.Message);
             return BadRequest();
         }
     }
-    public bool IsGinPresent(string ginName, string distillery) {
-        bool ginExists = gpdb.Gins.Any(m => m.GinName.ToLower() == ginName.ToLower() && m.Distillery.ToLower() == distillery.ToLower());
-        return ginExists;
-    }
+
     [HttpPost("addTonic")]
     public IActionResult AddTonic([FromBody] JsonElement data) {
         var response = new ApiResponse();
         string? tonicBrand = data.GetProperty("tonicBrand").GetString();
         string? tonicFlavour = data.GetProperty("tonicFlavour").GetString();
+
         if (string.IsNullOrEmpty(tonicBrand) || string.IsNullOrEmpty(tonicFlavour)) {
             response.StatusMessage = "Please provide the tonic brand and flavour/name.";
             response.BsColor = BsColor.Warning;
+
             return Ok(response);
         }
         if (IsTonicPresent(tonicBrand, tonicFlavour)) {
             response.StatusMessage = "Sorry this tonic cannot be added as it is already part of our collection!";
             response.BsColor = BsColor.Danger;
+
             return Ok(response);
         }
         try {
@@ -137,10 +144,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             return BadRequest();
         }
     }
-    public bool IsTonicPresent(string tonicBrand, string tonicFlavour) {
-        bool tonicExists = gpdb.Tonics.Any(m => m.TonicBrand != null && m.TonicBrand.Equals(tonicBrand, StringComparison.OrdinalIgnoreCase) && m.TonicFlavour != null && m.TonicFlavour.Equals(tonicFlavour, StringComparison.OrdinalIgnoreCase));
-        return tonicExists;
-    }
+
     [HttpPost("addPairing")]
     public IActionResult AddPairing([FromBody] JsonElement data) {
         var response = new ApiResponse();
@@ -162,6 +166,12 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             return Ok(response);
         }
 
+        if (IsPairingPresent(pairedGin.GinId, pairedTonic.TonicId)) {
+            response.StatusMessage = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic are already paired!";
+            response.BsColor = BsColor.Danger;
+            return Ok(response);
+        }
+
         try {
             _ = gpdb.Pairings.Add(new() {
                 GinId = pairedGin.GinId,
@@ -178,5 +188,27 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             Console.WriteLine(ex.Message);
             return BadRequest();
         }
+    }
+    public bool IsGinPresent(string ginName, string distillery) {
+        bool ginExists = gpdb.Gins.Any(
+            m =>
+            m.GinName != null &&
+            m.GinName.ToLower() == ginName.ToLower() &&
+            m.Distillery != null &&
+            m.Distillery.ToLower() == distillery.ToLower());
+        return ginExists;
+    }
+    public bool IsTonicPresent(string tonicBrand, string tonicFlavour) {
+        bool tonicExists = gpdb.Tonics.Any(
+            m =>
+            m.TonicBrand != null &&
+            m.TonicBrand.ToLower() == tonicBrand.ToLower() &&
+            m.TonicFlavour != null &&
+            m.TonicFlavour.ToLower() == tonicFlavour.ToLower());
+        return tonicExists;
+    }
+    public bool IsPairingPresent(int ginId, int tonicId) {
+        bool pairingExists = gpdb.Pairings.Any(m => m.GinId == ginId && m.TonicId == tonicId);
+        return pairingExists;
     }
 }

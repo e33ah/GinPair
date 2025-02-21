@@ -132,6 +132,8 @@
 		// Reset message
 		function ResetMessage() {
 			document.getElementById("addGinResult").innerText = "";
+			document.getElementById("addTonicResult").innerText = "";
+			document.getElementById("addPairingResult").innerText = "";
 			$("#addGinResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
 			$("#addTonicResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
 			$("#addPairingResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
@@ -139,6 +141,11 @@
 		document.getElementById("ginNameInput").addEventListener("click", ResetMessage);
 		document.getElementById("distilleryInput").addEventListener("click", ResetMessage);
 		document.getElementById("descriptionInput").addEventListener("click", ResetMessage);
+		document.getElementById("tonicBrandInput").addEventListener("click", ResetMessage);
+		document.getElementById("tonicFlavourInput").addEventListener("click", ResetMessage);
+		document.getElementById("ginDropDown").addEventListener("click", ResetMessage);
+		document.getElementById("tonicDropDown").addEventListener("click", ResetMessage);
+
 
 		// Add Gin
 		$("#addGinButton").click(function(data) {

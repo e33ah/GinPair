@@ -87,7 +87,20 @@
                     type: "GET",
                     success: function(response){
                         $("#searchResult").html(response.statusMessage);
-                        $("#searchResult").addClass("alert alert-primary");
+						switch(response.bsColor){
+							case 0:
+								$("#searchResult").addClass("alert alert-primary");
+								break;
+							case 1:
+								$("#searchResult").addClass("alert alert-success");
+								break;
+							case 2:
+								$("#searchResult").addClass("alert alert-warning");
+								break;
+							case 3:
+								$("#searchResult").addClass("alert alert-danger");
+								break;
+						}
                     },
                     error: function(){
                         console.error("An error occured when retrieving pairing");
