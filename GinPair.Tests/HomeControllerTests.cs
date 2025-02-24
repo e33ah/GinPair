@@ -14,23 +14,11 @@ public class HomeControllerTests {
         var controller = new HomeController(mockContext);
 
         // Act - call Index action of HomeController
-        var result = controller.Index(null);
+        var result = controller.Index();
 
         // Assert result of the Index action is of type ViewResult (subclass of ActionResult class) and model is a Pairing VM
         var viewResult = Assert.IsType<ViewResult>(result);
         var modelResult = Assert.IsType<PairingVM>(viewResult.Model);
         Assert.Null(viewResult.ViewName); // ViewName will be null if default View is being returned (Index)
-    }
-    [Fact]
-    public void Index_With_EmptySearch_Returns_ViewResult() {
-        var options = GetDbContextOptions();
-        using var mockContext = new GinPairDbContext(options);
-        var controller = new HomeController(mockContext);
-
-        var result = controller.Index("");
-
-        // Assert 
-        var viewResult = Assert.IsType<ViewResult>(result);
-        Assert.Null(viewResult.ViewName);
     }
 }
