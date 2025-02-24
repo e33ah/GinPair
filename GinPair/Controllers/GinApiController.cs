@@ -134,7 +134,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             });
             _ = gpdb.SaveChanges();
 
-            response.StatusMessage = $"\"{tonicBrand} {tonicFlavour}\" tonic was added successfully!";
+            response.StatusMessage = $"✅ Success! \"{tonicBrand} {tonicFlavour}\" tonic was added!";
             response.BsColor = BsColor.Success;
 
             return Ok(response);
