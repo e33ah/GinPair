@@ -16,4 +16,5 @@ The app enables users to input the name of a gin and receive back a suggested to
 4. Run the app - press F5 on visual studio or using the command line, navigate to the folder which contains the solution `GinPair/GinPair.sln` and run: `dotnet run`. Navigate to http://localhost:5260
 
 ## Unit tests
-*TODO*
+Unit tests are located in the GinPair.Tests project and are written using xUnit.
+To run the unit tests, navigate to the folder which contains the solution `GinPair/GinPair.sln` and run: `dotnet test`
