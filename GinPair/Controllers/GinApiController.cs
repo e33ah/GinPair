@@ -182,7 +182,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             });
             _ = gpdb.SaveChanges();
 
-            response.StatusMessage = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired successfully!";
+            response.StatusMessage = $"✅ Success! \"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired!";
             response.BsColor = BsColor.Success;
 
             return Ok(response);

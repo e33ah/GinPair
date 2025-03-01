@@ -15,7 +15,6 @@
 			</button>
 			<div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
-					<p id="addGinResult" class="container"></p>
 					<p class="mb-2">Add a gin to our collection</p>
 					<form asp-action="AddGin" method="post">
 						<p>
@@ -32,6 +31,7 @@
 						</p>
 						<button id="addGinButton" type="button" class="btn btn-primary">Add</button>
 					</form>
+					<p id="addGinResult" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -43,7 +43,6 @@
 			</button>
 			<div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
-					<p id="addPairingResult" class="container"></p>
 					<p class="mb-2">Select a gin and tonic to pair together</p>
 					<form asp-action="AddPairing" method="post">
 						<p>
@@ -56,6 +55,7 @@
 						</p>
 						<button id="addPairingButton" type="button" class="btn btn-primary">Pair</button>
 					</form>
+					<p id="addPairingResult" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -67,7 +67,6 @@
 			</button>
 			<div class="accordion-collapse collapse" id="addTonicForm" aria-labelledby="addTonicHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
-					<p id="addTonicResult" class="container"></p>
 					<p class="mb-2">Add a new tonic to our collection</p>
 					<form asp-action="AddTonic" method="post">
 						<p>
@@ -80,6 +79,7 @@
 						</p>
 						<button id="addTonicButton" type="button" class="btn btn-primary">Add</button>
 					</form>
+					<p id="addTonicResult" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>

@@ -103,6 +103,7 @@
 			var selectedTonicText = $("#tonicDropDown option:selected").text();
 			$("#selectedTonicText").text(selectedTonicText);
 		});
+
 		// Get lists of gins and tonics
 		function PopulateLists() {
 			$.ajax({
@@ -143,6 +144,18 @@
 		$(document).ready(function(){
 			PopulateLists();
 		});
+		// Reset message
+		function ResetMessage() {
+			document.getElementById("deleteGinResult").innerText = "";
+			document.getElementById("deleteTonicResult").innerText = "";
+			// document.getElementById("deletePairingResult").innerText = "";
+			$("#deleteGinResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+			$("#deleteTonicResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+			// $("#deletePairingResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+		};
+		document.getElementById("ginDropDown").addEventListener("click", ResetMessage);
+		document.getElementById("tonicDropDown").addEventListener("click", ResetMessage);
+
 		// Delete Gin
 		$("#modalDeleteGinButton").click(function(data) {
 			var ginId = $("#ginDropDown").val();
@@ -155,6 +168,7 @@
 				}),
 				success: function(response){
 					$("#deleteGinModal").modal("hide");
+					$("#ginDropDown").focus();
 					$("#deleteGinResult").html(response.statusMessage);
 					switch(response.bsColor){
 						case 1:
@@ -186,6 +200,7 @@
 				}),
 				success: function(response){
 					$("#deleteTonicModal").modal("hide");
+					$("#tonicDropDown").focus();
 					$("#deleteTonicResult").html(response.statusMessage);
 					switch(response.bsColor){
 						case 1:
