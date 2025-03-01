@@ -1,115 +1,209 @@
 ﻿@model GinPair.Models.DeleteGntVM
 @{
-    ViewData["Title"] = "Delete";
+	ViewData["Title"] = "Delete";
 }
 
 <h1>Found something wrong?</h1>
 <h2>Remove it here!</h2>
 <div class="container mt-4">
-    <div class="accordion" id="accordion">
-        <div class="accordion-item">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deleteGinForm" aria-expanded="true" aria-controls="deleteGinForm">
-				<h4 class ="accordion-header" id="deleteGinHeader">
-                    Remove Gin
-                </h4>
-            </button>
-            <div class="accordion-collapse collapse show" id="deleteGinForm" aria-labelledby="deleteGinHeader" data-bs-parent="#accordion">
-                <div class="accordion-body">
-                    <p>Gin to remove: <br />
-                        @Html.DropDownListFor(m => m.GinId, Model.Gins, "Select gin", new { @id = "ginDropDown", @class = "form-select mt-1 w-50" })
-                    </p>
-                     <button class="btn btn-danger" id="ginDeleteButton" data-bs-toggle="modal" data-bs-target="#deleteGinModal">
-                        Remove
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="accordion-item">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deleteTonicForm" aria-expanded="true" aria-controls="deleteTonicForm">
-				<h4 class ="accordion-header" id="deleteTonicHeader">
-                    Remove Tonic
-                </h4>
-            </button>
-            <div class="accordion-collapse collapse" id="deleteTonicForm" aria-labelledby="deleteTonicHeader" data-bs-parent="#accordion">
-                <div class="accordion-body">
-                    <p>Tonic to remove: <br />
-                        @Html.DropDownListFor(m => m.TonicId, Model.Tonics, "Select tonic", new { @id = "tonicDropDown", @class = "form-select mt-1 w-50" })
-                    </p>
-                     <button class="btn btn-danger" id="tonicDeleteButton" data-bs-toggle="modal" data-bs-target="#deleteTonicModal">
-                        Remove
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="accordion" id="accordion">
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deleteGinForm" aria-expanded="true" aria-controls="deleteGinForm">
+				<h4 class="accordion-header" id="deleteGinHeader">
+					Remove Gin
+				</h4>
+			</button>
+			<div class="accordion-collapse collapse show" id="deleteGinForm" aria-labelledby="deleteGinHeader" data-bs-parent="#accordion">
+				<div class="accordion-body">
+					<form asp-action="RemoveGin" method="post">
+						<p>
+							Gin to remove:
+							<select id="ginDropDown" class="form-select mt-1 w-50"></select>
+						</p>
+						<button id="ginDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGinModal">
+							Remove
+						</button>
+					</form>
+					<p id="deleteGinResult" class="container mt-4"></p>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deleteTonicForm" aria-expanded="true" aria-controls="deleteTonicForm">
+				<h4 class="accordion-header" id="deleteTonicHeader">
+					Remove Tonic
+				</h4>
+			</button>
+			<div class="accordion-collapse collapse" id="deleteTonicForm" aria-labelledby="deleteTonicHeader" data-bs-parent="#accordion">
+				<div class="accordion-body">
+					<form asp-action="RemoveTonic" method="post">
+						<p>
+							Tonic to remove:
+							<select id="tonicDropDown" class="form-select mt-1 w-50"></select>
+						</p>
+						<button id="tonicDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTonicModal">
+							Remove
+						</button>
+					</form>
+					<p id="deleteTonicResult" class="container mt-4"></p>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" id="deleteGinModal" tabindex="-1" role="dialog" aria-labelledby="deleteGinModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteGinModalLabel">Remove Gin</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are sure you wish to remove "<span id="selectedGinText"></span>" gin from the collection?</p>
-                @using (Html.BeginForm("DeleteGnt", "Home", FormMethod.Post))
-                {
-                    @Html.HiddenFor(m => Model.GinId, new { @id = "hiddenGinIdToDelete" })
-                    <div class="modal-footer">
-                        <input type="submit" class="btn btn-danger" value="Remove">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deleteGinModalLabel">Remove Gin</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Are sure you wish to remove "<span id="selectedGinText"></span>" gin from the collection?</p>
+				<div class="modal-footer">
+					<button id="modalDeleteGinButton" type="submit" class="btn btn-danger">Remove</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div class="modal fade" id="deleteTonicModal" tabindex="-1" role="dialog" aria-labelledby="deleteTonicModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteTonicModalLabel">Remove Tonic</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are sure you wish to remove "<span id="selectedTonicText"></span>" tonic from the collection?</p>
-                @using (Html.BeginForm("DeleteGnt", "Home", FormMethod.Post))
-                {
-                    @Html.HiddenFor(m => Model.TonicId, new { @id = "hiddenTonicIdToDelete" })
-                    <div class="modal-footer">
-                        <input type="submit" class="btn btn-danger" value="Remove">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deleteTonicModalLabel">Remove Tonic</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Are sure you wish to remove "<span id="selectedTonicText"></span>" tonic from the collection?</p>
+				<div class="modal-footer">
+					<button id="modalDeleteTonicButton" type="submit" class="btn btn-danger">Remove</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
-<script>
-    document.getElementById("ginDropDown").addEventListener("change", function ()
-    {
-        var selectedGinId = this.value;
-        document.getElementById("hiddenGinIdToDelete").value = selectedGinId;
+@section Scripts {
+	<script type="text/javascript">
+		// Update selected gin and tonic modal text
+		document.getElementById("ginDropDown").addEventListener("change", function () {
+			var selectedGinText = $("#ginDropDown option:selected").text();
+			$("#selectedGinText").text(selectedGinText);
+		});
+		document.getElementById("tonicDropDown").addEventListener("change", function () {
+			var selectedTonicText = $("#tonicDropDown option:selected").text();
+			$("#selectedTonicText").text(selectedTonicText);
+		});
+		// Get lists of gins and tonics
+		function PopulateLists() {
+			$.ajax({
+				url: "/api/ginapi/getGinList/",
+				type: "GET",
+				success: function (data) {
+					var dropdown = $("#ginDropDown");
+					dropdown.empty();
+					dropdown.append("<option selected='true' disabled>Choose Gin</option>");
+					dropdown.prop("selectedIndex", 0);
 
-        var selectedGinText = $("#ginDropDown option:selected").text();
-        $("#selectedGinText").text(selectedGinText);
-    });
-</script>
+					$.each(data, function (key, entry) {
+						dropdown.append($('<option></option>').attr('value', entry.value).text(entry.text));
+					});
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+			$.ajax({
+				url: "/api/ginapi/getTonicList/",
+				type: "GET",
+				success: function (data) {
+					var dropdown = $("#tonicDropDown");
+					dropdown.empty();
+					dropdown.append("<option selected='true' disabled>Choose Tonic</option>");
+					dropdown.prop("selectedIndex", 0);
 
-<script>
-    document.getElementById("tonicDropDown").addEventListener("change", function ()
-    {
-        var selectedTonicId = this.value;
-        document.getElementById("hiddenTonicIdToDelete").value = selectedTonicId;
-
-        var selectedTonicText = $("#tonicDropDown option:selected").text();
-        $("#selectedTonicText").text(selectedTonicText);
-    });
-</script>
+					$.each(data, function (key, entry) {
+						dropdown.append($('<option></option>').attr('value', entry.value).text(entry.text));
+					});
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
+		}
+		$(document).ready(function(){
+			PopulateLists();
+		});
+		// Delete Gin
+		$("#modalDeleteGinButton").click(function(data) {
+			var ginId = $("#ginDropDown").val();
+			$.ajax({
+				url: "/api/ginapi/deleteGin/",
+				type: "POST",
+				contentType: "application/problem+json; charset=utf-8",
+				data: JSON.stringify({
+					ginId: ginId,
+				}),
+				success: function(response){
+					$("#deleteGinModal").modal("hide");
+					$("#deleteGinResult").html(response.statusMessage);
+					switch(response.bsColor){
+						case 1:
+							$("#deleteGinResult").addClass("alert alert-success");
+							PopulateLists();
+							break;
+						case 2:
+							$("#deleteGinResult").addClass("alert alert-warning");
+							break;
+						case 3:
+							$("#deleteGinResult").addClass("alert alert-danger");
+							break;
+					}
+				},
+				error: function(){
+					console.log("An error occured in api.")
+				}
+			});
+		});
+		// Delete Tonic
+		$("#modalDeleteTonicButton").click(function(data) {
+			var tonicId = $("#tonicDropDown").val();
+			$.ajax({
+				url: "/api/ginapi/deleteTonic/",
+				type: "POST",
+				contentType: "application/problem+json; charset=utf-8",
+				data: JSON.stringify({
+					tonicId: tonicId,
+				}),
+				success: function(response){
+					$("#deleteTonicModal").modal("hide");
+					$("#deleteTonicResult").html(response.statusMessage);
+					switch(response.bsColor){
+						case 1:
+							$("#deleteTonicResult").addClass("alert alert-success");
+							PopulateLists();
+							break;
+						case 2:
+							$("#deleteTonicResult").addClass("alert alert-warning");
+							break;
+						case 3:
+							$("#deleteTonicResult").addClass("alert alert-danger");
+							break;
+					}
+				},
+				error: function(){
+					console.log("An error occured in api.")
+				}
+			});
+		});
+	</script>
+}

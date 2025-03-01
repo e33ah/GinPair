@@ -15,7 +15,7 @@ public class DeleteGnTTests {
             .Options;
     }
 
-    [Fact (Skip = "Awaiting build")]
+    [Fact]
     public void DeleteGin_ShouldReturnSuccess_WhenGinIsDeleted() {
         var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
         mockContext.Gins.Add(gin);
@@ -35,7 +35,7 @@ public class DeleteGnTTests {
         deletedGin.Should().BeNull();
     }
 
-    [Fact(Skip = "Awaiting build")]
+    [Fact]
     public void DeleteGin_ShouldReturnWarning_WhenGinIdIsInvalid() {
         string json = JsonSerializer.Serialize(new { ginId = "0" });
         var data = JsonDocument.Parse(json).RootElement;
@@ -51,7 +51,7 @@ public class DeleteGnTTests {
         response.StatusMessage.Should().Be("Please select a gin to delete");
     }
 
-    [Fact(Skip = "Awaiting build")]
+    [Fact]
     public void DeleteTonic_ShouldReturnSuccess_WhenTonicIsDeleted() {
         var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
         mockContext.Tonics.Add(tonic);
@@ -71,7 +71,7 @@ public class DeleteGnTTests {
         deletedTonic.Should().BeNull();
     }
 
-    [Fact(Skip = "Awaiting build")]
+    [Fact]
     public void DeleteTonic_ShouldReturnWarning_WhenTonicIdIsInvalid() {
         string json = JsonSerializer.Serialize(new { tonicId = "0" });
         var data = JsonDocument.Parse(json).RootElement;

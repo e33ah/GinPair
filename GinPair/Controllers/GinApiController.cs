@@ -7,8 +7,11 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
 
     [HttpGet("matchGin")]
     public async Task<IActionResult> MatchGin(string partial) {
+        if (!gpdb.Gins.Any()) {
+            return BadRequest();
+        }
         var results = await gpdb.Gins
-                .Where(s => s.GinName.ToUpper().Contains(partial.ToUpper()) || s.Distillery.ToUpper().Contains(partial.ToUpper()))
+                .Where(s => s.GinName!.ToUpper().Contains(partial.ToUpper()) || s.Distillery!.ToUpper().Contains(partial.ToUpper()))
             .Take(10)
             .ToListAsync();
         return Ok(results);
@@ -189,6 +192,64 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             return BadRequest();
         }
     }
+    [HttpPost("deleteGin")]
+    public IActionResult DeleteGin([FromBody] JsonElement data) {
+        var response = new ApiResponse();
+        string? ginId = data.GetProperty("ginId").GetString();
+        if (string.IsNullOrEmpty(ginId) || ginId == "0") {
+            response.StatusMessage = "Please select a gin to delete";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+        try {
+            var gn = gpdb.Gins.Find(int.Parse(ginId));
+            if (gn == null) {
+                response.StatusMessage = "Gin not found";
+                response.BsColor = BsColor.Warning;
+                return Ok(response);
+            }
+            string ginToBeDeleted = $"{gn.Distillery} {gn.GinName}";
+            _ = gpdb.Gins.Remove(gn);
+            _ = gpdb.SaveChanges();
+
+            response.StatusMessage = $"✅ Success! \"{ginToBeDeleted}\" gin was removed!";
+            response.BsColor = BsColor.Success;
+            return Ok(response);
+        } catch (DbUpdateException ex) {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
+    }
+
+    [HttpPost("deleteTonic")]
+    public IActionResult DeleteTonic([FromBody] JsonElement data) {
+        var response = new ApiResponse();
+        string? tonicId = data.GetProperty("tonicId").GetString();
+        if (string.IsNullOrEmpty(tonicId) || tonicId == "0") {
+            response.StatusMessage = "Please select a tonic to delete";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+        try {
+            var tn = gpdb.Tonics.Find(int.Parse(tonicId));
+            if (tn == null) {
+                response.StatusMessage = "Tonic not found";
+                response.BsColor = BsColor.Warning;
+                return Ok(response);
+            }
+            string tonicToBeDeleted = $"{tn.TonicBrand} {tn.TonicFlavour}";
+            _ = gpdb.Tonics.Remove(tn);
+            _ = gpdb.SaveChanges();
+
+            response.StatusMessage = $"✅ Success! \"{tonicToBeDeleted}\" tonic was removed!";
+            response.BsColor = BsColor.Success;
+            return Ok(response);
+        } catch (DbUpdateException ex) {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
+    }
+
     public bool IsGinPresent(string ginName, string distillery) {
         bool ginExists = gpdb.Gins.Any(
             m =>
