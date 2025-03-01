@@ -1,4 +1,6 @@
-﻿namespace GinPair.Controllers;
+﻿using GinPair.Models;
+
+namespace GinPair.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -73,6 +75,18 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             .OrderBy(o => o.Text);
 
         return Ok(tonicList);
+    }
+
+    [HttpGet("getPairingList")]
+    public IActionResult GetPairingList() {
+        var pairingList = gpdb.Pairings.Select(p => new SelectListItem {
+            Value = p.PairingId.ToString(),
+            Text = $"{p.PairedGin.Distillery} {p.PairedGin.GinName} gin and {p.PairedTonic.TonicBrand} {p.PairedTonic.TonicFlavour} tonic"
+        })
+            .ToList()
+            .OrderBy(o => o.Text);
+
+        return Ok(pairingList);
     }
 
     [HttpPost("addGin")]
@@ -242,6 +256,44 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             _ = gpdb.SaveChanges();
 
             response.StatusMessage = $"✅ Success! \"{tonicToBeDeleted}\" tonic was removed!";
+            response.BsColor = BsColor.Success;
+            return Ok(response);
+        } catch (DbUpdateException ex) {
+            Console.WriteLine(ex.Message);
+            return BadRequest();
+        }
+    }
+
+    [HttpPost("deletePairing")]
+    public IActionResult DeletePairing([FromBody] JsonElement data) {
+        var response = new ApiResponse();
+        string? pairingId = data.GetProperty("pairingId").GetString();
+        if (string.IsNullOrEmpty(pairingId) || pairingId == "0") {
+            response.StatusMessage = "Please select a pairing to delete";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+
+        var pr = gpdb.Pairings.Find(int.Parse(pairingId));
+        if (pr == null) {
+            response.StatusMessage = "Pairing not found";
+            response.BsColor = BsColor.Warning;
+            return Ok(response);
+        }
+
+        var pairedGin = gpdb.Gins.Find(pr.GinId);
+        var pairedTonic = gpdb.Tonics.Find(pr.TonicId);
+        if (pairedGin == null || pairedTonic == null) {
+            response.StatusMessage = "An Error occured: Gin or Tonic not found. Not able to delete pairing.";
+            response.BsColor = BsColor.Danger;
+            return Ok(response);
+        }
+
+        try {
+            string pairingToBeDeleted = $"{pairedGin.Distillery} {pairedGin.GinName} gin and {pairedTonic.TonicBrand} {pairedTonic.TonicFlavour} tonic";
+            _ = gpdb.Pairings.Remove(pr);
+            _ = gpdb.SaveChanges();
+            response.StatusMessage = $"✅ Success! \"{pairingToBeDeleted}\" pairing was removed!";
             response.BsColor = BsColor.Success;
             return Ok(response);
         } catch (DbUpdateException ex) {

@@ -86,4 +86,45 @@ public class DeleteGnTTests {
         response.BsColor.ToString().Should().Be("Warning");
         response.StatusMessage.Should().Be("Please select a tonic to delete");
     }
+    
+    [Fact]
+    public void DeletePairing_ShouldReturnSuccess_WhenPairingIsDeleted() {
+        var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
+        var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
+        var pairing = new Pairing { PairingId = 1, PairedGin = gin, PairedTonic = tonic };
+        mockContext.Gins.Add(gin);
+        mockContext.Tonics.Add(tonic);
+        mockContext.Pairings.Add(pairing);
+        string json = JsonSerializer.Serialize(new { pairingId = "1" });
+        var data = JsonDocument.Parse(json).RootElement;
+
+        var result = mockController.DeletePairing(data) as OkObjectResult;
+        var response = result?.Value as ApiResponse;
+        var deletedPairing = mockContext.Pairings.Find(1);
+
+        using var scope = new AssertionScope();
+        result.Should().NotBeNull();
+        result.StatusCode.Should().Be(200);
+        response.Should().NotBeNull();
+        response.BsColor.ToString().Should().Be("Success");
+        response.StatusMessage.Should().Contain("was removed");
+        deletedPairing.Should().BeNull();
+
+    }
+
+    [Fact]
+    public void DeletePairing_ShouldReturnWarning_WhenPairingIdIsInvalid() {
+        string json = JsonSerializer.Serialize(new { pairingId = "0" });
+        var data = JsonDocument.Parse(json).RootElement;
+
+        var result = mockController.DeletePairing(data) as OkObjectResult;
+        var response = result?.Value as ApiResponse;
+
+        using var scope = new AssertionScope();
+        result.Should().NotBeNull();
+        result.StatusCode.Should().Be(200);
+        response.Should().NotBeNull();
+        response.BsColor.ToString().Should().Be("Warning");
+        response.StatusMessage.Should().Be("Please select a pairing to delete");
+    }
 }

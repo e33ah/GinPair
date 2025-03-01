@@ -122,7 +122,7 @@ public class AddGnTTests {
             .Which.Value.Should().BeOfType<ApiResponse>()
             .Which.Should().Match<ApiResponse>(response =>
                 response.BsColor == BsColor.Success &&
-                response.StatusMessage == "\"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic were paired successfully!");
+                response.StatusMessage == "✅ Success! \"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic were paired!");
     }
 
     [Theory]

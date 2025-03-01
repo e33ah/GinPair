@@ -49,6 +49,27 @@
 				</div>
 			</div>
 		</div>
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#deletePairingForm" aria-expanded="true" aria-controls="deletePairingForm">
+				<h4 class="accordion-header" id="deletePairingHeader">
+					Remove Pairing
+				</h4>
+			</button>
+			<div class="accordion-collapse collapse" id="deletePairingForm" aria-labelledby="deletePairingHeader" data-bs-parent="#accordion">
+				<div class="accordion-body">
+					<form asp-action="RemoveTonic" method="post">
+						<p>
+							Pairing to remove:
+							<select id="pairingDropDown" class="form-select mt-1 w-50"></select>
+						</p>
+						<button id="pairingDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePairingModal">
+							Remove
+						</button>
+					</form>
+					<p id="deletePairingResult" class="container mt-4"></p>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -92,6 +113,26 @@
 	</div>
 </div>
 
+<div class="modal fade" id="deletePairingModal" tabindex="-1" role="dialog" aria-labelledby="deletePairingModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deletePairingModalLabel">Remove Pairing</h5>
+				<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Are sure you wish to remove "<span id="selectedPairingText"></span>" pairing from the collection?</p>
+				<div class="modal-footer">
+					<button id="modalDeletePairingButton" type="submit" class="btn btn-danger">Remove</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
 @section Scripts {
 	<script type="text/javascript">
 		// Update selected gin and tonic modal text
@@ -102,6 +143,10 @@
 		document.getElementById("tonicDropDown").addEventListener("change", function () {
 			var selectedTonicText = $("#tonicDropDown option:selected").text();
 			$("#selectedTonicText").text(selectedTonicText);
+		});
+		document.getElementById("pairingDropDown").addEventListener("change", function () {
+			var selectedPairingText = $("#pairingDropDown option:selected").text();
+			$("#selectedPairingText").text(selectedPairingText);
 		});
 
 		// Get lists of gins and tonics
@@ -140,21 +185,40 @@
 					console.log(error);
 				}
 			});
+			$.ajax({
+				url: "/api/ginapi/getPairingList/",
+				type: "GET",
+				success: function (data) {
+					var dropdown = $("#pairingDropDown");
+					dropdown.empty();
+					dropdown.append("<option selected='true' disabled>Choose Pairing</option>");
+					dropdown.prop("selectedIndex", 0);
+
+					$.each(data, function (key, entry) {
+						dropdown.append($('<option></option>').attr('value', entry.value).text(entry.text));
+					});
+				},
+				error: function (error) {
+					console.log(error);
+				}
+			});
 		}
 		$(document).ready(function(){
 			PopulateLists();
 		});
+
 		// Reset message
 		function ResetMessage() {
 			document.getElementById("deleteGinResult").innerText = "";
 			document.getElementById("deleteTonicResult").innerText = "";
-			// document.getElementById("deletePairingResult").innerText = "";
+			document.getElementById("deletePairingResult").innerText = "";
 			$("#deleteGinResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
 			$("#deleteTonicResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
-			// $("#deletePairingResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
+			$("#deletePairingResult").removeClass("alert alert-primary alert-success alert-warning alert-danger");
 		};
 		document.getElementById("ginDropDown").addEventListener("click", ResetMessage);
 		document.getElementById("tonicDropDown").addEventListener("click", ResetMessage);
+		document.getElementById("pairingDropDown").addEventListener("click", ResetMessage);
 
 		// Delete Gin
 		$("#modalDeleteGinButton").click(function(data) {
@@ -184,10 +248,11 @@
 					}
 				},
 				error: function(){
-					console.log("An error occured in api.")
+					console.log("An error occured in the api.")
 				}
 			});
 		});
+
 		// Delete Tonic
 		$("#modalDeleteTonicButton").click(function(data) {
 			var tonicId = $("#tonicDropDown").val();
@@ -216,7 +281,40 @@
 					}
 				},
 				error: function(){
-					console.log("An error occured in api.")
+					console.log("An error occured in the api.")
+				}
+			});
+		});
+
+		// Delete Pairing
+		$("#modalDeletePairingButton").click(function(data) {
+			var pairingId = $("#pairingDropDown").val();
+			$.ajax({
+				url: "/api/ginapi/deletePairing/",
+				type: "POST",
+				contentType: "application/problem+json; charset=utf-8",
+				data: JSON.stringify({
+					pairingId: pairingId,
+				}),
+				success: function(response){
+					$("#deletePairingModal").modal("hide");
+					$("#pairingDropDown").focus();
+					$("#deletePairingResult").html(response.statusMessage);
+					switch(response.bsColor){
+						case 1:
+							$("#deletePairingResult").addClass("alert alert-success");
+							PopulateLists();
+							break;
+						case 2:
+							$("#deletePairingResult").addClass("alert alert-warning");
+							break;
+						case 3:
+							$("#deletePairingResult").addClass("alert alert-danger");
+							break;
+					}
+				},
+				error: function(){
+					console.log("An error occured in the api.")
 				}
 			});
 		});
