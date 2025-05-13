@@ -1,6 +1,4 @@
-﻿using GinPair.Models;
-
-namespace GinPair.Controllers;
+﻿namespace GinPair.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -79,10 +77,12 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
 
     [HttpGet("getPairingList")]
     public IActionResult GetPairingList() {
-        var pairingList = gpdb.Pairings.Select(p => new SelectListItem {
-            Value = p.PairingId.ToString(),
-            Text = $"{p.PairedGin.Distillery} {p.PairedGin.GinName} gin and {p.PairedTonic.TonicBrand} {p.PairedTonic.TonicFlavour} tonic"
-        })
+        var pairingList = gpdb.Pairings
+            .Where(p => p.PairedGin != null && p.PairedTonic != null) // Ensure non-null references
+            .Select(p => new SelectListItem {
+                Value = p.PairingId.ToString(),
+                Text = $"{p.PairedGin!.Distillery} {p.PairedGin.GinName} gin and {p.PairedTonic!.TonicBrand} {p.PairedTonic.TonicFlavour} tonic"
+            })
             .ToList()
             .OrderBy(o => o.Text);
 
