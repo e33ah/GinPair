@@ -1,6 +1,5 @@
 namespace GinPair.Controllers;
-public class HomeController(GinPairDbContext ginPairContext) : Controller {
-    protected GinPairDbContext gpdb = ginPairContext;
+public class HomeController() : Controller {
 
     public IActionResult Index() {
         return View(new PairingVM());
