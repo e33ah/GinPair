@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="GinPair is a web application that allows you to find gin and tonic combinations.">
-    <title>@ViewData["Title"] - GinPair</title>
+	<meta name="description" content="Discover the perfect gin and tonic pairings with GinPair.">
+	<title>GinPair - @ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GinPair.styles.css" asp-append-version="true" />
@@ -29,15 +29,15 @@
             </div>
         </nav>
     </header>
-    <div class="container">
+	<div class="container bg-white border-bottom box-shadow">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - GinPair - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+	<footer class="border-top footer text-muted bg-white border-bottom box-shadow">
+        <div class="container-fluid">
+            &copy; 2025 - GinPair
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

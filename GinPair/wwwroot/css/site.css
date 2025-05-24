@@ -18,5 +18,36 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-image: url('/images/ginbackground.png');
+    background-repeat: repeat;
+}
+@media (min-width: 576px) {
+    .container-sm, .container {
+        max-width: 460px; /* 80% of 576px */
+    }
+}
+
+@media (min-width: 768px) {
+    .container-md, .container-sm, .container {
+        max-width: 614px; /* 80% of 768px */
+    }
+}
+
+@media (min-width: 992px) {
+    .container-lg, .container-md, .container-sm, .container {
+        max-width: 793px; /* 80% of 992px */
+    }
+}
+
+@media (min-width: 1200px) {
+    .container-xl, .container-lg, .container-md, .container-sm, .container {
+        max-width: 960px; /* 80% of 1200px */
+    }
+}
+
+@media (min-width: 1400px) {
+    .container-xxl, .container-xl, .container-lg, .container-md, .container-sm, .container {
+        max-width: 1120px; /* 80% of 1400px */
+    }
 }

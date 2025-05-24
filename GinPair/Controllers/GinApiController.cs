@@ -47,7 +47,7 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
                 TonicBrand = result[r].TonicBrand,
                 TonicFlavour = result[r].TonicFlavour,
             };
-            response.StatusMessage = $"Try pairing {pairingResult.Distillery} {pairingResult.GinName} gin with<br>a {pairingResult.TonicBrand} {pairingResult.TonicFlavour} tonic!";
+            response.StatusMessage = $"Try pairing <b>{pairingResult.Distillery} {pairingResult.GinName}</b> gin with<br>a <b>{pairingResult.TonicBrand} {pairingResult.TonicFlavour}</b> tonic! 🍋🍋‍🟩";
             response.BsColor = BsColor.Primary;
         }
         return Ok(response);

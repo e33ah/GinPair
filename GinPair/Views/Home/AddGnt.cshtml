@@ -3,17 +3,41 @@
 	ViewData["Title"] = "Add";
 }
 
-<h1>Found something missing?</h1>
-<h2>Add it here!</h2>
 <div class="container mt-4">
+	<h1>Found something missing?</h1>
+	<h2>Add it here!</h2>
 	<div class="accordion" id="accordion">
 		<div class="accordion-item">
-			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addGinForm" aria-expanded="true" aria-controls="addGinForm">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="true" aria-controls="addPairingForm">
+				<h3 class="accordion-header" id="addPairingHeader">
+					Add Pairing
+				</h3>
+			</button>
+			<div class="accordion-collapse collapse show" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
+				<div class="accordion-body">
+					<p class="mb-2">Select a gin and tonic to pair together</p>
+					<form asp-action="AddPairing" method="post">
+						<p>
+							Gin to pair:
+							<select id="ginDropDown" class="form-select mt-1 w-50"></select>
+						</p>
+						<p>
+							Tonic to pair:
+							<select id="tonicDropDown" class="form-select mt-1 w-50"></select>
+						</p>
+						<button id="addPairingButton" type="button" class="btn btn-primary">Pair</button>
+					</form>
+					<p id="addPairingResult" class="container mt-4"></p>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addGinForm" aria-expanded="false" aria-controls="addGinForm">
 				<h3 class="accordion-header" id="addGinHeader">
 					Add Gin
 				</h3>
 			</button>
-			<div class="accordion-collapse collapse show" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
+			<div class="accordion-collapse collapse" id="addGinForm" aria-labelledby="addGinHeader" data-bs-parent="#accordion">
 				<div class="accordion-body">
 					<p class="mb-2">Add a gin to our collection</p>
 					<form asp-action="AddGin" method="post">
@@ -32,30 +56,6 @@
 						<button id="addGinButton" type="button" class="btn btn-primary">Add</button>
 					</form>
 					<p id="addGinResult" class="container mt-4"></p>
-				</div>
-			</div>
-		</div>
-		<div class="accordion-item">
-			<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addPairingForm" aria-expanded="false" aria-controls="addPairingForm">
-				<h3 class="accordion-header" id="addPairingHeader">
-					Add Pairing
-				</h3>
-			</button>
-			<div class="accordion-collapse collapse" id="addPairingForm" aria-labelledby="addPairingHeader" data-bs-parent="#accordion">
-				<div class="accordion-body">
-					<p class="mb-2">Select a gin and tonic to pair together</p>
-					<form asp-action="AddPairing" method="post">
-						<p>
-							Gin to pair:
-							<select id="ginDropDown" class="form-select mt-1 w-50"></select>
-						</p>
-						<p>
-							Tonic to pair:
-							<select id="tonicDropDown" class="form-select mt-1 w-50"></select>
-						</p>
-						<button id="addPairingButton" type="button" class="btn btn-primary">Pair</button>
-					</form>
-					<p id="addPairingResult" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
