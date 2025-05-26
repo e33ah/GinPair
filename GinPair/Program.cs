@@ -12,16 +12,18 @@ public class Program {
 
         var app = builder.Build();
 
+        if (!app.Environment.IsDevelopment()) {
+            app.UseExceptionHandler("/Home/Error");
+        }
+
         using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<GinPairDbContext>();
         try {
             dbContext.Database.EnsureCreated();
         } catch (InvalidOperationException) {
-            if (!app.Environment.IsDevelopment()) {
-                app.UseExceptionHandler("/Home/Error");
-            } else {
-                throw;
-            }
+#if DEBUG
+            throw new InvalidOperationException("Database creation failed. Ensure the connection string is correct and the database server is running.");
+#endif
         }
         app.UseStaticFiles();
 

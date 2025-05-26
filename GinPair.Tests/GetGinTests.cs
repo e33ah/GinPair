@@ -52,7 +52,7 @@ public class GetGinTests {
 
         result.Should().BeOfType<OkObjectResult>()
             .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.StatusMessage.Should().Contain("Try pairing TestDis3 TestName3 gin with");
+            .Which.StatusMessage.Should().Contain("Try pairing <b>TestDis3 TestName3</b> gin with");
         result.Should().BeOfType<OkObjectResult>()
             .Which.Value.Should().BeOfType<ApiResponse>()
             .Which.BsColor.Should().Be(BsColor.Primary);
