@@ -4,13 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GinPair.Tests;
 
-public class DbContextConfigurationTests
-{
+public class DbContextConfigurationTests {
     [Theory]
     [InlineData("Postgres", "Npgsql.EntityFrameworkCore.PostgreSQL")]
     [InlineData("SqlServer", "Microsoft.EntityFrameworkCore.SqlServer")]
-    public void Should_Use_Correct_Database_Provider(string dbProvider, string expectedProviderName)
-    {
+    public void Should_Use_Correct_Database_Provider(string dbProvider, string expectedProviderName) {
         var fakeConfig = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {

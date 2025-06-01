@@ -21,8 +21,8 @@ public static class ServiceConfiguration {
         // Configure the DbContext with the appropriate provider and connection string
         services.AddDbContext<GinPairDbContext>(options => {
             if (provider == "Postgres") {
-                options.UseNpgsql(connectionString, npgsqlOptionsAction => { 
-                    npgsqlOptionsAction.MigrationsAssembly("GinPair.Migrations.Postgres"); 
+                options.UseNpgsql(connectionString, npgsqlOptionsAction => {
+                    npgsqlOptionsAction.MigrationsAssembly("GinPair.Migrations.Postgres");
                 })
                 .UseSnakeCaseNamingConvention();
             } else if (provider == "SqlServer") {

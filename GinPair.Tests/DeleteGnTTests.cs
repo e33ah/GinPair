@@ -86,7 +86,7 @@ public class DeleteGnTTests {
         response.BsColor.ToString().Should().Be("Warning");
         response.StatusMessage.Should().Be("Please select a tonic to delete");
     }
-    
+
     [Fact]
     public void DeletePairing_ShouldReturnSuccess_WhenPairingIsDeleted() {
         var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };

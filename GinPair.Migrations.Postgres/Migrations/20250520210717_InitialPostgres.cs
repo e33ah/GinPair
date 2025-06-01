@@ -5,60 +5,51 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace GinPair.Migrations.Postgres.Migrations
-{
+namespace GinPair.Migrations.Postgres.Migrations {
     /// <inheritdoc />
-    public partial class InitialPostgres : Migration
-    {
+    public partial class InitialPostgres : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.EnsureSchema(
                 name: "gp_schema");
 
             migrationBuilder.CreateTable(
                 name: "gins",
                 schema: "gp_schema",
-                columns: table => new
-                {
+                columns: table => new {
                     gin_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     gin_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     distillery = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     gin_description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("pk_gins", x => x.gin_id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "tonics",
                 schema: "gp_schema",
-                columns: table => new
-                {
+                columns: table => new {
                     tonic_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     tonic_brand = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     tonic_flavour = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("pk_tonics", x => x.tonic_id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "pairings",
                 schema: "gp_schema",
-                columns: table => new
-                {
+                columns: table => new {
                     pairing_id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     gin_id = table.Column<int>(type: "integer", nullable: false),
                     tonic_id = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("pk_pairings", x => x.pairing_id);
                     table.ForeignKey(
                         name: "fk_pairings_gins_gin_id",
@@ -127,8 +118,7 @@ namespace GinPair.Migrations.Postgres.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "pairings",
                 schema: "gp_schema");

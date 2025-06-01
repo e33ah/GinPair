@@ -4,60 +4,51 @@
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace GinPair.Migrations.SqlServer.Migrations
-{
+namespace GinPair.Migrations.SqlServer.Migrations {
     /// <inheritdoc />
-    public partial class InitialSqlServer : Migration
-    {
+    public partial class InitialSqlServer : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.EnsureSchema(
                 name: "gp_schema");
 
             migrationBuilder.CreateTable(
                 name: "Gins",
                 schema: "gp_schema",
-                columns: table => new
-                {
+                columns: table => new {
                     GinId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GinName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Distillery = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     GinDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Gins", x => x.GinId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Tonics",
                 schema: "gp_schema",
-                columns: table => new
-                {
+                columns: table => new {
                     TonicId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TonicBrand = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     TonicFlavour = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Tonics", x => x.TonicId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Pairings",
                 schema: "gp_schema",
-                columns: table => new
-                {
+                columns: table => new {
                     PairingId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GinId = table.Column<int>(type: "int", nullable: false),
                     TonicId = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Pairings", x => x.PairingId);
                     table.ForeignKey(
                         name: "FK_Pairings_Gins_GinId",
@@ -126,8 +117,7 @@ namespace GinPair.Migrations.SqlServer.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "Pairings",
                 schema: "gp_schema");
