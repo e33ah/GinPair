@@ -16,15 +16,22 @@ public class Program {
             app.UseExceptionHandler("/Home/Error");
         }
 
-        using var scope = app.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<GinPairDbContext>();
-        try {
-            dbContext.Database.EnsureCreated();
-        } catch (InvalidOperationException) {
+        // Initialise the database in the background after the app has started
+        var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+        lifetime.ApplicationStarted.Register(() => {
+            Task.Run(() => {
+                using var scope = app.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<GinPairDbContext>();
+                try {
+                    dbContext.Database.EnsureCreated();
+                } catch (InvalidOperationException) {
 #if DEBUG
-            throw new InvalidOperationException("Database creation failed. Ensure the connection string is correct and the database server is running.");
+                    throw new InvalidOperationException("Database creation failed. Ensure the connection string is correct and the database server is running.");
 #endif
-        }
+                }
+            });
+        });
+
         app.UseStaticFiles();
 
         app.UseRouting();
