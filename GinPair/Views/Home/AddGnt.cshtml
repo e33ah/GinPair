@@ -1,4 +1,4 @@
-﻿  @model GinPair.Models.AddGntVM
+﻿@model GinPair.Models.AddGntVM
 @{
 	ViewData["Title"] = "Add";
 }
@@ -150,11 +150,8 @@
 		// Add Gin
 		$("#addGinButton").click(function(data) {
 			var ginName = $("#ginNameInput").val();
-			console.log(ginName);
 			var distillery = $("#distilleryInput").val();
-			console.log(distillery);
 			var description = $("#descriptionInput").val();
-			console.log("button clicked");
 			$.ajax({
 				url: "/api/ginapi/addGin/",
 				type: "POST",
@@ -182,18 +179,19 @@
 							break;
 					}
 				},
-				error: function(){
-					console.log("An error occurred in api.")
+				error: function(xhr) {
+					if (xhr.status === 503) {
+						$("#addGinResult").html("Hang tight! We're getting things ready. Please try again in a minute.").addClass("alert alert-danger");
+					} else {
+						$("#addGinResult").html("An error occurred. Please try again.").addClass("alert alert-danger");
+					}
 				}
 			});
 		});
-		// Add Paring
+		// Add Pairing
 		$("#addPairingButton").click(function(data) {
-			console.log("button clicked");
 			var ginId = $("#ginDropDown").val();
-			console.log(ginId);
 			var tonicId = $("#tonicDropDown").val();
-			console.log(tonicId);
 			$.ajax({
 				url: "/api/ginapi/addPairing/",
 				type: "POST",
@@ -217,18 +215,19 @@
 							break;
 					}
 				},
-				error: function(){
-					console.log("An error occurred in api.")
+				error: function(xhr) {
+					if (xhr.status === 503) {
+						$("#addPairingResult").html( "Hang tight! We're getting things ready. Please try again in a minute.").addClass("alert alert-danger");
+					} else {
+						$("#addPairingResult").html("An error occurred. Please try again.").addClass("alert alert-danger");
+					}
 				}
 			});
 		});
 		// Add Tonic
 		$("#addTonicButton").click(function(data) {
-			console.log("button clicked");
 			var tonicBrand = $("#tonicBrandInput").val();
-			console.log(tonicBrand);
 			var tonicFlavour = $("#tonicFlavourInput").val();
-			console.log(tonicFlavour);
 			$.ajax({
 				url: "/api/ginapi/addTonic/",
 				type: "POST",
@@ -254,8 +253,12 @@
 							break;
 					}
 				},
-				error: function(){
-					console.log("An error occurred in api.")
+				error: function(xhr) {
+					if (xhr.status === 503) {
+						$("#addTonicResult").html("Hang tight! We're getting things ready. Please try again in a minute.").addClass("alert alert-danger");
+					} else {
+						$("#addTonicResult").html("An error occurred. Please try again.").addClass("alert alert-danger");
+					}
 				}
 			});
 		});

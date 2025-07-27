@@ -7,7 +7,8 @@ public class DeleteGnTTests {
     public DeleteGnTTests() {
         var options = GetDbContextOptions();
         mockContext = new GinPairDbContext(options);
-        mockController = new GinApiController(mockContext);
+        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
+        mockController = new GinApiController(mockContext, dbInitState);
     }
     private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
         return new DbContextOptionsBuilder<GinPairDbContext>()
@@ -26,13 +27,12 @@ public class DeleteGnTTests {
         var response = result?.Value as ApiResponse;
         var deletedGin = mockContext.Gins.Find(1);
 
-        using var scope = new AssertionScope();
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(200);
-        response.Should().NotBeNull();
-        response.BsColor.ToString().Should().Be("Success");
-        response.StatusMessage.Should().Contain("was removed");
-        deletedGin.Should().BeNull();
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+        response.ShouldNotBeNull();
+        response.BsColor.ToString().ShouldBe("Success");
+        response.StatusMessage.ShouldContain("was removed");
+        deletedGin.ShouldBeNull();
     }
 
     [Fact]
@@ -43,12 +43,11 @@ public class DeleteGnTTests {
         var result = mockController.DeleteGin(data) as OkObjectResult;
         var response = result?.Value as ApiResponse;
 
-        using var scope = new AssertionScope();
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(200);
-        response.Should().NotBeNull();
-        response.BsColor.ToString().Should().Be("Warning");
-        response.StatusMessage.Should().Be("Please select a gin to delete");
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+        response.ShouldNotBeNull();
+        response.BsColor.ToString().ShouldBe("Warning");
+        response.StatusMessage.ShouldBe("Please select a gin to delete");
     }
 
     [Fact]
@@ -62,13 +61,12 @@ public class DeleteGnTTests {
         var response = result?.Value as ApiResponse;
         var deletedTonic = mockContext.Tonics.Find(1);
 
-        using var scope = new AssertionScope();
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(200);
-        response.Should().NotBeNull();
-        response.BsColor.ToString().Should().Be("Success");
-        response.StatusMessage.Should().Contain("was removed");
-        deletedTonic.Should().BeNull();
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+        response.ShouldNotBeNull();
+        response.BsColor.ToString().ShouldBe("Success");
+        response.StatusMessage.ShouldContain("was removed");
+        deletedTonic.ShouldBeNull();
     }
 
     [Fact]
@@ -79,12 +77,11 @@ public class DeleteGnTTests {
         var result = mockController.DeleteTonic(data) as OkObjectResult;
         var response = result?.Value as ApiResponse;
 
-        using var scope = new AssertionScope();
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(200);
-        response.Should().NotBeNull();
-        response.BsColor.ToString().Should().Be("Warning");
-        response.StatusMessage.Should().Be("Please select a tonic to delete");
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+        response.ShouldNotBeNull();
+        response.BsColor.ToString().ShouldBe("Warning");
+        response.StatusMessage.ShouldBe("Please select a tonic to delete");
     }
 
     [Fact]
@@ -102,13 +99,12 @@ public class DeleteGnTTests {
         var response = result?.Value as ApiResponse;
         var deletedPairing = mockContext.Pairings.Find(1);
 
-        using var scope = new AssertionScope();
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(200);
-        response.Should().NotBeNull();
-        response.BsColor.ToString().Should().Be("Success");
-        response.StatusMessage.Should().Contain("was removed");
-        deletedPairing.Should().BeNull();
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+        response.ShouldNotBeNull();
+        response.BsColor.ToString().ShouldBe("Success");
+        response.StatusMessage.ShouldContain("was removed");
+        deletedPairing.ShouldBeNull();
 
     }
 
@@ -120,11 +116,10 @@ public class DeleteGnTTests {
         var result = mockController.DeletePairing(data) as OkObjectResult;
         var response = result?.Value as ApiResponse;
 
-        using var scope = new AssertionScope();
-        result.Should().NotBeNull();
-        result.StatusCode.Should().Be(200);
-        response.Should().NotBeNull();
-        response.BsColor.ToString().Should().Be("Warning");
-        response.StatusMessage.Should().Be("Please select a pairing to delete");
+        result.ShouldNotBeNull();
+        result.StatusCode.ShouldBe(200);
+        response.ShouldNotBeNull();
+        response.BsColor.ToString().ShouldBe("Warning");
+        response.StatusMessage.ShouldBe("Please select a pairing to delete");
     }
 }

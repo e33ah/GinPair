@@ -28,9 +28,7 @@ public class DbContextConfigurationTests {
             .OfType<RelationalOptionsExtension>()
             .FirstOrDefault();
 
-        using var scope = new AssertionScope();
-        relationalExtension.Should().NotBeNull();
-        relationalExtension!.GetType().Assembly.FullName.Should().StartWith(expectedProviderName);
-
+        relationalExtension.ShouldNotBeNull();
+        relationalExtension!.GetType().Assembly.FullName.ShouldStartWith(expectedProviderName);
     }
 }

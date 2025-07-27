@@ -2,8 +2,10 @@
 
 [Route("api/[controller]")]
 [ApiController]
-public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase {
+[ServiceFilter(typeof(DatabaseReadyFilter))]
+public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializationState dbInitState) : ControllerBase {
     protected GinPairDbContext gpdb = ginPairContext;
+    private readonly DatabaseInitializationState dbInitState = dbInitState;
 
     [HttpGet("matchGin")]
     public async Task<IActionResult> MatchGin(string partial) {
@@ -58,8 +60,8 @@ public class GinApiController(GinPairDbContext ginPairContext) : ControllerBase 
             Value = g.GinId.ToString(),
             Text = $"{g.Distillery} {g.GinName}"
         })
-            .ToList().
-            OrderBy(o => o.Text);
+            .ToList()
+            .OrderBy(o => o.Text);
         return Ok(ginList);
     }
 

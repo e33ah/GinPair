@@ -10,6 +10,12 @@ public class Program {
         // Add database context
         builder.Services.AddConfiguredDbContext(builder.Configuration);
 
+        // Add database initialisation state singleton
+        builder.Services.AddSingleton<DatabaseInitializationState>();
+
+        // Register the database ready filter
+        builder.Services.AddScoped<DatabaseReadyFilter>();
+
         var app = builder.Build();
 
         if (!app.Environment.IsDevelopment()) {
@@ -17,6 +23,7 @@ public class Program {
         }
 
         // Initialise the database in the background after the app has started
+        var dbInitState = app.Services.GetRequiredService<DatabaseInitializationState>();
         var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
         lifetime.ApplicationStarted.Register(() => {
             Task.Run(() => {
@@ -24,6 +31,7 @@ public class Program {
                 var dbContext = scope.ServiceProvider.GetRequiredService<GinPairDbContext>();
                 try {
                     dbContext.Database.EnsureCreated();
+                    dbInitState.IsDatabaseReady = true;
                 } catch (InvalidOperationException) {
 #if DEBUG
                     throw new InvalidOperationException("Database creation failed. Ensure the connection string is correct and the database server is running.");

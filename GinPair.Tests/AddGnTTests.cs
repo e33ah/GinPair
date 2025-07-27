@@ -7,7 +7,8 @@ public class AddGnTTests {
     public AddGnTTests() {
         var options = GetDbContextOptions();
         mockContext = new GinPairDbContext(options);
-        mockController = new GinApiController(mockContext);
+        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
+        mockController = new GinApiController(mockContext, dbInitState);
     }
     private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
         return new DbContextOptionsBuilder<GinPairDbContext>()
@@ -22,11 +23,10 @@ public class AddGnTTests {
 
         var result = mockController.AddGin(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Success &&
-                response.StatusMessage == $"✅ Success! \"Test Distillery Test Gin\" gin was added!");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Success);
+        apiResponse.StatusMessage.ShouldBe("✅ Success! \"Test Distillery Test Gin\" gin was added!");
     }
 
     [Fact]
@@ -36,11 +36,21 @@ public class AddGnTTests {
 
         var result = mockController.AddGin(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Warning &&
-                response.StatusMessage == "Please provide the name of the Distillery and Gin.");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Warning);
+        apiResponse.StatusMessage.ShouldBe("Please provide the name of the Distillery and Gin.");
+    }
+
+    [Fact]
+    public void IsGinPresent_ReturnsTrue_WhenGinExists() {
+        var gin = new Gin { GinName = "TestGin", Distillery = "TestDistillery" };
+        mockContext.Gins.Add(gin);
+        mockContext.SaveChanges();
+
+        bool result = mockController.IsGinPresent("TestGin", "TestDistillery");
+
+        result.ShouldBeTrue();
     }
 
     [Fact]
@@ -53,11 +63,27 @@ public class AddGnTTests {
 
         var result = mockController.AddGin(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Danger &&
-                response.StatusMessage == "Sorry this gin cannot be added as it is already part of our collection!");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Danger);
+        apiResponse.StatusMessage.ShouldBe("Sorry this gin cannot be added as it is already part of our collection!");
+    }
+
+    [Theory]
+    [InlineData(null, "Distillery")]
+    [InlineData("GinName", null)]
+    [InlineData("", "Distillery")]
+    [InlineData("GinName", "")]
+    public void AddGin_ReturnsOk_WhenNameOrDistilleryMissing(string? ginName, string? distillery) {
+        string json = $@"{{ ""ginName"": ""{ginName}"", ""distillery"": ""{distillery}"", ""description"": ""desc"" }}";
+        var doc = JsonDocument.Parse(json);
+
+        var result = mockController.AddGin(doc.RootElement);
+
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Warning);
+        apiResponse.StatusMessage.ShouldContain("Please provide the name of the Distillery and Gin.");
     }
 
     [Fact]
@@ -67,11 +93,10 @@ public class AddGnTTests {
 
         var result = mockController.AddTonic(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Success &&
-                response.StatusMessage == "✅ Success! \"Test Brand Test Flavour\" tonic was added!");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Success);
+        apiResponse.StatusMessage.ShouldBe("✅ Success! \"Test Brand Test Flavour\" tonic was added!");
     }
 
     [Fact]
@@ -81,11 +106,10 @@ public class AddGnTTests {
 
         var result = mockController.AddTonic(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Warning &&
-                response.StatusMessage == "Please provide the tonic brand and flavour/name.");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Warning);
+        apiResponse.StatusMessage.ShouldBe("Please provide the tonic brand and flavour/name.");
     }
 
     [Fact]
@@ -98,11 +122,10 @@ public class AddGnTTests {
 
         var result = mockController.AddTonic(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Danger &&
-                response.StatusMessage == "Sorry this tonic cannot be added as it is already part of our collection!");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Danger);
+        apiResponse.StatusMessage.ShouldBe("Sorry this tonic cannot be added as it is already part of our collection!");
     }
 
     [Fact]
@@ -118,11 +141,10 @@ public class AddGnTTests {
 
         var result = mockController.AddPairing(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Success &&
-                response.StatusMessage == "✅ Success! \"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic were paired!");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Success);
+        apiResponse.StatusMessage.ShouldBe("✅ Success! \"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic were paired!");
     }
 
     [Theory]
@@ -137,11 +159,10 @@ public class AddGnTTests {
 
         var result = mockController.AddPairing(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Warning &&
-                response.StatusMessage == "Please select the gin and tonic to pair");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Warning);
+        apiResponse.StatusMessage.ShouldBe("Please select the gin and tonic to pair");
     }
 
     [Fact]
@@ -159,10 +180,9 @@ public class AddGnTTests {
 
         var result = mockController.AddPairing(data);
 
-        result.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ApiResponse>()
-            .Which.Should().Match<ApiResponse>(response =>
-                response.BsColor == BsColor.Danger &&
-                response.StatusMessage == "\"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic are already paired!");
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
+        apiResponse.BsColor.ShouldBe(BsColor.Danger);
+        apiResponse.StatusMessage.ShouldBe("\"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic are already paired!");
     }
 }
