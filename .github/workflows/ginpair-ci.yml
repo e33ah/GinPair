@@ -54,4 +54,4 @@ jobs:
         run: ./build.cmd ConstructStep --skip ArrangeStep
 
       - name: Run ExamineStep
-        run: ./build.cmd ExamineStep --skip ConstructStep
+        run: ./build.cmd ExamineStep --skip ArrangeStep ConstructStep

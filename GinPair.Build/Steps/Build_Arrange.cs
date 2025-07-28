@@ -5,12 +5,14 @@ using Serilog;
 namespace GinPair.Build;
 public partial class Build : NukeBuild {
     public Target ArrangeStep => _ => _
-    .Triggers(Clean, Restore)
-    .Executes(() => {
-        Log.Information("Arrange Step");
-    });
+        .Before(ConstructStep)
+        .Triggers(Clean, Restore)
+        .Executes(() => {
+            Log.Information("Arrange Step");
+        });
 
     private Target Clean => _ => _
+        .Before(ConstructStep)
         .DependsOn(ArrangeStep)
         .Executes(() => {
             Log.Information("Cleaning build artefacts...");
@@ -20,6 +22,7 @@ public partial class Build : NukeBuild {
         });
 
     private Target Restore => _ => _
+        .Before(ConstructStep)
         .DependsOn(Clean)
         .Executes(() => {
             DotNetTasks.DotNetRestore(s => s

@@ -5,13 +5,15 @@ using Serilog;
 namespace GinPair.Build;
 public partial class Build : NukeBuild {
     public Target ConstructStep => _ => _
-        .DependsOn(Restore)
+        .Before(ExamineStep)
+        .DependsOn(ArrangeStep)
         .Triggers(Compile)
         .Executes(() => {
             Log.Information("Construct Step");
         });
 
     private Target Compile => _ => _
+        .Before(ExamineStep)
         .DependsOn(ConstructStep)
         .Executes(() => {
             DotNetTasks.DotNetBuild(s => s

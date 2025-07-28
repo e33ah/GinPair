@@ -6,7 +6,7 @@ using Serilog;
 namespace GinPair.Build;
 public partial class Build : NukeBuild {
     public Target ExamineStep => _ => _
-        .DependsOn(Compile)
+        .DependsOn(ConstructStep)
         .Triggers(UnitTest)
         .Executes(() => {
             Log.Information("Examine Step");
