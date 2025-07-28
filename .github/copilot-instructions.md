@@ -62,7 +62,7 @@ would fix the issues. If you do not find any issues then state that no issues we
 - **Integration:** .ITest projects are Integration Tests.  Tests which require external resources, such as databases or file systems, should be placed in an .ITest project.
 - **Unit:** .Test projects are Unit Tests.  Use XUnit for all unit tests.
 - **NoComments:** Do not include comments for Arrange, Act, Assert sections but prefer to adopt that style of test.  Ensure that the primary subject of the test is named 'sut'. 
-- **Naming:** When creating new unit tests their names should be snake cased.  If the test is to ensure something succeeded and its not clear from the name then use _works as a suffix for the method name.  If the test throws an exception then use _throws as a suffix for the method name.
+- **Naming:** When creating new unit tests, use the following naming convention: `MethodUnderTest_ExpectedBehavior_WhenCondition`. For example, `AddMeta_ReturnsOk_WhenMetaAddedSuccessfully`. This convention clearly communicates what is being tested, the expected outcome, and the scenario or condition.
 - **Spacing:** Leave a single blank new line between the Arrange, Act, and Assert sections.  Prefer to use intermediary variables to help keep the arrange, act and assert sections separate.
 - **Shouldly:** Use Shouldly for assertions.  When updating test files check other methods in the same file to ensure that they are using Shouldly for consistency.  If they are not then update them to use Shouldly.
 - **Exploratory:** Use the ExploratoryTests class for new exploratory unit tests.

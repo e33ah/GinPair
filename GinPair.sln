@@ -12,12 +12,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		.github\copilot-instructions.md = .github\copilot-instructions.md
+		.github\workflows\ginpair-ci.yml = .github\workflows\ginpair-ci.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GinPair.Migrations.SqlServer", "GinPair.Migrations.SqlServer\GinPair.Migrations.SqlServer.csproj", "{73E4CDFA-20F7-46B4-9793-D3B6B0FD2E6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GinPair.Migrations.Postgres", "GinPair.Migrations.Postgres\GinPair.Migrations.Postgres.csproj", "{A9CF7C3F-FB49-4D36-BDD2-34D08FE180E2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GinPair.Build", "GinPair.Build\GinPair.Build.csproj", "{F2A10938-91FE-4095-977B-2B0CF27A33AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,14 +58,10 @@ Global
 		{4BEEB98F-8862-4C03-8140-56766BACED7C}.Release|x86.Build.0 = Release|Any CPU
 		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|x64.Build.0 = Debug|Any CPU
 		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{88709193-20EF-4880-9DCE-B16FBE699371}.Debug|x86.Build.0 = Debug|Any CPU
 		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|x64.ActiveCfg = Release|Any CPU
-		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|x64.Build.0 = Release|Any CPU
 		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|x86.ActiveCfg = Release|Any CPU
-		{88709193-20EF-4880-9DCE-B16FBE699371}.Release|x86.Build.0 = Release|Any CPU
 		{73E4CDFA-20F7-46B4-9793-D3B6B0FD2E6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{73E4CDFA-20F7-46B4-9793-D3B6B0FD2E6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73E4CDFA-20F7-46B4-9793-D3B6B0FD2E6E}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -87,6 +86,12 @@ Global
 		{A9CF7C3F-FB49-4D36-BDD2-34D08FE180E2}.Release|x64.Build.0 = Release|Any CPU
 		{A9CF7C3F-FB49-4D36-BDD2-34D08FE180E2}.Release|x86.ActiveCfg = Release|Any CPU
 		{A9CF7C3F-FB49-4D36-BDD2-34D08FE180E2}.Release|x86.Build.0 = Release|Any CPU
+		{F2A10938-91FE-4095-977B-2B0CF27A33AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2A10938-91FE-4095-977B-2B0CF27A33AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2A10938-91FE-4095-977B-2B0CF27A33AD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2A10938-91FE-4095-977B-2B0CF27A33AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2A10938-91FE-4095-977B-2B0CF27A33AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{F2A10938-91FE-4095-977B-2B0CF27A33AD}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
