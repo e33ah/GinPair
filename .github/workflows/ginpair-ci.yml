@@ -43,12 +43,15 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
+       
+      - name: Ensure build.cmd is executable
+        run: chmod +x build.cmd
 
-      - name: 'Run: ArrangeStep'
+      - name: Run ArrangeStep
         run: ./build.cmd ArrangeStep
 
-      - name: 'Run: ConstructStep'
+      - name: Run ConstructStep
         run: ./build.cmd ConstructStep --skip ArrangeStep
 
-      - name: 'Run: ExamineStep'
+      - name: Run ExamineStep
         run: ./build.cmd ExamineStep --skip ConstructStep
