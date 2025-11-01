@@ -5,48 +5,39 @@ public class AddGnTTests {
     private readonly GinApiController mockController;
 
     public AddGnTTests() {
-        var options = GetDbContextOptions();
-        mockContext = new GinPairDbContext(options);
-        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
-        mockController = new GinApiController(mockContext, dbInitState);
-    }
-    private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
-        return new DbContextOptionsBuilder<GinPairDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
+        mockContext = CreateInMemoryGinPairDbContext();
+        mockController = CreateController(mockContext);
     }
 
     [Fact]
     public void AddGin_ReturnsOk_WhenGinIsAddedSuccessfully() {
+        ResetDatabase(mockContext);
         string jsonData = JsonSerializer.Serialize(new { ginName = "Test Gin", distillery = "Test Distillery", description = "" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddGin(data);
+        var sut = mockController;
+        var result = sut.AddGin(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Success);
-        apiResponse.StatusMessage.ShouldBe("✅ Success! \"Test Distillery Test Gin\" gin was added!");
+        AssertApiResponse(result, BsColor.Success, "✅ Success! \"Test Distillery Test Gin\" gin was added!");
     }
 
     [Fact]
     public void AddGin_ReturnsOk_WhenGinIsEmpty() {
+        ResetDatabase(mockContext);
         string jsonData = JsonSerializer.Serialize(new { ginName = "", distillery = "", description = "" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddGin(data);
+        var sut = mockController;
+        var result = sut.AddGin(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Warning);
-        apiResponse.StatusMessage.ShouldBe("Please provide the name of the Distillery and Gin.");
+        AssertApiResponse(result, BsColor.Warning, "Please provide the name of the Distillery and Gin.");
     }
 
     [Fact]
     public void IsGinPresent_ReturnsTrue_WhenGinExists() {
-        var gin = new Gin { GinName = "TestGin", Distillery = "TestDistillery" };
-        mockContext.Gins.Add(gin);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var gin = CreateGin(1, "TestGin", "TestDistillery");
+        SeedGins(mockContext, new[] { gin });
 
         bool result = mockController.IsGinPresent("TestGin", "TestDistillery");
 
@@ -55,18 +46,16 @@ public class AddGnTTests {
 
     [Fact]
     public void AddGin_ReturnsOk_WhenGinIsPresent() {
-        var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
-        mockContext.Gins.Add(gin);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var gin = CreateGin(1, "Test Gin", "Test Distillery");
+        SeedGins(mockContext, new[] { gin });
         string jsonData = JsonSerializer.Serialize(new { ginName = "Test Gin", distillery = "Test Distillery", description = "" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddGin(data);
+        var sut = mockController;
+        var result = sut.AddGin(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Danger);
-        apiResponse.StatusMessage.ShouldBe("Sorry this gin cannot be added as it is already part of our collection!");
+        AssertApiResponse(result, BsColor.Danger, "Sorry this gin cannot be added as it is already part of our collection!");
     }
 
     [Theory]
@@ -75,76 +64,69 @@ public class AddGnTTests {
     [InlineData("", "Distillery")]
     [InlineData("GinName", "")]
     public void AddGin_ReturnsOk_WhenNameOrDistilleryMissing(string? ginName, string? distillery) {
+        ResetDatabase(mockContext);
         string json = $@"{{ ""ginName"": ""{ginName}"", ""distillery"": ""{distillery}"", ""description"": ""desc"" }}";
         var doc = JsonDocument.Parse(json);
 
-        var result = mockController.AddGin(doc.RootElement);
+        var sut = mockController;
+        var result = sut.AddGin(doc.RootElement);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Warning);
-        apiResponse.StatusMessage.ShouldContain("Please provide the name of the Distillery and Gin.");
+        AssertApiResponse(result, BsColor.Warning, "Please provide the name of the Distillery and Gin.");
     }
 
     [Fact]
     public void AddTonic_ReturnsOk_WhenTonicIsAddedSuccessfully() {
+        ResetDatabase(mockContext);
         string jsonData = JsonSerializer.Serialize(new { tonicBrand = "Test Brand", tonicFlavour = "Test Flavour" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddTonic(data);
+        var sut = mockController;
+        var result = sut.AddTonic(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Success);
-        apiResponse.StatusMessage.ShouldBe("✅ Success! \"Test Brand Test Flavour\" tonic was added!");
+        AssertApiResponse(result, BsColor.Success, "✅ Success! \"Test Brand Test Flavour\" tonic was added!");
     }
 
     [Fact]
     public void AddTonic_ReturnsOk_WhenTonicIsEmpty() {
+        ResetDatabase(mockContext);
         string jsonData = JsonSerializer.Serialize(new { tonicBrand = "", tonicFlavour = "" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddTonic(data);
+        var sut = mockController;
+        var result = sut.AddTonic(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Warning);
-        apiResponse.StatusMessage.ShouldBe("Please provide the tonic brand and flavour/name.");
+        AssertApiResponse(result, BsColor.Warning, "Please provide the tonic brand and flavour/name.");
     }
 
     [Fact]
     public void AddTonic_ReturnsOk_WhenTonicIsPresent() {
-        var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
-        mockContext.Tonics.Add(tonic);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
+        SeedTonics(mockContext, new[] { tonic });
         string jsonData = JsonSerializer.Serialize(new { tonicBrand = "Test Brand", tonicFlavour = "Test Flavour" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddTonic(data);
+        var sut = mockController;
+        var result = sut.AddTonic(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Danger);
-        apiResponse.StatusMessage.ShouldBe("Sorry this tonic cannot be added as it is already part of our collection!");
+        AssertApiResponse(result, BsColor.Danger, "Sorry this tonic cannot be added as it is already part of our collection!");
     }
 
     [Fact]
     public void AddPairing_ReturnsOk_WhenPairingIsAddedSuccessfully() {
-        var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
-        var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
-        mockContext.Gins.Add(gin);
-        mockContext.Tonics.Add(tonic);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var gin = CreateGin(1, "Test Gin", "Test Distillery");
+        var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
+        SeedGins(mockContext, new[] { gin });
+        SeedTonics(mockContext, new[] { tonic });
 
         string jsonData = JsonSerializer.Serialize(new { ginId = "1", tonicId = "1" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddPairing(data);
+        var sut = mockController;
+        var result = sut.AddPairing(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Success);
-        apiResponse.StatusMessage.ShouldBe("✅ Success! \"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic were paired!");
+        AssertApiResponse(result, BsColor.Success, "✅ Success! \"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic were paired!");
     }
 
     [Theory]
@@ -154,35 +136,32 @@ public class AddGnTTests {
     [InlineData("1", null)]
     [InlineData("1", "1")]
     public void AddPairing_ReturnsOk_WhenGinOrTonicIsNullOrEmpty(string? ginId, string? tonicId) {
+        ResetDatabase(mockContext);
         string jsonData = JsonSerializer.Serialize(new { ginId, tonicId });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddPairing(data);
+        var sut = mockController;
+        var result = sut.AddPairing(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Warning);
-        apiResponse.StatusMessage.ShouldBe("Please select the gin and tonic to pair");
+        AssertApiResponse(result, BsColor.Warning, "Please select the gin and tonic to pair");
     }
 
     [Fact]
     public void AddPairing_ReturnsOk_WhenGinOrTonicIsAlreadyPresent() {
-        var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
-        var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
-        var pairing = new Pairing { PairedGin = gin, PairedTonic = tonic };
-        mockContext.Gins.Add(gin);
-        mockContext.Tonics.Add(tonic);
-        mockContext.Pairings.Add(pairing);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var gin = CreateGin(1, "Test Gin", "Test Distillery");
+        var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
+        var pairing = CreatePairing(gin, tonic);
+        SeedGins(mockContext, new[] { gin });
+        SeedTonics(mockContext, new[] { tonic });
+        SeedPairings(mockContext, new[] { pairing });
 
         string jsonData = JsonSerializer.Serialize(new { ginId = "1", tonicId = "1" });
         var data = JsonDocument.Parse(jsonData).RootElement;
 
-        var result = mockController.AddPairing(data);
+        var sut = mockController;
+        var result = sut.AddPairing(data);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Danger);
-        apiResponse.StatusMessage.ShouldBe("\"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic are already paired!");
+        AssertApiResponse(result, BsColor.Danger, "\"Test Distillery Test Gin\" gin and \"Test Brand Test Flavour\" tonic are already paired!");
     }
 }

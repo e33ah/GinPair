@@ -5,121 +5,89 @@ public class DeleteGnTTests {
     private readonly GinApiController mockController;
 
     public DeleteGnTTests() {
-        var options = GetDbContextOptions();
-        mockContext = new GinPairDbContext(options);
-        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
-        mockController = new GinApiController(mockContext, dbInitState);
-    }
-    private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
-        return new DbContextOptionsBuilder<GinPairDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
+        mockContext = CreateInMemoryGinPairDbContext();
+        mockController = CreateController(mockContext);
     }
 
     [Fact]
     public void DeleteGin_ShouldReturnSuccess_WhenGinIsDeleted() {
-        var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
-        mockContext.Gins.Add(gin);
-        string json = JsonSerializer.Serialize(new { ginId = "1" });
-        var data = JsonDocument.Parse(json).RootElement;
+        ResetDatabase(mockContext);
+        var gin = CreateGin(1, "Test Gin", "Test Distillery");
+        SeedGins(mockContext, [gin]);
+        var data = BuildJsonElement(new { ginId = "1" });
 
-        var result = mockController.DeleteGin(data) as OkObjectResult;
-        var response = result?.Value as ApiResponse;
+        var sut = mockController;
+        var result = sut.DeleteGin(data);
+
+        AssertApiResponse(result, BsColor.Success, "was removed");
         var deletedGin = mockContext.Gins.Find(1);
-
-        result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(200);
-        response.ShouldNotBeNull();
-        response.BsColor.ToString().ShouldBe("Success");
-        response.StatusMessage.ShouldContain("was removed");
         deletedGin.ShouldBeNull();
     }
 
     [Fact]
     public void DeleteGin_ShouldReturnWarning_WhenGinIdIsInvalid() {
-        string json = JsonSerializer.Serialize(new { ginId = "0" });
-        var data = JsonDocument.Parse(json).RootElement;
+        ResetDatabase(mockContext);
+        var data = BuildJsonElement(new { ginId = "0" });
 
-        var result = mockController.DeleteGin(data) as OkObjectResult;
-        var response = result?.Value as ApiResponse;
+        var sut = mockController;
+        var result = sut.DeleteGin(data);
 
-        result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(200);
-        response.ShouldNotBeNull();
-        response.BsColor.ToString().ShouldBe("Warning");
-        response.StatusMessage.ShouldBe("Please select a gin to delete");
+        AssertApiResponse(result, BsColor.Warning, "Please select a gin to delete");
     }
 
     [Fact]
     public void DeleteTonic_ShouldReturnSuccess_WhenTonicIsDeleted() {
-        var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
-        mockContext.Tonics.Add(tonic);
-        string json = JsonSerializer.Serialize(new { tonicId = "1" });
-        var data = JsonDocument.Parse(json).RootElement;
+        ResetDatabase(mockContext);
+        var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
+        SeedTonics(mockContext, [tonic]);
+        var data = BuildJsonElement(new { tonicId = "1" });
 
-        var result = mockController.DeleteTonic(data) as OkObjectResult;
-        var response = result?.Value as ApiResponse;
+        var sut = mockController;
+        var result = sut.DeleteTonic(data);
+
+        AssertApiResponse(result, BsColor.Success, "was removed");
         var deletedTonic = mockContext.Tonics.Find(1);
-
-        result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(200);
-        response.ShouldNotBeNull();
-        response.BsColor.ToString().ShouldBe("Success");
-        response.StatusMessage.ShouldContain("was removed");
         deletedTonic.ShouldBeNull();
     }
 
     [Fact]
     public void DeleteTonic_ShouldReturnWarning_WhenTonicIdIsInvalid() {
-        string json = JsonSerializer.Serialize(new { tonicId = "0" });
-        var data = JsonDocument.Parse(json).RootElement;
+        ResetDatabase(mockContext);
+        var data = BuildJsonElement(new { tonicId = "0" });
 
-        var result = mockController.DeleteTonic(data) as OkObjectResult;
-        var response = result?.Value as ApiResponse;
+        var sut = mockController;
+        var result = sut.DeleteTonic(data);
 
-        result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(200);
-        response.ShouldNotBeNull();
-        response.BsColor.ToString().ShouldBe("Warning");
-        response.StatusMessage.ShouldBe("Please select a tonic to delete");
+        AssertApiResponse(result, BsColor.Warning, "Please select a tonic to delete");
     }
 
     [Fact]
     public void DeletePairing_ShouldReturnSuccess_WhenPairingIsDeleted() {
-        var gin = new Gin { GinId = 1, GinName = "Test Gin", Distillery = "Test Distillery" };
-        var tonic = new Tonic { TonicId = 1, TonicBrand = "Test Brand", TonicFlavour = "Test Flavour" };
-        var pairing = new Pairing { PairingId = 1, PairedGin = gin, PairedTonic = tonic };
-        mockContext.Gins.Add(gin);
-        mockContext.Tonics.Add(tonic);
-        mockContext.Pairings.Add(pairing);
-        string json = JsonSerializer.Serialize(new { pairingId = "1" });
-        var data = JsonDocument.Parse(json).RootElement;
+        ResetDatabase(mockContext);
+        var gin = CreateGin(1, "Test Gin", "Test Distillery");
+        var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
+        var pairing = CreatePairing(gin, tonic);
+        SeedGins(mockContext, [gin]);
+        SeedTonics(mockContext, [tonic]);
+        SeedPairings(mockContext, [pairing]);
+        var data = BuildJsonElement(new { pairingId = "1" });
 
-        var result = mockController.DeletePairing(data) as OkObjectResult;
-        var response = result?.Value as ApiResponse;
-        var deletedPairing = mockContext.Pairings.Find(1);
+        var sut = mockController;
+        var result = sut.DeletePairing(data);
 
-        result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(200);
-        response.ShouldNotBeNull();
-        response.BsColor.ToString().ShouldBe("Success");
-        response.StatusMessage.ShouldContain("was removed");
+        AssertApiResponse(result, BsColor.Success, "was removed");
+        var deletedPairing = mockContext.Pairings.Find(pairing.PairingId);
         deletedPairing.ShouldBeNull();
-
     }
 
     [Fact]
     public void DeletePairing_ShouldReturnWarning_WhenPairingIdIsInvalid() {
-        string json = JsonSerializer.Serialize(new { pairingId = "0" });
-        var data = JsonDocument.Parse(json).RootElement;
+        ResetDatabase(mockContext);
+        var data = BuildJsonElement(new { pairingId = "0" });
 
-        var result = mockController.DeletePairing(data) as OkObjectResult;
-        var response = result?.Value as ApiResponse;
+        var sut = mockController;
+        var result = sut.DeletePairing(data);
 
-        result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(200);
-        response.ShouldNotBeNull();
-        response.BsColor.ToString().ShouldBe("Warning");
-        response.StatusMessage.ShouldBe("Please select a pairing to delete");
+        AssertApiResponse(result, BsColor.Warning, "Please select a pairing to delete");
     }
 }

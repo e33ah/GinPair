@@ -4,36 +4,17 @@ public class GetGinTests {
     private readonly GinApiController mockController;
 
     public GetGinTests() {
-        var options = GetDbContextOptions();
-        mockContext = new GinPairDbContext(options);
-        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
-        mockController = new GinApiController(mockContext, dbInitState);
-    }
-    private static DbContextOptions<GinPairDbContext> GetDbContextOptions() {
-        return new DbContextOptionsBuilder<GinPairDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-    }
-    private void ResetDatabase() {
-        mockContext.Pairings.RemoveRange(mockContext.Pairings);
-        mockContext.Tonics.RemoveRange(mockContext.Tonics);
-        mockContext.Gins.RemoveRange(mockContext.Gins);
-        mockContext.SaveChanges();
-    }
-
-    private void SeedDefaultGins() {
-        ResetDatabase();
-        var gins = new List<Gin> {
-            new() { GinId = 1, GinName = "TestName1", Distillery = "TestDis1" },
-            new() { GinId = 2, GinName = "TestName2", Distillery = "TestDis2" }
-        };
-        mockContext.Gins.AddRange(gins);
-        mockContext.SaveChanges();
+        mockContext = CreateInMemoryGinPairDbContext();
+        mockController = CreateController(mockContext);
     }
 
     [Fact]
     public async Task MatchPartial_ReturnsOk() {
-        SeedDefaultGins();
+        ResetDatabase(mockContext);
+        SeedGins(mockContext, [
+            CreateGin(1, "TestName1", "TestDis1"),
+            CreateGin(2, "TestName2", "TestDis2")
+        ]);
 
         var result = await mockController.MatchGin("Test");
 
@@ -51,7 +32,11 @@ public class GetGinTests {
     [InlineData("dis1", 1)]
     [InlineData("DIS2", 1)]
     public async Task MatchGin_ReturnsExpectedCount_IgnoringCase(string partial, int expectedCount) {
-        SeedDefaultGins();
+        ResetDatabase(mockContext);
+        SeedGins(mockContext, [
+            CreateGin(1, "TestName1", "TestDis1"),
+            CreateGin(2, "TestName2", "TestDis2")
+        ]);
 
         var sut = mockController;
         var result = await sut.MatchGin(partial);
@@ -63,26 +48,24 @@ public class GetGinTests {
 
     [Fact]
     public async Task GetPairingById_ReturnsOk() {
-        ResetDatabase();
-        mockContext.Pairings.AddRange(new List<Pairing> {
-            new() {
-                PairedGin = new Gin {GinId = 3, GinName = "TestName3", Distillery = "TestDis3"},
-                PairedTonic = new Tonic {TonicId = 3, TonicBrand = "TestBrand3", TonicFlavour = "TestFl3"}
-            }
-        });
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var gin = CreateGin(3, "TestName3", "TestDis3");
+        var tonic = CreateTonic(3, "TestBrand3", "TestFl3");
+        var pairing = CreatePairing(gin, tonic);
+        SeedPairings(mockContext, [pairing]);
 
         var result = await mockController.GetPairingByGinId(3);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.StatusMessage.ShouldContain("Try pairing <b>TestDis3 TestName3</b> gin with");
-        apiResponse.BsColor.ShouldBe(BsColor.Primary);
+        AssertApiResponse(result, BsColor.Primary, "Try pairing <b>TestDis3 TestName3</b> gin with");
     }
 
     [Fact]
     public async Task GetPairingById_NoGin_Returns_Bad() {
-        SeedDefaultGins();
+        ResetDatabase(mockContext);
+        SeedGins(mockContext, [
+            CreateGin(1, "TestName1", "TestDis1"),
+            CreateGin(2, "TestName2", "TestDis2")
+        ]);
 
         var result = await mockController.GetPairingByGinId(4);
 
@@ -91,7 +74,7 @@ public class GetGinTests {
 
     [Fact]
     public void GetGinList_ReturnsOk_WithEmptyList_WhenNoGinsExist() {
-        ResetDatabase();
+        ResetDatabase(mockContext);
 
         var result = mockController.GetGinList();
 
@@ -105,29 +88,22 @@ public class GetGinTests {
     [InlineData("Tango", "Alpha", "Mike")]
     [InlineData("Zulu", "Alpha", "Mike")]
     public void GetGinList_ReturnsItemsOrderedByTextAscending(string n1, string n2, string n3) {
-        ResetDatabase();
+        ResetDatabase(mockContext);
         var gins = new List<Gin> {
-            new() { GinId = 21, GinName = n1, Distillery = n1 },
-            new() { GinId = 22, GinName = n2, Distillery = n2 },
-            new() { GinId = 23, GinName = n3, Distillery = n3 }
+            CreateGin(21, n1),
+            CreateGin(22, n2),
+            CreateGin(23, n3)
         };
-        mockContext.Gins.AddRange(gins);
-        mockContext.SaveChanges();
+        SeedGins(mockContext, gins);
 
         var sut = mockController;
         var result = sut.GetGinList();
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var selectList = okResult.Value as IEnumerable<SelectListItem>;
-        selectList.ShouldNotBeNull();
-        var items = selectList!.ToList();
-        var texts = items.Select(i => i.Text).ToList();
-
+        var texts = GetSelectListTexts(result);
         var expectedOrder = new List<string> { n1, n2, n3 }
             .OrderBy(x => x)
             .Select(x => $"{x} {x}")
             .ToList();
-
         texts.ShouldBe(expectedOrder);
     }
 
@@ -135,64 +111,51 @@ public class GetGinTests {
     [InlineData("Tango", "Alpha", "Mike")]
     [InlineData("Zulu", "Alpha", "Mike")]
     public void GetTonicList_ReturnsItemsOrderedByTextAscending(string t1, string t2, string t3) {
-        ResetDatabase();
+        ResetDatabase(mockContext);
         var tonics = new List<Tonic> {
-            new() { TonicId = 31, TonicBrand = t1, TonicFlavour = t1 },
-            new() { TonicId = 32, TonicBrand = t2, TonicFlavour = t2 },
-            new() { TonicId = 33, TonicBrand = t3, TonicFlavour = t3 }
+            CreateTonic(31, t1, t1),
+            CreateTonic(32, t2, t2),
+            CreateTonic(33, t3, t3)
         };
-        mockContext.Tonics.AddRange(tonics);
-        mockContext.SaveChanges();
+        SeedTonics(mockContext, tonics);
 
         var sut = mockController;
         var result = sut.GetTonicList();
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var selectList = okResult.Value as IEnumerable<SelectListItem>;
-        selectList.ShouldNotBeNull();
-        var items = selectList!.ToList();
-        var texts = items.Select(i => i.Text).ToList();
-
+        var texts = GetSelectListTexts(result);
         var expectedOrder = new List<string> { t1, t2, t3 }
             .OrderBy(x => x)
             .Select(x => $"{x} {x}")
             .ToList();
-
         texts.ShouldBe(expectedOrder);
     }
 
     [Fact]
     public void GetPairingList_ReturnsItemsOrderedByTextAscending() {
-        ResetDatabase();
+        ResetDatabase(mockContext);
 
-        var ginTango = new Gin { GinId = 101, GinName = "Tango", Distillery = "Tango" };
-        var ginAlpha = new Gin { GinId = 102, GinName = "Alpha", Distillery = "Alpha" };
-        var ginMike = new Gin { GinId = 103, GinName = "Mike", Distillery = "Mike" };
-        var tonicTango = new Tonic { TonicId = 201, TonicBrand = "Tango", TonicFlavour = "Tango" };
-        var tonicAlpha = new Tonic { TonicId = 202, TonicBrand = "Alpha", TonicFlavour = "Alpha" };
-        var tonicMike = new Tonic { TonicId = 203, TonicBrand = "Mike", TonicFlavour = "Mike" };
-        var pairingTango = new Pairing { PairedGin = ginTango, PairedTonic = tonicTango };
-        var pairingAlpha = new Pairing { PairedGin = ginAlpha, PairedTonic = tonicAlpha };
-        var pairingMike = new Pairing { PairedGin = ginMike, PairedTonic = tonicMike };
-
-        mockContext.Gins.AddRange(ginTango, ginAlpha, ginMike);
-        mockContext.Tonics.AddRange(tonicTango, tonicAlpha, tonicMike);
-        mockContext.Pairings.AddRange(pairingTango, pairingAlpha, pairingMike);
-        mockContext.SaveChanges();
+        var ginTango = CreateGin(101, "Tango");
+        var ginAlpha = CreateGin(102, "Alpha");
+        var ginMike = CreateGin(103, "Mike");
+        var tonicTango = CreateTonic(201, "Tango", "Tango");
+        var tonicAlpha = CreateTonic(202, "Alpha", "Alpha");
+        var tonicMike = CreateTonic(203, "Mike", "Mike");
+        var pairings = new List<Pairing> {
+            CreatePairing(ginTango, tonicTango),
+            CreatePairing(ginAlpha, tonicAlpha),
+            CreatePairing(ginMike, tonicMike)
+        };
+        SeedGins(mockContext, [ginTango, ginAlpha, ginMike]);
+        SeedTonics(mockContext, [tonicTango, tonicAlpha, tonicMike]);
+        SeedPairings(mockContext, pairings);
 
         var sut = mockController;
         var result = sut.GetPairingList();
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var selectList = okResult.Value as IEnumerable<SelectListItem>;
-        selectList.ShouldNotBeNull();
-        var items = selectList!.ToList();
-        var texts = items.Select(i => i.Text).ToList();
-        texts.ShouldBe([
+        AssertOkWithSelectListTexts(result,
             "Alpha Alpha gin and Alpha Alpha tonic",
             "Mike Mike gin and Mike Mike tonic",
-            "Tango Tango gin and Tango Tango tonic",
-        ]);
+            "Tango Tango gin and Tango Tango tonic");
     }
 
     [Theory]
@@ -202,21 +165,21 @@ public class GetGinTests {
         const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
         const string EXPECTEDMIKE = "Mike Mike gin and Mike Mike tonic";
 
-        ResetDatabase();
-        var ginTango = new Gin { GinId = 101, GinName = "Tango", Distillery = "Tango" };
-        var ginAlpha = new Gin { GinId = 102, GinName = "Alpha", Distillery = "Alpha" };
-        var ginMike = new Gin { GinId = 103, GinName = "Mike", Distillery = "Mike" };
-        var tonicTango = new Tonic { TonicId = 201, TonicBrand = "Tango", TonicFlavour = "Tango" };
-        var tonicAlpha = new Tonic { TonicId = 202, TonicBrand = "Alpha", TonicFlavour = "Alpha" };
-        var tonicMike = new Tonic { TonicId = 203, TonicBrand = "Mike", TonicFlavour = "Mike" };
-        var pairingTango = new Pairing { PairedGin = ginTango, PairedTonic = tonicTango };
-        var pairingAlpha = new Pairing { PairedGin = ginAlpha, PairedTonic = tonicAlpha };
-        var pairingMike = new Pairing { PairedGin = ginMike, PairedTonic = tonicMike };
-
-        mockContext.Gins.AddRange(ginTango, ginAlpha, ginMike);
-        mockContext.Tonics.AddRange(tonicTango, tonicAlpha, tonicMike);
-        mockContext.Pairings.AddRange(pairingTango, pairingAlpha, pairingMike);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
+        var ginTango = CreateGin(101, "Tango");
+        var ginAlpha = CreateGin(102, "Alpha");
+        var ginMike = CreateGin(103, "Mike");
+        var tonicTango = CreateTonic(201, "Tango", "Tango");
+        var tonicAlpha = CreateTonic(202, "Alpha", "Alpha");
+        var tonicMike = CreateTonic(203, "Mike", "Mike");
+        var pairings = new List<Pairing> {
+            CreatePairing(ginTango, tonicTango),
+            CreatePairing(ginAlpha, tonicAlpha),
+            CreatePairing(ginMike, tonicMike)
+        };
+        SeedGins(mockContext, [ginTango, ginAlpha, ginMike]);
+        SeedTonics(mockContext, [tonicTango, tonicAlpha, tonicMike]);
+        SeedPairings(mockContext, pairings);
 
         if (removeGin) {
             mockContext.Gins.Remove(ginTango);
@@ -228,20 +191,13 @@ public class GetGinTests {
         var sut = mockController;
         var result = sut.GetPairingList();
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var selectList = okResult.Value as IEnumerable<SelectListItem>;
-        selectList.ShouldNotBeNull();
-        var items = selectList!.ToList();
-        items.Count.ShouldBe(2);
-
-        var texts = items.Select(i => i.Text).ToList();
+        var texts = GetSelectListTexts(result);
         texts.ShouldBe([EXPECTEDALPHA, EXPECTEDMIKE]);
     }
 
     [Fact]
     public async Task MatchGin_ReturnsBadRequest_WhenNoGinsExist() {
-        mockContext.Gins.RemoveRange(mockContext.Gins);
-        mockContext.SaveChanges();
+        ResetDatabase(mockContext);
 
         var result = await mockController.MatchGin("anything");
 
@@ -250,24 +206,20 @@ public class GetGinTests {
 
     [Fact]
     public async Task GetPairingByGinId_ReturnsWarning_WhenNoPairingsFound() {
-        ResetDatabase();
+        ResetDatabase(mockContext);
         string ginName = "Lonely";
         string distillery = "Solo";
-        mockContext.Gins.Add(new Gin { GinId = 10, GinName = ginName, Distillery = distillery });
-        mockContext.SaveChanges();
+        SeedGins(mockContext, [CreateGin(10, ginName, distillery)]);
 
         var sut = mockController;
         var result = await sut.GetPairingByGinId(10);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Warning);
-        apiResponse.StatusMessage.ShouldContain($"Sorry, there is no pairing available for \"{distillery} {ginName}\"");
+        AssertApiResponse(result, BsColor.Warning, $"Sorry, there is no pairing available for \"{distillery} {ginName}\"");
     }
 
     [Fact]
     public async Task GetPairingByGinId_ReturnsPrimary_WithMessage_WhenPairingExists() {
-        ResetDatabase();
+        ResetDatabase(mockContext);
 
         int ginId = 5;
         string ginName = "Alpha";
@@ -276,22 +228,19 @@ public class GetGinTests {
         string brand = "BrandX";
         string flavour = "Citrus";
 
-        var gin = new Gin { GinId = ginId, GinName = ginName, Distillery = distillery };
-        var tonic = new Tonic { TonicId = tonicId, TonicBrand = brand, TonicFlavour = flavour };
-        var pairing = new Pairing { PairedGin = gin, PairedTonic = tonic };
+        var gin = CreateGin(ginId, ginName, distillery);
+        var tonic = CreateTonic(tonicId, brand, flavour);
+        var pairing = CreatePairing(gin, tonic);
 
-        mockContext.Gins.Add(gin);
-        mockContext.Tonics.Add(tonic);
-        mockContext.Pairings.Add(pairing);
-        mockContext.SaveChanges();
+        SeedGins(mockContext, [gin]);
+        SeedTonics(mockContext, [tonic]);
+        SeedPairings(mockContext, [pairing]);
 
         var sut = mockController;
         var result = await sut.GetPairingByGinId(ginId);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var apiResponse = okResult.Value.ShouldBeOfType<ApiResponse>();
-        apiResponse.BsColor.ShouldBe(BsColor.Primary);
-        apiResponse.StatusMessage.ShouldContain($"Try pairing <b>{distillery} {ginName}</b> gin with");
-        apiResponse.StatusMessage.ShouldContain($"a <b>{brand} {flavour}</b> tonic");
+        AssertApiResponse(result, BsColor.Primary,
+            $"Try pairing <b>{distillery} {ginName}</b> gin with",
+            $"a <b>{brand} {flavour}</b> tonic");
     }
 }

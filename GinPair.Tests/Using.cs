@@ -6,3 +6,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Rendering;
 global using Microsoft.EntityFrameworkCore;
 global using Shouldly;
+global using static GinPair.Tests.TestHelper;
