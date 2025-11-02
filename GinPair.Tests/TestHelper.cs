@@ -35,11 +35,11 @@ public static class TestHelper {
         context.SaveChanges();
     }
 
-    public static Gin CreateGin(int id, string name, string? distillery = null, string? description = null) {
-        return new Gin { GinId = id, GinName = name, Distillery = distillery ?? name, GinDescription = description };
+    public static Gin CreateGin(int id, string name, string? distillery = null) {
+        return new Gin { GinId = id, GinName = name, Distillery = distillery ?? name };
     }
 
-    public static Tonic CreateTonic(int id, string brand, string? flavour) {
+    public static Tonic CreateTonic(int id, string brand, string? flavour = null) {
         return new Tonic { TonicId = id, TonicBrand = brand, TonicFlavour = flavour ?? brand };
     }
 

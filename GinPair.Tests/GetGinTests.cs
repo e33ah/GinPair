@@ -7,69 +7,54 @@ public class GetGinTests {
         mockContext = CreateInMemoryGinPairDbContext();
         mockController = CreateController(mockContext);
     }
+    public class MatchGinTests : GetGinTests {
 
-    [Fact]
-    public async Task MatchPartial_ReturnsOk() {
-        ResetDatabase(mockContext);
-        SeedGins(mockContext, [
-            CreateGin(1, "TestName1", "TestDis1"),
+        [Fact]
+        public async Task MatchPartial_ReturnsOk() {
+            ResetDatabase(mockContext);
+            SeedGins(mockContext, [
+                CreateGin(1, "TestName1", "TestDis1"),
             CreateGin(2, "TestName2", "TestDis2")
-        ]);
+            ]);
 
-        var result = await mockController.MatchGin("Test");
+            var result = await mockController.MatchGin("Test");
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var ginList = okResult.Value.ShouldBeOfType<List<Gin>>();
-        ginList.Count.ShouldBe(2);
-        ginList.ShouldContain(g => g.GinName == "TestName1");
-        ginList.ShouldContain(g => g.GinName == "TestName2");
-    }
+            var okResult = result.ShouldBeOfType<OkObjectResult>();
+            var ginList = okResult.Value.ShouldBeOfType<List<Gin>>();
+            ginList.Count.ShouldBe(2);
+            ginList.ShouldContain(g => g.GinName == "TestName1");
+            ginList.ShouldContain(g => g.GinName == "TestName2");
+        }
 
-    [Theory]
-    [InlineData("test", 2)]
-    [InlineData("TEST", 2)]
-    [InlineData("tEsT", 2)]
-    [InlineData("dis1", 1)]
-    [InlineData("DIS2", 1)]
-    public async Task MatchGin_ReturnsExpectedCount_IgnoringCase(string partial, int expectedCount) {
-        ResetDatabase(mockContext);
-        SeedGins(mockContext, [
-            CreateGin(1, "TestName1", "TestDis1"),
+        [Theory]
+        [InlineData("test", 2)]
+        [InlineData("TEST", 2)]
+        [InlineData("tEsT", 2)]
+        [InlineData("dis1", 1)]
+        [InlineData("DIS2", 1)]
+        public async Task MatchGin_ReturnsExpectedCount_IgnoringCase(string partial, int expectedCount) {
+            ResetDatabase(mockContext);
+            SeedGins(mockContext, [
+                CreateGin(1, "TestName1", "TestDis1"),
             CreateGin(2, "TestName2", "TestDis2")
-        ]);
+            ]);
 
-        var sut = mockController;
-        var result = await sut.MatchGin(partial);
+            var sut = mockController;
+            var result = await sut.MatchGin(partial);
 
-        var okResult = result.ShouldBeOfType<OkObjectResult>();
-        var ginList = okResult.Value.ShouldBeOfType<List<Gin>>();
-        ginList.Count.ShouldBe(expectedCount);
-    }
+            var okResult = result.ShouldBeOfType<OkObjectResult>();
+            var ginList = okResult.Value.ShouldBeOfType<List<Gin>>();
+            ginList.Count.ShouldBe(expectedCount);
+        }
 
-    [Fact]
-    public async Task GetPairingById_ReturnsOk() {
-        ResetDatabase(mockContext);
-        var gin = CreateGin(3, "TestName3", "TestDis3");
-        var tonic = CreateTonic(3, "TestBrand3", "TestFl3");
-        var pairing = CreatePairing(gin, tonic);
-        SeedPairings(mockContext, [pairing]);
+        [Fact]
+        public async Task MatchGin_ReturnsBadRequest_WhenNoGinsExist() {
+            ResetDatabase(mockContext);
 
-        var result = await mockController.GetPairingByGinId(3);
+            var result = await mockController.MatchGin("anything");
 
-        AssertApiResponse(result, BsColor.Primary, "Try pairing <b>TestDis3 TestName3</b> gin with");
-    }
-
-    [Fact]
-    public async Task GetPairingById_NoGin_Returns_Bad() {
-        ResetDatabase(mockContext);
-        SeedGins(mockContext, [
-            CreateGin(1, "TestName1", "TestDis1"),
-            CreateGin(2, "TestName2", "TestDis2")
-        ]);
-
-        var result = await mockController.GetPairingByGinId(4);
-
-        result.ShouldBeOfType<BadRequestResult>();
+            result.ShouldBeOfType<BadRequestResult>();
+        }
     }
 
     [Fact]
@@ -131,15 +116,41 @@ public class GetGinTests {
     }
 
     [Fact]
+    public async Task GetPairingById_ReturnsOk() {
+        ResetDatabase(mockContext);
+        string ginName = "gin2Pair";
+        string distillery = "dis2Pair";
+        var gin = CreateGin(3, ginName, distillery);
+        var tonic = CreateTonic(3, "brand2Pair", "flavour2Pair");
+        var pairing = CreatePairing(gin, tonic);
+        SeedPairings(mockContext, [pairing]);
+
+        var result = await mockController.GetPairingByGinId(3);
+
+        AssertApiResponse(result, BsColor.Primary, $"Try pairing <b>{distillery} {ginName}</b> gin with");
+    }
+
+    [Fact]
+    public async Task GetPairingById_WhenGinNotExist_Returns_Bad() {
+
+        var result = await mockController.GetPairingByGinId(453);
+
+        result.ShouldBeOfType<BadRequestResult>();
+    }
+
+    [Fact]
     public void GetPairingList_ReturnsItemsOrderedByTextAscending() {
+        const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
+        const string EXPECTEDMIKE = "Mike Mike gin and Mike Mike tonic";
+        const string EXPECTEDTANGO = "Tango Tango gin and Tango Tango tonic";
         ResetDatabase(mockContext);
 
         var ginTango = CreateGin(101, "Tango");
         var ginAlpha = CreateGin(102, "Alpha");
         var ginMike = CreateGin(103, "Mike");
-        var tonicTango = CreateTonic(201, "Tango", "Tango");
-        var tonicAlpha = CreateTonic(202, "Alpha", "Alpha");
-        var tonicMike = CreateTonic(203, "Mike", "Mike");
+        var tonicTango = CreateTonic(201, "Tango");
+        var tonicAlpha = CreateTonic(202, "Alpha");
+        var tonicMike = CreateTonic(203, "Mike");
         var pairings = new List<Pairing> {
             CreatePairing(ginTango, tonicTango),
             CreatePairing(ginAlpha, tonicAlpha),
@@ -153,37 +164,37 @@ public class GetGinTests {
         var result = sut.GetPairingList();
 
         AssertOkWithSelectListTexts(result,
-            "Alpha Alpha gin and Alpha Alpha tonic",
-            "Mike Mike gin and Mike Mike tonic",
-            "Tango Tango gin and Tango Tango tonic");
+            EXPECTEDALPHA,
+            EXPECTEDMIKE,
+            EXPECTEDTANGO);
     }
 
+    // TODO: this test needs to be reviewed to check it is actually valid
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void GetPairingList_ExcludesNullPairings(bool removeGin) {
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public void GetPairingList_ExcludesNullPairings(bool removeGin, bool removeTonic) {
         const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
-        const string EXPECTEDMIKE = "Mike Mike gin and Mike Mike tonic";
 
         ResetDatabase(mockContext);
         var ginTango = CreateGin(101, "Tango");
         var ginAlpha = CreateGin(102, "Alpha");
-        var ginMike = CreateGin(103, "Mike");
-        var tonicTango = CreateTonic(201, "Tango", "Tango");
-        var tonicAlpha = CreateTonic(202, "Alpha", "Alpha");
-        var tonicMike = CreateTonic(203, "Mike", "Mike");
+        var tonicTango = CreateTonic(201, "Tango");
+        var tonicAlpha = CreateTonic(202, "Alpha");
         var pairings = new List<Pairing> {
             CreatePairing(ginTango, tonicTango),
             CreatePairing(ginAlpha, tonicAlpha),
-            CreatePairing(ginMike, tonicMike)
         };
-        SeedGins(mockContext, [ginTango, ginAlpha, ginMike]);
-        SeedTonics(mockContext, [tonicTango, tonicAlpha, tonicMike]);
+        SeedGins(mockContext, [ginTango, ginAlpha]);
+        SeedTonics(mockContext, [tonicTango, tonicAlpha]);
         SeedPairings(mockContext, pairings);
 
         if (removeGin) {
             mockContext.Gins.Remove(ginTango);
-        } else {
+            mockContext.SaveChanges();
+        }
+        if (removeTonic) {
             mockContext.Tonics.Remove(tonicTango);
         }
         mockContext.SaveChanges();
@@ -192,16 +203,7 @@ public class GetGinTests {
         var result = sut.GetPairingList();
 
         var texts = GetSelectListTexts(result);
-        texts.ShouldBe([EXPECTEDALPHA, EXPECTEDMIKE]);
-    }
-
-    [Fact]
-    public async Task MatchGin_ReturnsBadRequest_WhenNoGinsExist() {
-        ResetDatabase(mockContext);
-
-        var result = await mockController.MatchGin("anything");
-
-        result.ShouldBeOfType<BadRequestResult>();
+        texts.ShouldBe([EXPECTEDALPHA]);
     }
 
     [Fact]
