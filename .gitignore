@@ -401,3 +401,6 @@ FodyWeavers.xsd
 
 # GinPair
 *.lutconfig
+
+# NUKE generated editor schema
+/.nuke/build.schema.json
