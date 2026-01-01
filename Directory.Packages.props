@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <!-- Central package versions -->
+    <PackageVersion Include="Microsoft.Build" Version="18.0.2" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+{
+  "stryker-config": {
+
+    "test-projects": [
+      "GinPair.Tests.csproj"
+    ],
+    "solution": "../GinPair.sln",
+    "project": "GinPair.csproj",
+    "reporters": [ "dots", "cleartexttree" ],
+    "mutate": [ "!**/Program.cs", "!**/Data/**" ] // Exclude the Program.cs file and the Data folder from mutation testing
+  }
+}

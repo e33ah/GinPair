@@ -21,31 +21,31 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
 
     [HttpGet("getPairing/{ginId}")]
     public async Task<IActionResult> GetPairingByGinId(int ginId) {
-        var ginfind = await gpdb.Gins.FindAsync(ginId);
+        var ginFind = await gpdb.Gins.FindAsync(ginId);
         var response = new ApiResponse();
 
-        if (ginfind == null) {
+        if (ginFind == null) {
             return BadRequest();
         }
 
         var result = await (from tonic in gpdb.Tonics
                             join pairing in gpdb.Pairings on tonic.TonicId equals pairing.TonicId
                             join gin in gpdb.Gins on pairing.GinId equals gin.GinId
-                            where gin.GinId == ginfind.GinId
+                            where gin.GinId == ginFind.GinId
                             select new {
                                 tonic.TonicBrand,
                                 tonic.TonicFlavour
                             }).ToListAsync();
         if (result.Count == 0) {
-            response.StatusMessage = $"<p>Sorry, there is no pairing available for \"{ginfind.Distillery} {ginfind.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
+            response.StatusMessage = $"<p>Sorry, there is no pairing available for \"{ginFind.Distillery} {ginFind.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
             response.BsColor = BsColor.Warning;
         } else {
             Random random = new();
             int r = random.Next(0, result.Count);
 
             var pairingResult = new PairingVM {
-                GinName = ginfind.GinName,
-                Distillery = ginfind.Distillery,
+                GinName = ginFind.GinName,
+                Distillery = ginFind.Distillery,
                 TonicBrand = result[r].TonicBrand,
                 TonicFlavour = result[r].TonicFlavour,
             };
@@ -286,7 +286,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var pairedGin = gpdb.Gins.Find(pr.GinId);
         var pairedTonic = gpdb.Tonics.Find(pr.TonicId);
         if (IsGinOrTonicNull(pairedGin, pairedTonic)) {
-            response.StatusMessage = "An Error occured: Gin or Tonic not found. Not able to delete pairing.";
+            response.StatusMessage = "An Error occurred: Gin or Tonic not found. Not able to delete pairing.";
             response.BsColor = BsColor.Danger;
             return Ok(response);
         }
@@ -306,7 +306,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
 
     internal static void WriteLog(string message) {
         //TODO: Replace this with better logging functionality
-        Console.WriteLine($"An error has occured: {message}");
+        Console.WriteLine($"An error has occurred: {message}");
     }
 
     internal static bool IsGinOrTonicNull(Gin? pairedGin, Tonic? pairedTonic) {

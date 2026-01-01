@@ -1,4 +1,5 @@
 ﻿namespace GinPair.Tests;
+
 public class GetGinTests {
     private readonly GinPairDbContext mockContext;
     private readonly GinApiController mockController;
@@ -244,5 +245,22 @@ public class GetGinTests {
         AssertApiResponse(result, BsColor.Primary,
             $"Try pairing <b>{distillery} {ginName}</b> gin with",
             $"a <b>{brand} {flavour}</b> tonic");
+    }
+
+    [Fact]
+    public void WriteLog_WritesExpectedMessageToConsole() {
+        var originalConsoleOutput = Console.Out;
+        string message = "test me please";
+        try {
+            var consoleOutputWriter = new StringWriter();
+            Console.SetOut(consoleOutputWriter); // redirect Console.WriteLine
+
+            GinApiController.WriteLog(message);
+
+            string consoleOutput = consoleOutputWriter.ToString().Trim();
+            consoleOutput.ShouldBe($"An error has occurred: {message}");
+        } finally {
+            Console.SetOut(originalConsoleOutput);
+        }
     }
 }
