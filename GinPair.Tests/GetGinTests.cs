@@ -188,6 +188,46 @@ public class GetGinTests {
     }
 
     [Fact]
+    public async Task GetPairingByGinId_ReturnsWarning_WhenNoPairingsFound() {
+        ResetDatabase(mockContext);
+        string ginName = "Lonely";
+        string distillery = "Solo";
+        SeedGins(mockContext, [CreateGin(10, ginName, distillery)]);
+
+        var sut = mockController;
+        var result = await sut.GetPairingByGinId(10);
+
+        AssertApiResponse(result, BsColor.Warning, $"Sorry, there is no pairing available for \"{distillery} {ginName}\"");
+    }
+
+    [Fact]
+    public async Task GetPairingByGinId_ReturnsPrimary_WithMessage_WhenPairingExists() {
+        ResetDatabase(mockContext);
+
+        int ginId = 5;
+        string ginName = "Alpha";
+        string distillery = "Beta";
+        int tonicId = 7;
+        string brand = "BrandX";
+        string flavour = "Citrus";
+
+        var gin = CreateGin(ginId, ginName, distillery);
+        var tonic = CreateTonic(tonicId, brand, flavour);
+        var pairing = CreatePairing(gin, tonic);
+
+        SeedGins(mockContext, [gin]);
+        SeedTonics(mockContext, [tonic]);
+        SeedPairings(mockContext, [pairing]);
+
+        var sut = mockController;
+        var result = await sut.GetPairingByGinId(ginId);
+
+        AssertApiResponse(result, BsColor.Primary,
+            $"Try pairing <b>{distillery} {ginName}</b> gin with",
+            $"a <b>{brand} {flavour}</b> tonic");
+    }
+
+    [Fact]
     public void GetPairingList_ReturnsItemsOrderedByTextAscending() {
         const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
         const string EXPECTEDMIKE = "Mike Mike gin and Mike Mike tonic";
@@ -255,42 +295,14 @@ public class GetGinTests {
     }
 
     [Fact]
-    public async Task GetPairingByGinId_ReturnsWarning_WhenNoPairingsFound() {
+    public void GetPairingList_ReturnsOk_WithEmptyList_WhenNoPairingsExist() {
         ResetDatabase(mockContext);
-        string ginName = "Lonely";
-        string distillery = "Solo";
-        SeedGins(mockContext, [CreateGin(10, ginName, distillery)]);
-
-        var sut = mockController;
-        var result = await sut.GetPairingByGinId(10);
-
-        AssertApiResponse(result, BsColor.Warning, $"Sorry, there is no pairing available for \"{distillery} {ginName}\"");
-    }
-
-    [Fact]
-    public async Task GetPairingByGinId_ReturnsPrimary_WithMessage_WhenPairingExists() {
-        ResetDatabase(mockContext);
-
-        int ginId = 5;
-        string ginName = "Alpha";
-        string distillery = "Beta";
-        int tonicId = 7;
-        string brand = "BrandX";
-        string flavour = "Citrus";
-
-        var gin = CreateGin(ginId, ginName, distillery);
-        var tonic = CreateTonic(tonicId, brand, flavour);
-        var pairing = CreatePairing(gin, tonic);
-
-        SeedGins(mockContext, [gin]);
-        SeedTonics(mockContext, [tonic]);
-        SeedPairings(mockContext, [pairing]);
-
-        var sut = mockController;
-        var result = await sut.GetPairingByGinId(ginId);
-
-        AssertApiResponse(result, BsColor.Primary,
-            $"Try pairing <b>{distillery} {ginName}</b> gin with",
-            $"a <b>{brand} {flavour}</b> tonic");
+        
+        var result = mockController.GetPairingList();
+        
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        var selectList = okResult.Value as IEnumerable<SelectListItem>;
+        selectList.ShouldNotBeNull();
+        selectList.ShouldBeEmpty();
     }
 }
