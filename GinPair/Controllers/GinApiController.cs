@@ -1,21 +1,36 @@
-﻿namespace GinPair.Controllers;
+﻿#pragma warning disable CA1873 // Suppress CA1873: Using string.ToUpper() for case-insensitive comparison is intentional for EF Core database queries.
+
+namespace GinPair.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [ServiceFilter(typeof(DatabaseReadyFilter))]
-public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializationState dbInitState) : ControllerBase {
+public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializationState dbInitState, ILogger<GinApiController> logger) : ControllerBase {
     protected GinPairDbContext gpdb = ginPairContext;
     private readonly DatabaseInitializationState dbInitState = dbInitState;
+    private readonly ILogger<GinApiController> logger = logger;
 
     [HttpGet("matchGin")]
     public async Task<IActionResult> MatchGin(string partial) {
         if (!gpdb.Gins.Any()) {
+            logger.LogWarning("MatchGin called but database contains no gins");
             return BadRequest();
         }
+
+        logger.LogInformation("Searching for gin with partial match: {SearchTerm}", partial);
         var results = await gpdb.Gins
-                .Where(s => s.GinName!.ToUpper().Contains(partial.ToUpper()) || s.Distillery!.ToUpper().Contains(partial.ToUpper()))
+            .Where(s => s.GinName!.ToUpper().Contains(partial.ToUpper()) || s.Distillery!.ToUpper().Contains(partial.ToUpper()))
+            .OrderBy(s => s.Distillery)
+            .ThenBy(s => s.GinName)
             .Take(10)
             .ToListAsync();
+
+        if (results.Count == 0) {
+            logger.LogInformation("No results found for search term: {SearchTerm}", partial);
+        } else {
+            logger.LogInformation("Found {ResultCount} gin(s) matching search term: {SearchTerm}", results.Count, partial);
+        }
+
         return Ok(results);
     }
 
@@ -25,6 +40,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var response = new ApiResponse();
 
         if (ginFind == null) {
+            logger.LogWarning("GetPairingByGinId called with invalid GinId: {GinId}", ginId);
             return BadRequest();
         }
 
@@ -37,6 +53,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
                                 tonic.TonicFlavour
                             }).ToListAsync();
         if (result.Count == 0) {
+            logger.LogInformation("No pairings found for gin: {Distillery} {GinName} (GinId: {GinId})", ginFind.Distillery, ginFind.GinName, ginId);
             response.StatusMessage = $"<p>Sorry, there is no pairing available for \"{ginFind.Distillery} {ginFind.GinName}\".<br>Try searching again, or <a href='/Home/AddGnt/'>add it</a> to our collection.</p>";
             response.BsColor = BsColor.Warning;
         } else {
@@ -49,6 +66,8 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
                 TonicBrand = result[r].TonicBrand,
                 TonicFlavour = result[r].TonicFlavour,
             };
+            logger.LogInformation("Pairing suggested for {Distillery} {GinName}: {TonicBrand} {TonicFlavour} (selected from {PairingCount} options)", 
+                pairingResult.Distillery, pairingResult.GinName, pairingResult.TonicBrand, pairingResult.TonicFlavour, result.Count);
             response.StatusMessage = $"Try pairing <b>{pairingResult.Distillery} {pairingResult.GinName}</b> gin with<br>a <b>{pairingResult.TonicBrand} {pairingResult.TonicFlavour}</b> tonic! 🍋🍋‍🟩";
             response.BsColor = BsColor.Primary;
         }
@@ -99,12 +118,15 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         string? description = data.GetProperty("description").GetString();
 
         if (string.IsNullOrEmpty(ginName) || string.IsNullOrEmpty(distillery)) {
+            logger.LogWarning("AddGin validation failed: missing required fields. GinName: {GinName}, Distillery: {Distillery}", 
+                ginName ?? "(null)", distillery ?? "(null)");
             response.StatusMessage = "Please provide the name of the Distillery and Gin.";
             response.BsColor = BsColor.Warning;
 
             return Ok(response);
         }
         if (IsGinPresent(ginName, distillery)) {
+            logger.LogWarning("AddGin validation failed: duplicate gin. {Distillery} {GinName} already exists", distillery, ginName);
             response.StatusMessage = "Sorry this gin cannot be added as it is already part of our collection!";
             response.BsColor = BsColor.Danger;
 
@@ -118,12 +140,13 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
             });
             _ = gpdb.SaveChanges();
 
+            logger.LogInformation("Gin added successfully: {Distillery} {GinName}", distillery, ginName);
             response.StatusMessage = $"✅ Success! \"{distillery} {ginName}\" gin was added!";
             response.BsColor = BsColor.Success;
 
             return Ok(response);
         } catch (DbUpdateException ex) {
-            WriteLog(ex.Message);
+            logger.LogError(ex, "Failed to add gin: {Distillery} {GinName}", distillery, ginName);
             return BadRequest();
         }
     }
@@ -135,12 +158,15 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         string? tonicFlavour = data.GetProperty("tonicFlavour").GetString();
 
         if (string.IsNullOrEmpty(tonicBrand) || string.IsNullOrEmpty(tonicFlavour)) {
+            logger.LogWarning("AddTonic validation failed: missing required fields. TonicBrand: {TonicBrand}, TonicFlavour: {TonicFlavour}", 
+                tonicBrand ?? "(null)", tonicFlavour ?? "(null)");
             response.StatusMessage = "Please provide the tonic brand and flavour/name.";
             response.BsColor = BsColor.Warning;
 
             return Ok(response);
         }
         if (IsTonicPresent(tonicBrand, tonicFlavour)) {
+            logger.LogWarning("AddTonic validation failed: duplicate tonic. {TonicBrand} {TonicFlavour} already exists", tonicBrand, tonicFlavour);
             response.StatusMessage = "Sorry this tonic cannot be added as it is already part of our collection!";
             response.BsColor = BsColor.Danger;
 
@@ -153,13 +179,14 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
             });
             _ = gpdb.SaveChanges();
 
+            logger.LogInformation("Tonic added successfully: {TonicBrand} {TonicFlavour}", tonicBrand, tonicFlavour);
             response.StatusMessage = $"✅ Success! \"{tonicBrand} {tonicFlavour}\" tonic was added!";
             response.BsColor = BsColor.Success;
 
             return Ok(response);
 
         } catch (DbUpdateException ex) {
-            WriteLog(ex.Message);
+            logger.LogError(ex, "Failed to add tonic: {TonicBrand} {TonicFlavour}", tonicBrand, tonicFlavour);
             return BadRequest();
         }
     }
@@ -171,6 +198,8 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         string? tonicId = data.GetProperty("tonicId").GetString();
 
         if (string.IsNullOrEmpty(ginId) || string.IsNullOrEmpty(tonicId)) {
+            logger.LogWarning("AddPairing validation failed: missing required fields. GinId: {GinId}, TonicId: {TonicId}", 
+                ginId ?? "(null)", tonicId ?? "(null)");
             response.StatusMessage = "Please select the gin and tonic to pair";
             response.BsColor = BsColor.Warning;
             return Ok(response);
@@ -180,12 +209,15 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var pairedTonic = gpdb.Tonics.Find(int.Parse(tonicId));
 
         if (IsGinOrTonicNull(pairedGin, pairedTonic)) {
+            logger.LogWarning("AddPairing validation failed: gin or tonic not found. GinId: {GinId}, TonicId: {TonicId}", ginId, tonicId);
             response.StatusMessage = "Please select the gin and tonic to pair";
             response.BsColor = BsColor.Warning;
             return Ok(response);
         }
 
         if (IsPairingPresent(pairedGin!.GinId, pairedTonic!.TonicId)) {
+            logger.LogWarning("AddPairing validation failed: duplicate pairing. {Distillery} {GinName} with {TonicBrand} {TonicFlavour} already exists", 
+                pairedGin.Distillery, pairedGin.GinName, pairedTonic.TonicBrand, pairedTonic.TonicFlavour);
             response.StatusMessage = $"\"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic are already paired!";
             response.BsColor = BsColor.Danger;
             return Ok(response);
@@ -198,13 +230,15 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
             });
             _ = gpdb.SaveChanges();
 
+            logger.LogInformation("Pairing added successfully: {Distillery} {GinName} with {TonicBrand} {TonicFlavour}", 
+                pairedGin.Distillery, pairedGin.GinName, pairedTonic.TonicBrand, pairedTonic.TonicFlavour);
             response.StatusMessage = $"✅ Success! \"{pairedGin.Distillery} {pairedGin.GinName}\" gin and \"{pairedTonic.TonicBrand} {pairedTonic.TonicFlavour}\" tonic were paired!";
             response.BsColor = BsColor.Success;
 
             return Ok(response);
 
         } catch (DbUpdateException ex) {
-            WriteLog(ex.Message);
+            logger.LogError(ex, "Failed to add pairing: GinId={GinId}, TonicId={TonicId}", pairedGin.GinId, pairedTonic.TonicId);
             return BadRequest();
         }
     }
@@ -213,6 +247,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var response = new ApiResponse();
         string? ginId = data.GetProperty("ginId").GetString();
         if (string.IsNullOrEmpty(ginId) || ginId == "0") {
+            logger.LogWarning("DeleteGin validation failed: invalid GinId: {GinId}", ginId ?? "(null)");
             response.StatusMessage = "Please select a gin to delete";
             response.BsColor = BsColor.Warning;
             return Ok(response);
@@ -220,6 +255,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         try {
             var gn = gpdb.Gins.Find(int.Parse(ginId));
             if (gn == null) {
+                logger.LogWarning("DeleteGin validation failed: gin not found. GinId: {GinId}", ginId);
                 response.StatusMessage = "Gin not found";
                 response.BsColor = BsColor.Warning;
                 return Ok(response);
@@ -228,11 +264,12 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
             _ = gpdb.Gins.Remove(gn);
             _ = gpdb.SaveChanges();
 
+            logger.LogInformation("Gin deleted successfully: {Distillery} {GinName}", gn.Distillery, gn.GinName);
             response.StatusMessage = $"✅ Success! \"{ginToBeDeleted}\" gin was removed!";
             response.BsColor = BsColor.Success;
             return Ok(response);
         } catch (DbUpdateException ex) {
-            WriteLog(ex.Message);
+            logger.LogError(ex, "Failed to delete gin: GinId={GinId}", ginId);
             return BadRequest();
         }
     }
@@ -242,6 +279,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var response = new ApiResponse();
         string? tonicId = data.GetProperty("tonicId").GetString();
         if (string.IsNullOrEmpty(tonicId) || tonicId == "0") {
+            logger.LogWarning("DeleteTonic validation failed: invalid TonicId: {TonicId}", tonicId ?? "(null)");
             response.StatusMessage = "Please select a tonic to delete";
             response.BsColor = BsColor.Warning;
             return Ok(response);
@@ -249,6 +287,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         try {
             var tn = gpdb.Tonics.Find(int.Parse(tonicId));
             if (tn == null) {
+                logger.LogWarning("DeleteTonic validation failed: tonic not found. TonicId: {TonicId}", tonicId);
                 response.StatusMessage = "Tonic not found";
                 response.BsColor = BsColor.Warning;
                 return Ok(response);
@@ -257,11 +296,12 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
             _ = gpdb.Tonics.Remove(tn);
             _ = gpdb.SaveChanges();
 
+            logger.LogInformation("Tonic deleted successfully: {TonicBrand} {TonicFlavour}", tn.TonicBrand, tn.TonicFlavour);
             response.StatusMessage = $"✅ Success! \"{tonicToBeDeleted}\" tonic was removed!";
             response.BsColor = BsColor.Success;
             return Ok(response);
         } catch (DbUpdateException ex) {
-            WriteLog(ex.Message);
+            logger.LogError(ex, "Failed to delete tonic: TonicId={TonicId}", tonicId);
             return BadRequest();
         }
     }
@@ -271,6 +311,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var response = new ApiResponse();
         string? pairingId = data.GetProperty("pairingId").GetString();
         if (string.IsNullOrEmpty(pairingId) || pairingId == "0") {
+            logger.LogWarning("DeletePairing validation failed: invalid PairingId: {PairingId}", pairingId ?? "(null)");
             response.StatusMessage = "Please select a pairing to delete";
             response.BsColor = BsColor.Warning;
             return Ok(response);
@@ -278,6 +319,7 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
 
         var pr = gpdb.Pairings.Find(int.Parse(pairingId));
         if (pr == null) {
+            logger.LogWarning("DeletePairing validation failed: pairing not found. PairingId: {PairingId}", pairingId);
             response.StatusMessage = "Pairing not found";
             response.BsColor = BsColor.Warning;
             return Ok(response);
@@ -286,6 +328,8 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
         var pairedGin = gpdb.Gins.Find(pr.GinId);
         var pairedTonic = gpdb.Tonics.Find(pr.TonicId);
         if (IsGinOrTonicNull(pairedGin, pairedTonic)) {
+            logger.LogWarning("DeletePairing validation failed: gin or tonic not found for pairing. PairingId: {PairingId}, GinId: {GinId}, TonicId: {TonicId}", 
+                pairingId, pr.GinId, pr.TonicId);
             response.StatusMessage = "An Error occurred: Gin or Tonic not found. Not able to delete pairing.";
             response.BsColor = BsColor.Danger;
             return Ok(response);
@@ -295,18 +339,16 @@ public class GinApiController(GinPairDbContext ginPairContext, DatabaseInitializ
             string pairingToBeDeleted = $"{pairedGin!.Distillery} {pairedGin.GinName} gin and {pairedTonic!.TonicBrand} {pairedTonic.TonicFlavour} tonic";
             _ = gpdb.Pairings.Remove(pr);
             _ = gpdb.SaveChanges();
+            
+            logger.LogInformation("Pairing deleted successfully: {Distillery} {GinName} with {TonicBrand} {TonicFlavour}", 
+                pairedGin.Distillery, pairedGin.GinName, pairedTonic.TonicBrand, pairedTonic.TonicFlavour);
             response.StatusMessage = $"✅ Success! \"{pairingToBeDeleted}\" pairing was removed!";
             response.BsColor = BsColor.Success;
             return Ok(response);
         } catch (DbUpdateException ex) {
-            WriteLog(ex.Message);
+            logger.LogError(ex, "Failed to delete pairing: PairingId={PairingId}", pairingId);
             return BadRequest();
         }
-    }
-
-    internal static void WriteLog(string message) {
-        //TODO: Replace this with better logging functionality
-        Console.WriteLine($"An error has occurred: {message}");
     }
 
     internal static bool IsGinOrTonicNull(Gin? pairedGin, Tonic? pairedTonic) {

@@ -56,6 +56,54 @@ public class GetGinTests {
 
             result.ShouldBeOfType<BadRequestResult>();
         }
+
+        [Fact]
+        public async Task MatchGin_ReturnsResultsOrderedByDistilleryThenGinName() {
+            ResetDatabase(mockContext);
+            SeedGins(mockContext, [
+                CreateGin(1, "Zulu", "Charlie"),
+                CreateGin(2, "Alpha", "Charlie"),
+                CreateGin(3, "Mike", "Bravo"),
+                CreateGin(4, "Tango", "Alpha"),
+                CreateGin(5, "Delta", "Alpha")
+            ]);
+
+            var sut = mockController;
+            var result = await sut.MatchGin("a");
+
+            var okResult = result.ShouldBeOfType<OkObjectResult>();
+            var ginList = okResult.Value.ShouldBeOfType<List<Gin>>();
+            ginList.Count.ShouldBe(5);
+            ginList[0].Distillery.ShouldBe("Alpha");
+            ginList[0].GinName.ShouldBe("Delta");
+            ginList[1].Distillery.ShouldBe("Alpha");
+            ginList[1].GinName.ShouldBe("Tango");
+            ginList[2].Distillery.ShouldBe("Bravo");
+            ginList[2].GinName.ShouldBe("Mike");
+            ginList[3].Distillery.ShouldBe("Charlie");
+            ginList[3].GinName.ShouldBe("Alpha");
+            ginList[4].Distillery.ShouldBe("Charlie");
+            ginList[4].GinName.ShouldBe("Zulu");
+        }
+
+        [Fact]
+        public async Task MatchGin_LimitsResultsToTenItems_InCorrectOrder() {
+            ResetDatabase(mockContext);
+            var gins = new List<Gin>();
+            for (int i = 1; i <= 15; i++) {
+                gins.Add(CreateGin(i, $"Gin{i:D2}", $"Distillery{i:D2}"));
+            }
+            SeedGins(mockContext, gins);
+
+            var sut = mockController;
+            var result = await sut.MatchGin("Gin");
+
+            var okResult = result.ShouldBeOfType<OkObjectResult>();
+            var ginList = okResult.Value.ShouldBeOfType<List<Gin>>();
+            ginList.Count.ShouldBe(10);
+            ginList[0].Distillery.ShouldBe("Distillery01");
+            ginList[9].Distillery.ShouldBe("Distillery10");
+        }
     }
 
     [Fact]
@@ -170,12 +218,11 @@ public class GetGinTests {
             EXPECTEDTANGO);
     }
 
-    // TODO: this test needs to be reviewed to check it is actually valid
     [Theory]
     [InlineData(true, false)]
     [InlineData(false, true)]
     [InlineData(true, true)]
-    public void GetPairingList_ExcludesNullPairings(bool removeGin, bool removeTonic) {
+    public void GetPairingList_ExcludesOrphanedPairings_WhenGinOrTonicDeleted(bool removeGin, bool removeTonic) {
         const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
 
         ResetDatabase(mockContext);
@@ -245,22 +292,5 @@ public class GetGinTests {
         AssertApiResponse(result, BsColor.Primary,
             $"Try pairing <b>{distillery} {ginName}</b> gin with",
             $"a <b>{brand} {flavour}</b> tonic");
-    }
-
-    [Fact]
-    public void WriteLog_WritesExpectedMessageToConsole() {
-        var originalConsoleOutput = Console.Out;
-        string message = "test me please";
-        try {
-            var consoleOutputWriter = new StringWriter();
-            Console.SetOut(consoleOutputWriter); // redirect Console.WriteLine
-
-            GinApiController.WriteLog(message);
-
-            string consoleOutput = consoleOutputWriter.ToString().Trim();
-            consoleOutput.ShouldBe($"An error has occurred: {message}");
-        } finally {
-            Console.SetOut(originalConsoleOutput);
-        }
     }
 }

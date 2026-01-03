@@ -10,7 +10,8 @@ public static class TestHelper {
 
     public static GinApiController CreateController(GinPairDbContext context) {
         var state = new DatabaseInitializationState { IsDatabaseReady = true };
-        return new GinApiController(context, state);
+        var logger = new Microsoft.Extensions.Logging.Abstractions.NullLogger<GinApiController>();
+        return new GinApiController(context, state, logger);
     }
 
     public static void ResetDatabase(GinPairDbContext context) {
@@ -58,7 +59,7 @@ public static class TestHelper {
         var ok = result.ShouldBeOfType<OkObjectResult>();
         var items = ok.Value as IEnumerable<SelectListItem>;
         items.ShouldNotBeNull();
-        return items!.Select(i => i.Text).ToList();
+        return [.. items!.Select(i => i.Text)];
     }
 
     public static ApiResponse GetApiResponse(IActionResult result) {
@@ -67,7 +68,7 @@ public static class TestHelper {
 
     public static void AssertOkWithSelectListTexts(IActionResult result, params string[] expectedTexts) {
         var texts = GetSelectListTexts(result);
-        texts.ShouldBe(expectedTexts.ToList());
+        texts.ShouldBe([.. expectedTexts]);
     }
 
     public static void AssertApiResponse(IActionResult result, BsColor expectedColour, params string[] mustContain) {

@@ -129,6 +129,23 @@ public class DeleteGnTTests {
         AssertApiResponse(result, BsColor.Warning, "Pairing not found");
     }
 
+    [Fact]
+    public void DeletePairing_ShouldReturnWarning_WhenGinOrTonicNotFound() {
+        ResetDatabase(mockContext);
+
+        var pairing = new Pairing { PairingId = 1, GinId = 999, TonicId = 999 };
+        mockContext.Pairings.Add(pairing);
+        mockContext.SaveChanges();
+
+        var sut = mockController;
+
+        var data = BuildJsonElement(new { pairingId = "1" });
+
+        var result = sut.DeletePairing(data);
+
+        AssertApiResponse(result, BsColor.Danger, "An Error occurred: Gin or Tonic not found. Not able to delete pairing");
+    }
+
     [Theory]
     [InlineData(true, true, true)]
     [InlineData(true, false, true)]
