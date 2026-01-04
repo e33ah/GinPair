@@ -3,19 +3,26 @@ namespace GinPair.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[ServiceFilter(typeof(DatabaseReadyFilter))]
 public class GinApiController(
     IGinService ginService,
     ITonicService tonicService,
     IPairingService pairingService,
+    DatabaseInitializationState dbInitState,
     ILogger<GinApiController> logger) : ControllerBase {
 
     private readonly IGinService ginService = ginService;
     private readonly ITonicService tonicService = tonicService;
     private readonly IPairingService pairingService = pairingService;
+    private readonly DatabaseInitializationState dbInitState = dbInitState;
     private readonly ILogger<GinApiController> logger = logger;
 
+    [HttpGet("databaseStatus")]
+    public IActionResult GetDatabaseStatus() {
+        return Ok(new { isReady = dbInitState.IsDatabaseReady });
+    }
+
     [HttpGet("matchGin")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> MatchGin(string partial) {
         if (!await ginService.HasAnyGinsAsync()) {
             logger.LogWarning("MatchGin called but database contains no gins");
@@ -27,6 +34,7 @@ public class GinApiController(
     }
 
     [HttpGet("getPairing/{ginId}")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> GetPairingByGinId(int ginId) {
         var result = await pairingService.GetRandomPairingForGinAsync(ginId);
 
@@ -38,24 +46,28 @@ public class GinApiController(
     }
 
     [HttpGet("getGinList")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> GetGinList() {
         var ginList = await ginService.GetGinListAsync();
         return Ok(ginList);
     }
 
     [HttpGet("getTonicList")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> GetTonicList() {
         var tonicList = await tonicService.GetTonicListAsync();
         return Ok(tonicList);
     }
 
     [HttpGet("getPairingList")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> GetPairingList() {
         var pairingList = await pairingService.GetPairingListAsync();
         return Ok(pairingList);
     }
 
     [HttpPost("addGin")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> AddGin([FromBody] JsonElement data) {
         string? ginName = data.GetProperty("ginName").GetString();
         string? distillery = data.GetProperty("distillery").GetString();
@@ -82,6 +94,7 @@ public class GinApiController(
     }
 
     [HttpPost("addTonic")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> AddTonic([FromBody] JsonElement data) {
         string? tonicBrand = data.GetProperty("tonicBrand").GetString();
         string? tonicFlavour = data.GetProperty("tonicFlavour").GetString();
@@ -107,6 +120,7 @@ public class GinApiController(
     }
 
     [HttpPost("addPairing")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> AddPairing([FromBody] JsonElement data) {
         string? ginId = data.GetProperty("ginId").GetString();
         string? tonicId = data.GetProperty("tonicId").GetString();
@@ -132,6 +146,7 @@ public class GinApiController(
     }
 
     [HttpPost("deleteGin")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> DeleteGin([FromBody] JsonElement data) {
         string? ginId = data.GetProperty("ginId").GetString();
 
@@ -155,6 +170,7 @@ public class GinApiController(
     }
 
     [HttpPost("deleteTonic")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> DeleteTonic([FromBody] JsonElement data) {
         string? tonicId = data.GetProperty("tonicId").GetString();
 
@@ -178,6 +194,7 @@ public class GinApiController(
     }
 
     [HttpPost("deletePairing")]
+    [ServiceFilter(typeof(DatabaseReadyFilter))]
     public async Task<IActionResult> DeletePairing([FromBody] JsonElement data) {
         string? pairingId = data.GetProperty("pairingId").GetString();
 

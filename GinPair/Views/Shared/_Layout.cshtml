@@ -12,6 +12,15 @@
 	<link rel="stylesheet" href="~/lib/jqueryui/themes/base/jquery-ui.min.css" />
 </head>
 <body>
+	<div id="dbLoadingOverlay">
+		<div class="loading-content">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+			<h2>Loading everything, please wait...</h2>
+		</div>
+	</div>
+
 	<header>
 		<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
 			<div class="container-fluid">
@@ -45,6 +54,29 @@
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	<script src="~/lib/jqueryui/jquery-ui.min.js"></script>
+	<script>
+		(function() {
+			var overlay = document.getElementById('dbLoadingOverlay');
+			
+			function checkDatabaseStatus() {
+				$.ajax({
+					url: '/api/ginapi/databaseStatus',
+					type: 'GET',
+					success: function(data) {
+						if (data.isReady) {
+							overlay.style.display = 'none';
+						} else {
+							setTimeout(checkDatabaseStatus, 1000);
+						}
+					},
+					error: function() {
+						setTimeout(checkDatabaseStatus, 1000);
+					}
+				});
+			}
+			checkDatabaseStatus();
+		})();
+	</script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

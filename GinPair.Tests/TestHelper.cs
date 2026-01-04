@@ -17,8 +17,9 @@ public static class TestHelper {
         var ginService = new GinService(context, ginServiceLogger);
         var tonicService = new TonicService(context, tonicServiceLogger);
         var pairingService = new PairingService(context, ginService, tonicService, pairingServiceLogger);
+        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
 
-        return new GinApiController(ginService, tonicService, pairingService, controllerLogger);
+        return new GinApiController(ginService, tonicService, pairingService, dbInitState, controllerLogger);
     }
 
     public static void ResetDatabase(GinPairDbContext context) {

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GinPair.Tests;
@@ -71,5 +70,32 @@ public class InfrastructureTests {
         sut.OnActionExecuting(context);
 
         context.Result.ShouldBeNull();
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void GetDatabaseStatus_ReturnsOk_WithCorrectStatus(bool isReady) {
+        var context = CreateInMemoryGinPairDbContext();
+        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = isReady };
+        var ginServiceLogger = new NullLogger<GinService>();
+        var tonicServiceLogger = new NullLogger<TonicService>();
+        var pairingServiceLogger = new NullLogger<PairingService>();
+        var controllerLogger = new NullLogger<GinApiController>();
+
+        var ginService = new GinService(context, ginServiceLogger);
+        var tonicService = new TonicService(context, tonicServiceLogger);
+        var pairingService = new PairingService(context, ginService, tonicService, pairingServiceLogger);
+        var sut = new GinApiController(ginService, tonicService, pairingService, dbInitState, controllerLogger);
+
+        var result = sut.GetDatabaseStatus();
+
+        var okResult = result.ShouldBeOfType<OkObjectResult>();
+        object? response = okResult.Value;
+        response.ShouldNotBeNull();
+        var isReadyProperty = response.GetType().GetProperty("isReady");
+        isReadyProperty.ShouldNotBeNull();
+        bool actualIsReady = (bool)isReadyProperty!.GetValue(response)!;
+        actualIsReady.ShouldBe(isReady);
     }
 }

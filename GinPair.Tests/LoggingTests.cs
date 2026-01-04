@@ -46,8 +46,9 @@ public class LoggingTests {
         var ginService = new GinService(context, mockGinServiceLogger.Object);
         var tonicService = new TonicService(context, mockTonicServiceLogger.Object);
         var pairingService = new PairingService(context, ginService, tonicService, mockPairingServiceLogger.Object);
+        var dbInitState = new DatabaseInitializationState { IsDatabaseReady = true };
 
-        return new GinApiController(ginService, tonicService, pairingService, mockControllerLogger.Object);
+        return new GinApiController(ginService, tonicService, pairingService, dbInitState, mockControllerLogger.Object);
     }
 
     private static void VerifyLogContains<T>(Mock<ILogger<T>> mockLogger, LogLevel level, params string[] expectedContent) {

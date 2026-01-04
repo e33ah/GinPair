@@ -22,6 +22,40 @@ body {
     background-image: url('/images/ginbackground.png');
     background-repeat: repeat;
 }
+
+#dbLoadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#dbLoadingOverlay .loading-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+}
+
+#dbLoadingOverlay .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
+#dbLoadingOverlay h2 {
+    margin: 0;
+    color: #333;
+}
+
 @media (min-width: 576px) {
     .container-sm, .container {
         max-width: 460px; /* 80% of 576px */
