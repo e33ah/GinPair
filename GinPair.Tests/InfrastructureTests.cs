@@ -18,10 +18,10 @@ public class InfrastructureTests {
         var context = new ActionExecutingContext(
             new ActionContext {
                 HttpContext = new DefaultHttpContext(),
-                RouteData = new Microsoft.AspNetCore.Routing.RouteData(),
-                ActionDescriptor = new Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor()
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
             },
-            new List<IFilterMetadata>(),
+            [],
             new Dictionary<string, object?>(),
             new object());
 
@@ -40,10 +40,10 @@ public class InfrastructureTests {
         var context = new ActionExecutingContext(
             new ActionContext {
                 HttpContext = new DefaultHttpContext(),
-                RouteData = new Microsoft.AspNetCore.Routing.RouteData(),
-                ActionDescriptor = new Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor()
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
             },
-            new List<IFilterMetadata>(),
+            [],
             new Dictionary<string, object?>(),
             new object());
         sut.OnActionExecuting(context);
@@ -61,10 +61,10 @@ public class InfrastructureTests {
         var context = new ActionExecutingContext(
             new ActionContext {
                 HttpContext = new DefaultHttpContext(),
-                RouteData = new Microsoft.AspNetCore.Routing.RouteData(),
-                ActionDescriptor = new Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor()
+                RouteData = new RouteData(),
+                ActionDescriptor = new ControllerActionDescriptor()
             },
-            new List<IFilterMetadata>(),
+            [],
             new Dictionary<string, object?>(),
             new object());
 

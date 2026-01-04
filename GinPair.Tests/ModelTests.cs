@@ -1,4 +1,5 @@
 ﻿namespace GinPair.Tests;
+
 public class ModelTests {
     [Fact]
     public void ApiResponse_Creation_WorksAsExpected() {

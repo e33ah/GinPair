@@ -9,9 +9,16 @@ public static class TestHelper {
     }
 
     public static GinApiController CreateController(GinPairDbContext context) {
-        var state = new DatabaseInitializationState { IsDatabaseReady = true };
-        var logger = new Microsoft.Extensions.Logging.Abstractions.NullLogger<GinApiController>();
-        return new GinApiController(context, state, logger);
+        var controllerLogger = new NullLogger<GinApiController>();
+        var ginServiceLogger = new NullLogger<GinService>();
+        var tonicServiceLogger = new NullLogger<TonicService>();
+        var pairingServiceLogger = new NullLogger<PairingService>();
+
+        var ginService = new GinService(context, ginServiceLogger);
+        var tonicService = new TonicService(context, tonicServiceLogger);
+        var pairingService = new PairingService(context, ginService, tonicService, pairingServiceLogger);
+
+        return new GinApiController(ginService, tonicService, pairingService, controllerLogger);
     }
 
     public static void ResetDatabase(GinPairDbContext context) {

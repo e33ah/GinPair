@@ -1,4 +1,4 @@
-namespace GinPair.Tests;
+﻿namespace GinPair.Tests;
 
 public class DeleteGnTTests {
     private readonly GinPairDbContext mockContext;
@@ -10,7 +10,7 @@ public class DeleteGnTTests {
     }
 
     [Fact]
-    public void DeleteGin_ShouldReturnSuccess_WhenGinIsDeleted() {
+    public async Task DeleteGin_ShouldReturnSuccess_WhenGinIsDeleted() {
         ResetDatabase(mockContext);
         var gin = CreateGin(1, "Test Gin", "Test Distillery");
         SeedGins(mockContext, [gin]);
@@ -18,37 +18,37 @@ public class DeleteGnTTests {
         string ginToBeDeleted = $"{gin.Distillery} {gin.GinName}";
 
         var sut = mockController;
-        var result = sut.DeleteGin(data);
+        var result = await sut.DeleteGin(data);
 
-        AssertApiResponse(result, BsColor.Success, $"{ginToBeDeleted}\" gin was removed");
+        AssertApiResponse(result, BsColor.Success, $"\"{ginToBeDeleted}\" gin was removed");
         var deletedGin = mockContext.Gins.Find(1);
         deletedGin.ShouldBeNull();
     }
 
     [Fact]
-    public void DeleteGin_ShouldReturnWarning_WhenGinIdIsInvalid() {
+    public async Task DeleteGin_ShouldReturnWarning_WhenGinIdIsInvalid() {
         ResetDatabase(mockContext);
         var data = BuildJsonElement(new { ginId = "0" });
 
         var sut = mockController;
-        var result = sut.DeleteGin(data);
+        var result = await sut.DeleteGin(data);
 
         AssertApiResponse(result, BsColor.Warning, "Please select a gin to delete");
     }
 
     [Fact]
-    public void DeleteGin_ShouldReturnWarning_WhenGinIdNotFound() {
+    public async Task DeleteGin_ShouldReturnWarning_WhenGinIdNotFound() {
         ResetDatabase(mockContext);
         var data = BuildJsonElement(new { ginId = "2" });
 
         var sut = mockController;
-        var result = sut.DeleteGin(data);
+        var result = await sut.DeleteGin(data);
 
         AssertApiResponse(result, BsColor.Warning, "Gin not found");
     }
 
     [Fact]
-    public void DeleteTonic_ShouldReturnSuccess_WhenTonicIsDeleted() {
+    public async Task DeleteTonic_ShouldReturnSuccess_WhenTonicIsDeleted() {
         ResetDatabase(mockContext);
         var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
         SeedTonics(mockContext, [tonic]);
@@ -56,37 +56,37 @@ public class DeleteGnTTests {
         string tonicToBeDeleted = $"{tonic.TonicBrand} {tonic.TonicFlavour}";
 
         var sut = mockController;
-        var result = sut.DeleteTonic(data);
+        var result = await sut.DeleteTonic(data);
 
-        AssertApiResponse(result, BsColor.Success, $"{tonicToBeDeleted}\" tonic was removed");
+        AssertApiResponse(result, BsColor.Success, $"\"{tonicToBeDeleted}\" tonic was removed");
         var deletedTonic = mockContext.Tonics.Find(1);
         deletedTonic.ShouldBeNull();
     }
 
     [Fact]
-    public void DeleteTonic_ShouldReturnWarning_WhenTonicIdIsInvalid() {
+    public async Task DeleteTonic_ShouldReturnWarning_WhenTonicIdIsInvalid() {
         ResetDatabase(mockContext);
         var data = BuildJsonElement(new { tonicId = "0" });
 
         var sut = mockController;
-        var result = sut.DeleteTonic(data);
+        var result = await sut.DeleteTonic(data);
 
         AssertApiResponse(result, BsColor.Warning, "Please select a tonic to delete");
     }
 
     [Fact]
-    public void DeleteTonic_ShouldReturnWarning_WhenTonicIdNotFound() {
+    public async Task DeleteTonic_ShouldReturnWarning_WhenTonicIdNotFound() {
         ResetDatabase(mockContext);
         var data = BuildJsonElement(new { tonicId = "2" });
 
         var sut = mockController;
-        var result = sut.DeleteTonic(data);
+        var result = await sut.DeleteTonic(data);
 
         AssertApiResponse(result, BsColor.Warning, "Tonic not found");
     }
 
     [Fact]
-    public void DeletePairing_ShouldReturnSuccess_WhenPairingIsDeleted() {
+    public async Task DeletePairing_ShouldReturnSuccess_WhenPairingIsDeleted() {
         ResetDatabase(mockContext);
         var gin = CreateGin(1, "Test Gin", "Test Distillery");
         var tonic = CreateTonic(1, "Test Brand", "Test Flavour");
@@ -100,7 +100,7 @@ public class DeleteGnTTests {
         string pairingToBeDeleted = $"\"{ginToBeDeleted} gin and {tonicToBeDeleted} tonic\"";
 
         var sut = mockController;
-        var result = sut.DeletePairing(data);
+        var result = await sut.DeletePairing(data);
 
         AssertApiResponse(result, BsColor.Success, $"{pairingToBeDeleted} pairing was removed");
         var deletedPairing = mockContext.Pairings.Find(pairing.PairingId);
@@ -108,29 +108,29 @@ public class DeleteGnTTests {
     }
 
     [Fact]
-    public void DeletePairing_ShouldReturnWarning_WhenPairingIdIsInvalid() {
+    public async Task DeletePairing_ShouldReturnWarning_WhenPairingIdIsInvalid() {
         ResetDatabase(mockContext);
         var data = BuildJsonElement(new { pairingId = "0" });
 
         var sut = mockController;
-        var result = sut.DeletePairing(data);
+        var result = await sut.DeletePairing(data);
 
         AssertApiResponse(result, BsColor.Warning, "Please select a pairing to delete");
     }
 
     [Fact]
-    public void DeletePairing_ShouldReturnWarning_WhenPairingIdNotFound() {
+    public async Task DeletePairing_ShouldReturnWarning_WhenPairingIdNotFound() {
         ResetDatabase(mockContext);
         var data = BuildJsonElement(new { pairingId = "2" });
 
         var sut = mockController;
-        var result = sut.DeletePairing(data);
+        var result = await sut.DeletePairing(data);
 
         AssertApiResponse(result, BsColor.Warning, "Pairing not found");
     }
 
     [Fact]
-    public void DeletePairing_ShouldReturnWarning_WhenGinOrTonicNotFound() {
+    public async Task DeletePairing_ShouldReturnDanger_WhenGinAndTonicNotFound() {
         ResetDatabase(mockContext);
 
         var pairing = new Pairing { PairingId = 1, GinId = 999, TonicId = 999 };
@@ -141,21 +141,8 @@ public class DeleteGnTTests {
 
         var data = BuildJsonElement(new { pairingId = "1" });
 
-        var result = sut.DeletePairing(data);
+        var result = await sut.DeletePairing(data);
 
         AssertApiResponse(result, BsColor.Danger, "An Error occurred: Gin or Tonic not found. Not able to delete pairing");
-    }
-
-    [Theory]
-    [InlineData(true, true, true)]
-    [InlineData(true, false, true)]
-    [InlineData(false, false, false)]
-    public void IsGinOrTonicNull_WorksCorrectly(bool isGinNull, bool isTonicNull, bool expectedResult) {
-        var gin = isGinNull ? null : new Gin();
-        var tonic = isTonicNull ? null : new Tonic();
-
-        bool result = GinApiController.IsGinOrTonicNull(gin, tonic);
-
-        result.ShouldBe(expectedResult);
     }
 }

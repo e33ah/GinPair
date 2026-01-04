@@ -67,6 +67,11 @@ public class Program {
             // Register the database ready filter
             builder.Services.AddScoped<DatabaseReadyFilter>();
 
+            // Register services
+            builder.Services.AddScoped<IGinService, GinService>();
+            builder.Services.AddScoped<ITonicService, TonicService>();
+            builder.Services.AddScoped<IPairingService, PairingService>();
+
             var app = builder.Build();
 
             // Log application context once at startup

@@ -107,10 +107,10 @@ public class GetGinTests {
     }
 
     [Fact]
-    public void GetGinList_ReturnsOk_WithEmptyList_WhenNoGinsExist() {
+    public async Task GetGinList_ReturnsOk_WithEmptyList_WhenNoGinsExist() {
         ResetDatabase(mockContext);
 
-        var result = mockController.GetGinList();
+        var result = await mockController.GetGinList();
 
         var okResult = result.ShouldBeOfType<OkObjectResult>();
         var selectList = okResult.Value as IEnumerable<SelectListItem>;
@@ -121,7 +121,7 @@ public class GetGinTests {
     [Theory]
     [InlineData("Tango", "Alpha", "Mike")]
     [InlineData("Zulu", "Alpha", "Mike")]
-    public void GetGinList_ReturnsItemsOrderedByTextAscending(string n1, string n2, string n3) {
+    public async Task GetGinList_ReturnsItemsOrderedByTextAscending(string n1, string n2, string n3) {
         ResetDatabase(mockContext);
         var gins = new List<Gin> {
             CreateGin(21, n1),
@@ -131,7 +131,7 @@ public class GetGinTests {
         SeedGins(mockContext, gins);
 
         var sut = mockController;
-        var result = sut.GetGinList();
+        var result = await sut.GetGinList();
 
         var texts = GetSelectListTexts(result);
         var expectedOrder = new List<string> { n1, n2, n3 }
@@ -144,7 +144,7 @@ public class GetGinTests {
     [Theory]
     [InlineData("Tango", "Alpha", "Mike")]
     [InlineData("Zulu", "Alpha", "Mike")]
-    public void GetTonicList_ReturnsItemsOrderedByTextAscending(string t1, string t2, string t3) {
+    public async Task GetTonicList_ReturnsItemsOrderedByTextAscending(string t1, string t2, string t3) {
         ResetDatabase(mockContext);
         var tonics = new List<Tonic> {
             CreateTonic(31, t1, t1),
@@ -154,7 +154,7 @@ public class GetGinTests {
         SeedTonics(mockContext, tonics);
 
         var sut = mockController;
-        var result = sut.GetTonicList();
+        var result = await sut.GetTonicList();
 
         var texts = GetSelectListTexts(result);
         var expectedOrder = new List<string> { t1, t2, t3 }
@@ -228,7 +228,7 @@ public class GetGinTests {
     }
 
     [Fact]
-    public void GetPairingList_ReturnsItemsOrderedByTextAscending() {
+    public async Task GetPairingList_ReturnsItemsOrderedByTextAscending() {
         const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
         const string EXPECTEDMIKE = "Mike Mike gin and Mike Mike tonic";
         const string EXPECTEDTANGO = "Tango Tango gin and Tango Tango tonic";
@@ -250,7 +250,7 @@ public class GetGinTests {
         SeedPairings(mockContext, pairings);
 
         var sut = mockController;
-        var result = sut.GetPairingList();
+        var result = await sut.GetPairingList();
 
         AssertOkWithSelectListTexts(result,
             EXPECTEDALPHA,
@@ -262,7 +262,7 @@ public class GetGinTests {
     [InlineData(true, false)]
     [InlineData(false, true)]
     [InlineData(true, true)]
-    public void GetPairingList_ExcludesOrphanedPairings_WhenGinOrTonicDeleted(bool removeGin, bool removeTonic) {
+    public async Task GetPairingList_ExcludesOrphanedPairings_WhenGinOrTonicDeleted(bool removeGin, bool removeTonic) {
         const string EXPECTEDALPHA = "Alpha Alpha gin and Alpha Alpha tonic";
 
         ResetDatabase(mockContext);
@@ -288,18 +288,18 @@ public class GetGinTests {
         mockContext.SaveChanges();
 
         var sut = mockController;
-        var result = sut.GetPairingList();
+        var result = await sut.GetPairingList();
 
         var texts = GetSelectListTexts(result);
         texts.ShouldBe([EXPECTEDALPHA]);
     }
 
     [Fact]
-    public void GetPairingList_ReturnsOk_WithEmptyList_WhenNoPairingsExist() {
+    public async Task GetPairingList_ReturnsOk_WithEmptyList_WhenNoPairingsExist() {
         ResetDatabase(mockContext);
-        
-        var result = mockController.GetPairingList();
-        
+
+        var result = await mockController.GetPairingList();
+
         var okResult = result.ShouldBeOfType<OkObjectResult>();
         var selectList = okResult.Value as IEnumerable<SelectListItem>;
         selectList.ShouldNotBeNull();

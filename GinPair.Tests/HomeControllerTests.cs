@@ -18,7 +18,7 @@ public class HomeControllerTests {
 
         var result = controller.Privacy();
 
-        var viewResult = result.ShouldBeOfType<ViewResult>();
+       result.ShouldBeOfType<ViewResult>();
     }
 
     [Fact]
