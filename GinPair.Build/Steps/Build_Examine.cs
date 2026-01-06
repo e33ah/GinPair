@@ -1,12 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using Nuke.Common;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.DotNet;
-using Serilog;
-
-namespace GinPair.Build;
+﻿namespace GinPair.Build;
 
 public partial class Build : NukeBuild {
 
@@ -14,6 +6,7 @@ public partial class Build : NukeBuild {
     protected Tool StrykerNet { get; set; }
 
     public Target ExamineStep => _ => _
+        .Before(PublishStep)
         .DependsOn(ConstructStep)
         .Triggers(UnitTest, MutationAnalysis)
         .Executes(() => {
@@ -21,6 +14,7 @@ public partial class Build : NukeBuild {
         });
 
     private Target UnitTest => _ => _
+        .Before(PublishStep)
         .DependsOn(ExamineStep)
         .Executes(() => {
             Log.Information("Running unit tests...");
@@ -38,25 +32,26 @@ public partial class Build : NukeBuild {
             }
         });
     private Target MutationAnalysis => _ => _
-    .After(UnitTest)
-    .Executes(() => {
-        try {
-            Log.Information("Running mutation analysis...");
-            var testProjects = Solution.GetAllProjects("*.Tests");
-            if (testProjects.Any()) {
-                string strykerArgs = "";
-                string strykerConfigPath = Path.Combine(testProjects.First().Directory, "stryker-config.json");
-                if (File.Exists(strykerConfigPath)) {
-                    strykerArgs = $"--config-file {strykerConfigPath}";
-                }
+        .After(UnitTest)
+        .Before(PublishStep)
+        .Executes(() => {
+            try {
+                Log.Information("Running mutation analysis...");
+                var testProjects = Solution.GetAllProjects("*.Tests");
+                if (testProjects.Any()) {
+                    string strykerArgs = "";
+                    string strykerConfigPath = Path.Combine(testProjects.First().Directory, "stryker-config.json");
+                    if (File.Exists(strykerConfigPath)) {
+                        strykerArgs = $"--config-file {strykerConfigPath}";
+                    }
 
-                StrykerNet(arguments: strykerArgs, workingDirectory: testProjects.First().Directory);
-            } else {
-                Log.Warning("No test projects found for mutation analysis. Skipping Stryker execution.");
+                    StrykerNet(arguments: strykerArgs, workingDirectory: testProjects.First().Directory);
+                } else {
+                    Log.Warning("No test projects found for mutation analysis. Skipping Stryker execution.");
+                }
+            } catch (Exception ex) {
+                Log.Error(ex, "Mutation analysis failed while running Stryker.");
+                throw;
             }
-        } catch (Exception ex) {
-            Log.Error(ex, "Mutation analysis failed while running Stryker.");
-            throw;
-        }
-    });
+        });
 }

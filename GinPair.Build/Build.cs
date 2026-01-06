@@ -1,7 +1,3 @@
-using Nuke.Common;
-using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.ProjectModel;
-
 namespace GinPair.Build;
 
 [GitHubActions("ginpair-ci", GitHubActionsImage.UbuntuLatest, On = new[] { GitHubActionsTrigger.Push, GitHubActionsTrigger.PullRequest },

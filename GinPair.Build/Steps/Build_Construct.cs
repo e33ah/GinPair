@@ -1,8 +1,4 @@
-﻿using Nuke.Common;
-using Nuke.Common.Tools.DotNet;
-using Serilog;
-
-namespace GinPair.Build;
+﻿namespace GinPair.Build;
 public partial class Build : NukeBuild {
     public Target ConstructStep => _ => _
         .Before(ExamineStep)
