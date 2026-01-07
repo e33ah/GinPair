@@ -27,7 +27,7 @@ public partial class Build : NukeBuild {
                 .SetProject(webProject)
                 .SetConfiguration(Configuration)
                 .SetOutput(PublishDirectory)
-                .SetRuntime("win-x64")
+                //.SetRuntime("win-x64")
                 .SetSelfContained(false)
                 .SetProperty("PublishReadyToRun", "true")
                 .SetProperty("PublishTrimmed", "false")
