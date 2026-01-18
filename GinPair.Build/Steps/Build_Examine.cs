@@ -32,6 +32,7 @@ public partial class Build : NukeBuild {
             }
         });
     private Target MutationAnalysis => _ => _
+        .OnlyWhenDynamic(() => EnableMutationAnalysis)
         .After(UnitTest)
         .Before(PublishStep)
         .Executes(() => {

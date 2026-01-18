@@ -9,16 +9,21 @@
     <NukeScriptDirectory>..</NukeScriptDirectory>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
     <IsPackable>false</IsPackable>
+    <UserSecretsId>fa617959-b4f2-44b4-9fae-8b99dd866812</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.2" />
     <PackageReference Include="Nuke.Common" Version="10.1.0" />
+    <PackageReference Include="Nuke.Utilities" Version="10.1.0" />
+    <PackageReference Include="Nuke.Utilities.IO.Compression" Version="10.1.0" />
     <PackageReference Include="Serilog" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageDownload Include="dotnet-stryker" Version="[4.9.2]" />
+    <PackageDownload Include="dotnet-stryker" Version="[4.11.0]" />
   </ItemGroup>
 
 </Project>
