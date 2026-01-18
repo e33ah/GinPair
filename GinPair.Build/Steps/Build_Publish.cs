@@ -14,24 +14,18 @@ public partial class Build : NukeBuild {
     private Target Publish => _ => _
         .DependsOn(PublishStep)
         .Executes(() => {
-            var webProjects = Solution.GetAllProjects("GinPair");
-            if (!webProjects.Any()) {
+            var project = Solution.Projects.FirstOrDefault(x => x.Name == "GinPair");
+            if (project == null) {
                 Log.Error("Could not find GinPair project in solution");
                 throw new InvalidOperationException("GinPair project not found");
             }
-
-            var webProject = webProjects.First();
-            Log.Information("Publishing {ProjectName} to {PublishDirectory}", webProject.Name, PublishDirectory);
+            Log.Information("Publishing {ProjectName} to {PublishDirectory}", project.Name, PublishDirectory);
 
             DotNetTasks.DotNetPublish(s => s
-                .SetProject(webProject)
+                .SetProject(project)
                 .SetConfiguration(Configuration)
                 .SetOutput(PublishDirectory)
-                //.SetRuntime("win-x64")
-                .SetSelfContained(false)
-                .SetProperty("PublishReadyToRun", "true")
-                .SetProperty("PublishTrimmed", "false")
-               // .EnableNoBuild()
+                .EnableNoRestore()
             );
 
             Log.Information("Publish completed successfully to {PublishDirectory}", PublishDirectory);
