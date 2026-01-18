@@ -5,6 +5,7 @@ public partial class Build : NukeBuild {
     readonly AbsolutePath PublishDirectory = RootDirectory / "publish";
 
     public Target PublishStep => _ => _
+        .Before(ReleaseStep)
         .DependsOn(ExamineStep)
         .Triggers(Publish)
         .Executes(() => {
@@ -12,6 +13,7 @@ public partial class Build : NukeBuild {
         });
 
     private Target Publish => _ => _
+        .Before(ReleaseStep)
         .DependsOn(PublishStep)
         .Executes(() => {
             var project = Solution.Projects.FirstOrDefault(x => x.Name == "GinPair");

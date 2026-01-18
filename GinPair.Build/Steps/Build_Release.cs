@@ -9,7 +9,7 @@ public partial class Build : NukeBuild {
         });
 
     private Target Release => _ => _
-        .DependsOn(Publish)
+        .DependsOn(ReleaseStep)
         .Requires(() => PublishDirectory)
         .Requires(() => AzureResourceGroup)
         .Requires(() => AzureWebAppName)
