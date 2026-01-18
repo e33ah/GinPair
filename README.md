@@ -73,3 +73,29 @@ To add additional migrations,
 
 - Postgres: `dotnet ef migrations add <MigrationName> --context GinPairDbContext --project GinPair.Migrations.Postgres --startup-project GinPair --output-dir Migrations`. 
 - SqlServer: `dotnet ef migrations add <MigrationName> --context GinPairDbContext --project GinPair.Migrations.SqlServer --startup-project GinPair --output-dir Migrations`.
+
+## CI/CD
+
+To run the build pipeline locally using NUKE, use the following commands based on your operating system:
+
+```bash
+# Windows
+.\build.cmd 
+
+# Linux/macOS
+./build.sh 
+
+# Using Nuke global tool
+nuke
+```
+
+The project uses GitHub Actions for continuous integration and continuous deployment.
+
+To deploy using the Nuke pipeline locally, install the Azure CLI. 
+Add AzureResourceGroup and AzureWebAppName to user secrets.
+Then run:
+```
+az login
+
+nuke ReleaseStep
+```
