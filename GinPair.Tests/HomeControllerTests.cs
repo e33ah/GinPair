@@ -1,4 +1,5 @@
 namespace GinPair.Tests;
+
 public class HomeControllerTests {
 
     [Fact]
@@ -18,7 +19,7 @@ public class HomeControllerTests {
 
         var result = controller.Privacy();
 
-       result.ShouldBeOfType<ViewResult>();
+        result.ShouldBeOfType<ViewResult>();
     }
 
     [Fact]

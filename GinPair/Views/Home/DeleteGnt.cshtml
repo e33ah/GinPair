@@ -17,14 +17,14 @@
 				<div class="accordion-body">
 					<form asp-action="RemoveGin" method="post">
 						<p>
-							Gin to remove:
+							<label for="ginDropDown">Gin to remove:</label>
 							<select id="ginDropDown" class="form-select mt-1 w-50"></select>
 						</p>
-						<button id="ginDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGinModal">
+						<button id="ginDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGinModal" aria-label="Remove selected gin">
 							Remove
 						</button>
 					</form>
-					<p id="deleteGinResult" class="container mt-4"></p>
+					<p id="deleteGinResult" role="status" aria-live="polite" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -38,14 +38,14 @@
 				<div class="accordion-body">
 					<form asp-action="RemoveTonic" method="post">
 						<p>
-							Tonic to remove:
+							<label for="tonicDropDown">Tonic to remove:</label>
 							<select id="tonicDropDown" class="form-select mt-1 w-50"></select>
 						</p>
-						<button id="tonicDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTonicModal">
+						<button id="tonicDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTonicModal" aria-label="Remove selected tonic">
 							Remove
 						</button>
 					</form>
-					<p id="deleteTonicResult" class="container mt-4"></p>
+					<p id="deleteTonicResult" role="status" aria-live="polite" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -59,14 +59,14 @@
 				<div class="accordion-body">
 					<form asp-action="RemoveTonic" method="post">
 						<p>
-							Pairing to remove:
+							<label for="pairingDropDown">Pairing to remove:</label>
 							<select id="pairingDropDown" class="form-select mt-1 w-50"></select>
 						</p>
-						<button id="pairingDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePairingModal">
+						<button id="pairingDeleteButton" type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePairingModal" aria-label="Remove selected pairing">
 							Remove
 						</button>
 					</form>
-					<p id="deletePairingResult" class="container mt-4"></p>
+					<p id="deletePairingResult" role="status" aria-live="polite" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -85,8 +85,8 @@
 			<div class="modal-body">
 				<p>Are sure you wish to remove "<span id="selectedGinText"></span>" gin from the collection?</p>
 				<div class="modal-footer">
-					<button id="modalDeleteGinButton" type="submit" class="btn btn-danger">Remove</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button id="modalDeleteGinButton" type="submit" class="btn btn-danger" aria-label="Confirm remove gin">Remove</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel remove gin">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -105,8 +105,8 @@
 			<div class="modal-body">
 				<p>Are sure you wish to remove "<span id="selectedTonicText"></span>" tonic from the collection?</p>
 				<div class="modal-footer">
-					<button id="modalDeleteTonicButton" type="submit" class="btn btn-danger">Remove</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button id="modalDeleteTonicButton" type="submit" class="btn btn-danger" aria-label="Confirm remove tonic">Remove</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel remove tonic">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -125,8 +125,8 @@
 			<div class="modal-body">
 				<p>Are sure you wish to remove "<span id="selectedPairingText"></span>" pairing from the collection?</p>
 				<div class="modal-footer">
-					<button id="modalDeletePairingButton" type="submit" class="btn btn-danger">Remove</button>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button id="modalDeletePairingButton" type="submit" class="btn btn-danger" aria-label="Confirm remove pairing">Remove</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Cancel remove pairing">Cancel</button>
 				</div>
 			</div>
 		</div>

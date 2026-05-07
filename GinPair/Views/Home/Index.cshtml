@@ -12,6 +12,7 @@
 	</p>
 	<form asp-action="Index" method="get" class="row d-flex flex-row align-items-center mb-2 justify-content-center">
 		<div class="col-12 col-md-8 col-lg-4 py-1">
+			<label class="visually-hidden" for="ginSearchBox">Search for a gin</label>
 			<input id="ginSearchBox" type="text" name="searchString" placeholder="Start typing a gin..." value="@ViewData["CurrentFilter"]" class="form-control p-2" />
 			<input id="ginSelectedId" type="hidden" name="searchId" />
 		</div>
@@ -19,7 +20,7 @@
 			<button id="ginSearchButton" type="button" class="btn btn-primary">Search</button>
 		</div>
 	</form>
-	<div id="searchResult" class="container mt-4 col-12 col-md-6 col-lg-6"></div>
+	<div id="searchResult" role="status" aria-live="polite" class="container mt-4 col-12 col-md-6 col-lg-6"></div>
 </div>
 
 

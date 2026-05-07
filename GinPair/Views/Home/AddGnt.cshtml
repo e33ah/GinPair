@@ -18,16 +18,16 @@
 					<p class="mb-2">Select a gin and tonic to pair together</p>
 					<form asp-action="AddPairing" method="post">
 						<p>
-							Gin to pair:
+							<label for="ginDropDown">Gin to pair:</label>
 							<select id="ginDropDown" class="form-select mt-1 w-50"></select>
 						</p>
 						<p>
-							Tonic to pair:
+							<label for="tonicDropDown">Tonic to pair:</label>
 							<select id="tonicDropDown" class="form-select mt-1 w-50"></select>
 						</p>
-						<button id="addPairingButton" type="button" class="btn btn-primary">Pair</button>
+						<button id="addPairingButton" type="button" class="btn btn-primary" aria-label="Submit pairing">Pair</button>
 					</form>
-					<p id="addPairingResult" class="container mt-4"></p>
+					<p id="addPairingResult" role="status" aria-live="polite" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -42,20 +42,20 @@
 					<p class="mb-2">Add a gin to our collection</p>
 					<form asp-action="AddGin" method="post">
 						<p>
-							Distillery / Brand:  *
+							<label for="distilleryInput">Distillery / Brand: *</label>
 							<input id="distilleryInput" type="text" placeholder="e.g. Hendrick's" class="form-control w-50" />
 						</p>
 						<p>
-							Gin Name / Flavour:  *
+							<label for="ginNameInput">Gin Name / Flavour: *</label>
 							<input id="ginNameInput" type="text" placeholder="e.g. Original" class="form-control w-50" />
 						</p>
 						<p>
 							<label for="descriptionInput">Short Description:</label>
 							<textarea id="descriptionInput" type="text" class="form-control mt-1 w-50"></textarea>
 						</p>
-						<button id="addGinButton" type="button" class="btn btn-primary">Add</button>
+						<button id="addGinButton" type="button" class="btn btn-primary" aria-label="Submit gin">Add</button>
 					</form>
-					<p id="addGinResult" class="container mt-4"></p>
+					<p id="addGinResult" role="status" aria-live="polite" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
@@ -70,16 +70,16 @@
 					<p class="mb-2">Add a new tonic to our collection</p>
 					<form asp-action="AddTonic" method="post">
 						<p>
-							Tonic Brand:    *
+							<label for="tonicBrandInput">Tonic Brand: *</label>
 							<input id="tonicBrandInput" type="text" placeholder="e.g. Fever Tree" class="form-control mt-1 w-50" />
 						</p>
 						<p>
-							Tonic Flavour:  *
+							<label for="tonicFlavourInput">Tonic Flavour: *</label>
 							<input id="tonicFlavourInput" type="text" placeholder="e.g. Indian" class="form-control mt-1 w-50" />
 						</p>
-						<button id="addTonicButton" type="button" class="btn btn-primary">Add</button>
+						<button id="addTonicButton" type="button" class="btn btn-primary" aria-label="Submit tonic">Add</button>
 					</form>
-					<p id="addTonicResult" class="container mt-4"></p>
+					<p id="addTonicResult" role="status" aria-live="polite" class="container mt-4"></p>
 				</div>
 			</div>
 		</div>
