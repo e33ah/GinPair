@@ -1,0 +1,11 @@
+global using System.Diagnostics;
+global using System.Net.Http;
+global using System.Net.Http.Json;
+global using System.Net.Sockets;
+global using System.Text;
+global using System.Text.Json;
+global using GinPair;
+global using GinPair.Models;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.Playwright;
+global using Shouldly;

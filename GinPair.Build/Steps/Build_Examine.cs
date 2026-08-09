@@ -1,4 +1,4 @@
-﻿namespace GinPair.Build;
+namespace GinPair.Build;
 
 public partial class Build : NukeBuild {
 
@@ -8,7 +8,7 @@ public partial class Build : NukeBuild {
     public Target ExamineStep => _ => _
         .Before(PublishStep)
         .DependsOn(ConstructStep)
-        .Triggers(UnitTest, MutationAnalysis)
+        .Triggers(UnitTest, IntegrationTest, MutationAnalysis)
         .Executes(() => {
             Log.Information("Examine Step");
         });
@@ -21,16 +21,48 @@ public partial class Build : NukeBuild {
 
             var testProjects = Solution.GetAllProjects("*.Tests");
             if (testProjects.Any()) {
-                DotNetTasks.DotNetTest(s => s
-                    .SetProjectFile(testProjects.First().Directory)
-                    .SetConfiguration(Configuration)
-                    .EnableNoBuild()
-                    .EnableNoRestore()
-                );
+                foreach (var testProject in testProjects) {
+                    DotNetTasks.DotNetTest(s => s
+                        .SetProjectFile(testProject.Path)
+                        .SetConfiguration(Configuration)
+                        .EnableNoBuild()
+                        .EnableNoRestore()
+                    );
+                }
             } else {
                 Log.Warning("No test projects found in the solution.");
             }
         });
+
+    private Target IntegrationTest => _ => _
+        .Before(PublishStep)
+        .After(UnitTest)
+        .Executes(() => {
+            var integrationTestProjects = Solution.GetAllProjects("*.ITest");
+            if (!integrationTestProjects.Any()) {
+                Log.Warning("No integration test projects found in the solution.");
+                return;
+            }
+
+            if (!OperatingSystem.IsWindows()) {
+                Log.Warning("Skipping integration tests because the current Playwright setup depends on SQL Server LocalDB and only runs on Windows.");
+                return;
+            }
+
+            Log.Information("Running integration tests...");
+
+            foreach (var integrationTestProject in integrationTestProjects) {
+                InstallPlaywrightBrowsers(integrationTestProject);
+
+                DotNetTasks.DotNetTest(s => s
+                    .SetProjectFile(integrationTestProject.Path)
+                    .SetConfiguration(Configuration)
+                    .EnableNoBuild()
+                    .EnableNoRestore()
+                );
+            }
+        });
+
     private Target MutationAnalysis => _ => _
         .OnlyWhenDynamic(() => EnableMutationAnalysis)
         .After(UnitTest)
@@ -55,4 +87,34 @@ public partial class Build : NukeBuild {
                 throw;
             }
         });
+
+    private void InstallPlaywrightBrowsers(Project integrationTestProject) {
+        string projectBinDirectory = Path.Combine(integrationTestProject.Directory, "bin", Configuration.ToString());
+        string integrationTestFramework = GetIntegrationTestFrameworkFolder(projectBinDirectory);
+        string playwrightScriptPath = Path.Combine(projectBinDirectory, integrationTestFramework, "playwright.ps1");
+        if (!File.Exists(playwrightScriptPath)) {
+            throw new FileNotFoundException($"Playwright install script was not found for {integrationTestProject.Name}. Expected path: {playwrightScriptPath}");
+        }
+
+        Log.Information("Installing Playwright Chromium for {ProjectName}", integrationTestProject.Name);
+
+        ProcessTasks.StartProcess(
+                toolPath: "powershell",
+                arguments: $"-ExecutionPolicy Bypass -File \"{playwrightScriptPath}\" install chromium",
+                workingDirectory: integrationTestProject.Directory)
+            .AssertZeroExitCode();
+    }
+    private static string GetIntegrationTestFrameworkFolder(string projectBinDirectory) {
+        if (!Directory.Exists(projectBinDirectory)) {
+            throw new DirectoryNotFoundException($"Could not find bin directory: {projectBinDirectory}");
+        }
+
+        string[] frameworkDirectories = Directory.GetDirectories(projectBinDirectory);
+        if (frameworkDirectories.Length == 0) {
+            throw new InvalidOperationException($"No framework directories found in: {projectBinDirectory}");
+        }
+
+            string result = Path.GetFileName(frameworkDirectories[^1]);
+        return result;
+    }
 }

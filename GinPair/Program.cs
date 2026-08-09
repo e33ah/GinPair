@@ -27,10 +27,10 @@ public class Program {
             string? appInsightsConnectionString = builder.Configuration.GetConnectionString("ApplicationInsights");
             if (!string.IsNullOrEmpty(appInsightsConnectionString)) {
                 string cloudRoleName = builder.Configuration["ApplicationInsights:CloudRoleName"] ?? "GinPair";
-                
+
                 builder.Services.AddSingleton<Microsoft.ApplicationInsights.Extensibility.ITelemetryInitializer>(
                     new Infrastructure.CloudRoleNameTelemetryInitializer(cloudRoleName));
-                
+
                 builder.Services.AddApplicationInsightsTelemetry(options => {
                     options.ConnectionString = appInsightsConnectionString;
                 });
@@ -75,17 +75,17 @@ public class Program {
             var app = builder.Build();
 
             // Log application context once at startup
-            Log.Information("Application started - Application: {Application}, Environment: {Environment}, MachineName: {MachineName}", 
-                "GinPair", 
-                app.Environment.EnvironmentName, 
+            Log.Information("Application started - Application: {Application}, Environment: {Environment}, MachineName: {MachineName}",
+                "GinPair",
+                app.Environment.EnvironmentName,
                 Environment.MachineName);
 
             app.UseSerilogRequestLogging(options => {
                 options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
-                options.GetLevel = (httpContext, elapsed, ex) => ex != null 
-                    ? LogEventLevel.Error 
-                    : elapsed > 1000 
-                        ? LogEventLevel.Warning 
+                options.GetLevel = (httpContext, elapsed, ex) => ex != null
+                    ? LogEventLevel.Error
+                    : elapsed > 1000
+                        ? LogEventLevel.Warning
                         : LogEventLevel.Information;
             });
 

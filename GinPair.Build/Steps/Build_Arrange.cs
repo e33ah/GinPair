@@ -1,4 +1,5 @@
 ﻿namespace GinPair.Build;
+
 public partial class Build : NukeBuild {
     public Target ArrangeStep => _ => _
         .Before(ConstructStep)
