@@ -35,11 +35,9 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
-      - name: 'Restore: dotnet tools'
-        run: dotnet tool restore
-      - name: 'Run: ArrangeStep'
-        run: dotnet fallout ArrangeStep
-      - name: 'Run: ConstructStep'
-        run: dotnet fallout ConstructStep --skip ArrangeStep
-      - name: 'Run: ExamineStep'
-        run: dotnet fallout ExamineStep --skip ArrangeStep ConstructStep
+      - name: Run ArrangeStep
+        run: ./build.cmd ArrangeStep
+      - name: Run ConstructStep
+        run: ./build.cmd ConstructStep --skip ArrangeStep
+      - name: Run ExamineStep
+        run: ./build.cmd ExamineStep --skip ArrangeStep ConstructStep
