@@ -1,6 +1,6 @@
 namespace GinPair.Build;
 
-public partial class Build : NukeBuild {
+public partial class Build : FalloutBuild {
 
     [NuGetPackage(packageId: "dotnet-stryker", packageExecutable: "Stryker.CLI.dll", Framework = "net8.0")]
     protected Tool StrykerNet { get; set; }

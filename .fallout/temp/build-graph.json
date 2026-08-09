@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "falloutVersion": "10.4.0.15",
+  "targets": [
+    {
+      "name": "ArrangeStep",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [],
+      "after": [],
+      "triggeredBy": [],
+      "triggers": [
+        "Clean",
+        "Restore"
+      ]
+    },
+    {
+      "name": "Clean",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "ArrangeStep"
+      ],
+      "after": [],
+      "triggeredBy": [
+        "ArrangeStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "Compile",
+      "description": null,
+      "declaredIn": "Build",
+      "default": true,
+      "listed": true,
+      "dependsOn": [
+        "ConstructStep"
+      ],
+      "after": [],
+      "triggeredBy": [
+        "ConstructStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "ConstructStep",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "ArrangeStep"
+      ],
+      "after": [
+        "ArrangeStep",
+        "Clean",
+        "Restore"
+      ],
+      "triggeredBy": [],
+      "triggers": [
+        "Compile"
+      ]
+    },
+    {
+      "name": "ExamineStep",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "ConstructStep"
+      ],
+      "after": [
+        "Compile",
+        "ConstructStep"
+      ],
+      "triggeredBy": [],
+      "triggers": [
+        "IntegrationTest",
+        "MutationAnalysis",
+        "UnitTest"
+      ]
+    },
+    {
+      "name": "IntegrationTest",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [],
+      "after": [
+        "UnitTest"
+      ],
+      "triggeredBy": [
+        "ExamineStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "MutationAnalysis",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [],
+      "after": [
+        "UnitTest"
+      ],
+      "triggeredBy": [
+        "ExamineStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "Publish",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "PublishStep"
+      ],
+      "after": [],
+      "triggeredBy": [
+        "PublishStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "PublishStep",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "ExamineStep"
+      ],
+      "after": [
+        "ExamineStep",
+        "IntegrationTest",
+        "MutationAnalysis",
+        "UnitTest"
+      ],
+      "triggeredBy": [],
+      "triggers": [
+        "Publish"
+      ]
+    },
+    {
+      "name": "Release",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "ReleaseStep"
+      ],
+      "after": [],
+      "triggeredBy": [
+        "ReleaseStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "ReleaseStep",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "PublishStep"
+      ],
+      "after": [
+        "Publish",
+        "PublishStep"
+      ],
+      "triggeredBy": [],
+      "triggers": [
+        "Release"
+      ]
+    },
+    {
+      "name": "Restore",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "Clean"
+      ],
+      "after": [],
+      "triggeredBy": [
+        "ArrangeStep"
+      ],
+      "triggers": []
+    },
+    {
+      "name": "UnitTest",
+      "description": null,
+      "declaredIn": "Build",
+      "default": false,
+      "listed": true,
+      "dependsOn": [
+        "ExamineStep"
+      ],
+      "after": [],
+      "triggeredBy": [
+        "ExamineStep"
+      ],
+      "triggers": []
+    }
+  ]
+}

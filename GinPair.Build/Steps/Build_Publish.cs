@@ -1,6 +1,6 @@
-﻿namespace GinPair.Build;
+namespace GinPair.Build;
 
-public partial class Build : NukeBuild {
+public partial class Build : FalloutBuild {
     [Parameter("Output directory for publish artifacts")]
     readonly AbsolutePath PublishDirectory = RootDirectory / "publish";
 

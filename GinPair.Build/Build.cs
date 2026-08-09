@@ -1,8 +1,8 @@
 namespace GinPair.Build;
 
-[GitHubActions("ginpair-ci", GitHubActionsImage.UbuntuLatest, On = new[] { GitHubActionsTrigger.Push, GitHubActionsTrigger.PullRequest },
-    InvokedTargets = new[] { nameof(ArrangeStep), nameof(ConstructStep), nameof(ExamineStep) }, AutoGenerate = false)]
-public partial class Build : NukeBuild {
+[GitHubActions("ginpair-ci", GitHubActionsImage.WindowsLatest, On = new[] { GitHubActionsTrigger.Push, GitHubActionsTrigger.PullRequest, GitHubActionsTrigger.WorkflowDispatch },
+    InvokedTargets = new[] { nameof(ArrangeStep), nameof(ConstructStep), nameof(ExamineStep) }, AutoGenerate = true)]
+public partial class Build : FalloutBuild {
     public static int Main() {
         if (IsLocalBuild) {
             var config = new ConfigurationBuilder()
