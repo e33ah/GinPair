@@ -5,6 +5,7 @@
     <UserSecretsId>0626e2cb-9fe5-4fe0-b61c-2c520592cb3d</UserSecretsId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <GenerateDependencyFile>true</GenerateDependencyFile>
+    <RazorLangVersion>Latest</RazorLangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,5 +36,5 @@
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
   </ItemGroup>
-  
+
 </Project>

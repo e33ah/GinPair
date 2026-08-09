@@ -94,7 +94,7 @@ public sealed class BrowserAppHost(int? databaseInitialisationDelayMs = null) : 
             applicationArguments += $" --DatabaseInitialisationDelayMs {startupDelayMs.Value}";
         }
 
-        var startInfo = new ProcessStartInfo("dotnet", $"run --project \"{projectPath}\" --no-build -- {applicationArguments}") {
+        var startInfo = new ProcessStartInfo("dotnet", $"run --project \"{projectPath}\" --no-build --configuration {GetBuildConfiguration()} -- {applicationArguments}") {
             WorkingDirectory = workingDirectory,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -215,6 +215,11 @@ public sealed class BrowserAppHost(int? databaseInitialisationDelayMs = null) : 
 
     private static string GetApplicationProjectPath() {
         string result = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "GinPair", "GinPair.csproj"));
+        return result;
+    }
+
+    private static string GetBuildConfiguration() {
+        string result = Environment.GetEnvironmentVariable("BUILD_CONFIGURATION") ?? "Debug";
         return result;
     }
 }

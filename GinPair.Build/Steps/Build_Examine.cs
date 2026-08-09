@@ -57,6 +57,7 @@ public partial class Build : NukeBuild {
                 DotNetTasks.DotNetTest(s => s
                     .SetProjectFile(integrationTestProject.Path)
                     .SetConfiguration(Configuration)
+                    .SetProcessEnvironmentVariable("BUILD_CONFIGURATION", Configuration.ToString())
                     .EnableNoBuild()
                     .EnableNoRestore()
                 );

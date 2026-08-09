@@ -9,7 +9,7 @@ public sealed class BrowserAppFixture : IAsyncLifetime {
     public string DatabaseName => host.DatabaseName;
     public Uri BaseUri => host.BaseUri;
 
-    public async Task InitializeAsync() {
+    public async ValueTask InitializeAsync() {
         host = new BrowserAppHost();
         await host.StartAsync();
 
@@ -19,7 +19,7 @@ public sealed class BrowserAppFixture : IAsyncLifetime {
         });
     }
 
-    public async Task DisposeAsync() {
+    public async ValueTask DisposeAsync() {
         Exception? result = null;
 
         try {
