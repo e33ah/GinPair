@@ -7,6 +7,7 @@ The app enables users to input the name of a gin and receive back a suggested to
 2. Either install PostgreSQL OR SQL Server
 3. Create an empty database
 4. Install Entity Framework Core CLI: `dotnet tool install --global dotnet-ef`
+5. [optional] Install Fallout for CI/CD local execution: `dotnet tool install --global Fallout.GlobalTool`
 
 ## Getting Started
 1. Clone the GinPair repository
@@ -76,7 +77,7 @@ To add additional migrations,
 
 ## CI/CD
 
-To run the build pipeline locally using NUKE, use the following commands based on your operating system:
+To run the build pipeline locally using FALLOUT, use the following commands based on your operating system:
 
 ```bash
 # Windows
@@ -85,17 +86,18 @@ To run the build pipeline locally using NUKE, use the following commands based o
 # Linux/macOS
 ./build.sh 
 
-# Using Nuke global tool
-nuke
+# Using Fallout global tool
+fallout
 ```
 
 The project uses GitHub Actions for continuous integration and continuous deployment.
 
-To deploy using the Nuke pipeline locally, install the Azure CLI. 
+To deploy using the Fallout pipeline locally, install the Azure CLI. 
 Add AzureResourceGroup and AzureWebAppName to user secrets.
 Then run:
+
 ```
 az login
 
-nuke ReleaseStep
+fallout ReleaseStep
 ```

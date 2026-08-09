@@ -5,9 +5,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace></RootNamespace>
     <NoWarn>CS0649;CS0169;CA1050;CA1822;CA2211;IDE1006</NoWarn>
-    <NukeRootDirectory>..</NukeRootDirectory>
-    <NukeScriptDirectory>..</NukeScriptDirectory>
-    <NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <FalloutRootDirectory>..</FalloutRootDirectory>
+    <FalloutScriptDirectory>..</FalloutScriptDirectory>
     <IsPackable>false</IsPackable>
     <UserSecretsId>fa617959-b4f2-44b4-9fae-8b99dd866812</UserSecretsId>
   </PropertyGroup>
@@ -17,15 +16,18 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.10" />
     <PackageReference Include="NuGet.Packaging" Version="7.6.0" />
-    <PackageReference Include="Nuke.Common" Version="10.1.0" />
-    <PackageReference Include="Nuke.Utilities" Version="10.1.0" />
-    <PackageReference Include="Nuke.Utilities.IO.Compression" Version="10.1.0" />
+    <PackageReference Include="Fallout.Common" Version="10.4.0" />
+    <PackageReference Include="Fallout.Utilities" Version="10.4.0" />
+    <PackageReference Include="Fallout.Utilities.IO.Compression" Version="10.4.0" />
     <PackageReference Include="Serilog" Version="4.4.0" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageDownload Include="dotnet-stryker" Version="[4.11.0]" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

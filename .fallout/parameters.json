@@ -1,0 +1,5 @@
+{
+  "$schema": "build.schema.json",
+  "Solution": "GinPair.sln",
+  "BuildProjectFile": "GinPair.Build/GinPair.Build.csproj"
+}

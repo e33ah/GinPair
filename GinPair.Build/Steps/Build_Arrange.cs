@@ -1,6 +1,6 @@
-﻿namespace GinPair.Build;
+namespace GinPair.Build;
 
-public partial class Build : NukeBuild {
+public partial class Build : FalloutBuild {
     public Target ArrangeStep => _ => _
         .Before(ConstructStep)
         .Triggers(Clean, Restore)

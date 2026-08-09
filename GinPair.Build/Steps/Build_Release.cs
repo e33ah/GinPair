@@ -1,6 +1,6 @@
-﻿namespace GinPair.Build;
+namespace GinPair.Build;
 
-public partial class Build : NukeBuild {
+public partial class Build : FalloutBuild {
     public Target ReleaseStep => _ => _
         .DependsOn(PublishStep)
         .Triggers(Release)
