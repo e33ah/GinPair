@@ -405,6 +405,6 @@ FodyWeavers.xsd
 # GinPair
 *.lutconfig
 
-# NUKE generated editor schema
-/.nuke/build.schema.json
-/.nuke/temp/*
+# FALLOUT generated editor schema
+/.fallout/build.schema.json
+/.fallout/temp/*
