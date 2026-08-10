@@ -2,7 +2,7 @@ namespace GinPair.Tests;
 
 public class TonicServiceTests {
     private readonly GinPairDbContext mockContext;
-    private readonly ITonicService tonicService;
+    private readonly TonicService tonicService;
 
     public TonicServiceTests() {
         mockContext = CreateInMemoryGinPairDbContext();

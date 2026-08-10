@@ -2,7 +2,7 @@ namespace GinPair.Tests;
 
 public class PairingServiceTests {
     private readonly GinPairDbContext mockContext;
-    private readonly IPairingService pairingService;
+    private readonly PairingService pairingService;
 
     public PairingServiceTests() {
         mockContext = CreateInMemoryGinPairDbContext();

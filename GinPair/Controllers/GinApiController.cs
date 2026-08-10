@@ -1,5 +1,4 @@
-﻿#pragma warning disable CA1873 // Suppress warning regarding logging performance
-namespace GinPair.Controllers;
+﻿namespace GinPair.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
