@@ -56,10 +56,15 @@ public class LoggingTests {
             x => x.Log(
                 level,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => expectedContent.All(content => v.ToString()!.Contains(content))),
-                null,
+                It.Is<It.IsAnyType>((v, t) => LogMessageContains(v, expectedContent)),
+                                null,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
+    }
+
+    private static bool LogMessageContains(object? state, string[] expectedContent) {
+        string? message = state?.ToString();
+        return message is not null && expectedContent.All(content => message.Contains(content));
     }
 
     [Fact]
