@@ -14,14 +14,14 @@
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
     <PackageReference Include="Microsoft.Build" Version="18.9.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.12">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.13">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -29,12 +29,15 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="NuGet.Packaging" Version="7.9.0" />
     <PackageReference Include="NuGet.Protocol" Version="7.9.0" />
-    <PackageReference Include="OpenTelemetry.Api" Version="1.19.1" />
+    <PackageReference Include="OpenTelemetry.Api" Version="1.20.0" />
     <PackageReference Include="popper.js" Version="1.16.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+
+    <!--Add cryptographic packages temporarily until parent package is updated-->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
 </Project>
