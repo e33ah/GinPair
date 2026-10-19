@@ -1,3 +1,5 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+using OpenTelemetry.Resources;
 using Serilog;
 using Serilog.Events;
 
@@ -23,37 +25,30 @@ public class Program {
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // Configure Application Insights
-            string? appInsightsConnectionString = builder.Configuration.GetConnectionString("ApplicationInsights");
+            // Configure OpenTelemetry and Azure Monitor
+            string? appInsightsConnectionString = new[] {
+                builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"],
+                builder.Configuration.GetConnectionString("ApplicationInsights"),
+                builder.Configuration["AzureMonitor:ConnectionString"]
+            }.FirstOrDefault(cs => !string.IsNullOrWhiteSpace(cs));
+            string cloudRoleName = builder.Configuration["ApplicationInsights:CloudRoleName"]
+                ?? builder.Configuration["OTEL_SERVICE_NAME"]
+                ?? "GinPair";
+
+            var otel = builder.Services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource.AddService(serviceName: cloudRoleName));
+
             if (!string.IsNullOrEmpty(appInsightsConnectionString)) {
-                string cloudRoleName = builder.Configuration["ApplicationInsights:CloudRoleName"] ?? "GinPair";
-
-                builder.Services.AddSingleton<Microsoft.ApplicationInsights.Extensibility.ITelemetryInitializer>(
-                    new Infrastructure.CloudRoleNameTelemetryInitializer(cloudRoleName));
-
-                builder.Services.AddApplicationInsightsTelemetry(options => {
+                otel.UseAzureMonitor(options => {
                     options.ConnectionString = appInsightsConnectionString;
                 });
             }
 
             builder.Host.UseSerilog((context, services, configuration) => {
-                var loggerConfig = configuration
+                configuration
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(services);
-
-                // Add Application Insights sink if connection string is available
-                string? aiConnectionString = context.Configuration.GetConnectionString("ApplicationInsights");
-                if (!string.IsNullOrEmpty(aiConnectionString)) {
-                    var telemetryConfiguration = services.GetService<Microsoft.ApplicationInsights.Extensibility.TelemetryConfiguration>();
-                    if (telemetryConfiguration != null) {
-                        var minLevel = context.HostingEnvironment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information;
-                        loggerConfig.WriteTo.ApplicationInsights(
-                            telemetryConfiguration,
-                            new Serilog.Sinks.ApplicationInsights.TelemetryConverters.TraceTelemetryConverter(),
-                            minLevel);
-                    }
-                }
-            });
+            }, writeToProviders: true);
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

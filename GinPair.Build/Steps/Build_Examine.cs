@@ -115,7 +115,7 @@ public partial class Build : FalloutBuild {
             throw new InvalidOperationException($"No framework directories found in: {projectBinDirectory}");
         }
 
-            string result = Path.GetFileName(frameworkDirectories[^1]);
+        string result = Path.GetFileName(frameworkDirectories[^1]);
         return result;
     }
 }

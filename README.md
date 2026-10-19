@@ -39,17 +39,26 @@ Unit tests are located in the GinPair.Tests project and are written using xUnit 
 
 To run the unit tests, navigate to the folder which contains the solution `GinPair/GinPair.sln` and run: `dotnet test`
 
-## Logging
+## Observability & Logging
 The application uses Serilog for structured logging and writes logs to the console. Logging configuration can be customised in appsettings.json.
 
-### Optional: Application Insights Integration
-The application supports optional Azure Application Insights telemetry for production monitoring. If you don't configure Application Insights, the application will run normally with console-only logging.
+### Optional: Azure Monitor & OpenTelemetry Integration
+The application uses **OpenTelemetry** (`Azure.Monitor.OpenTelemetry.AspNetCore`) for distributed tracing, runtime metrics, and log export to Azure Application Insights. When enabled, Serilog logs are automatically correlated with incoming HTTP request traces and SQL dependencies.
 
-To enable Application Insights:
-1. Set the "ApplicationInsights" connection string in appsettings.json or use User Secrets for local development
-2. Optionally configure the "CloudRoleName" in the ApplicationInsights section to identify your application instance
+If an Application Insights connection string is not configured, the application runs normally with console-only logging.
 
-Example configuration:
+#### Enabling Azure Monitor / Application Insights:
+Provide the connection string using any of the following methods:
+1. **Azure App Service (Production):** Set the `APPLICATIONINSIGHTS_CONNECTION_STRING` environment variable in the Azure Portal.
+2. **Local Development:** Set via .NET User Secrets or in `appsettings.json`:
+   ```bash
+   dotnet user-secrets set "ConnectionStrings:ApplicationInsights" "InstrumentationKey=...;IngestionEndpoint=..."
+   ```
+
+#### Optional Configuration:
+- **Cloud Role Name / Service Name:** Customise the application role name using either `ApplicationInsights:CloudRoleName` in configuration or the standard `OTEL_SERVICE_NAME` environment variable (defaults to `"GinPair"`).
+
+Example `appsettings.json` configuration:
 ```json
 {
   "ConnectionStrings": {
