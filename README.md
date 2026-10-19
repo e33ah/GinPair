@@ -1,6 +1,12 @@
 # Gin Pair App
-This project is a web app built using MVC design pattern with .NET 10 and Entity Framework Core. The app is compatible with a PostgreSQL or SQL Server database.
-The app enables users to input the name of a gin and receive back a suggested tonic pairing. Users can also add and delete gins, tonics, and pairings to the database.
+
+<p align="center">
+    <img width="680" height="286" alt="GinPair Index page" src="https://github.com/user-attachments/assets/d527b9f6-e0d0-4de2-894f-1d0143d481e7" />
+</p>
+
+A lightweight web application built using the MVC design pattern with .NET 10 and Entity Framework Core.  
+The app works with either PostgreSQL or SQL Server and allows users to browse, add, and delete gins, tonics, and pairing suggestions.  
+Enter the name of a gin and the app returns a recommended tonic pairing based on the stored data.
 
 ## Prerequisites
 1. Install .NET SDK
