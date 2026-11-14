@@ -4,5 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Npgsql 11 is prerelease and EFCore.NamingConventions has no EF Core 11 release yet; remove once both ship v11 -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1608</WarningsNotAsErrors>
   </PropertyGroup>
 </Project>
