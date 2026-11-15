@@ -4,12 +4,12 @@
     <img width="680" height="286" alt="GinPair Index page" src="https://github.com/user-attachments/assets/d527b9f6-e0d0-4de2-894f-1d0143d481e7" />
 </p>
 
-A lightweight web application built using the MVC design pattern with .NET 10 and Entity Framework Core.  
+A lightweight web application built using the MVC design pattern with .NET 11 and Entity Framework Core.
 The app works with either PostgreSQL or SQL Server and allows users to browse, add, and delete gins, tonics, and pairing suggestions.  
 Enter the name of a gin and the app returns a recommended tonic pairing based on the stored data.
 
 ## Prerequisites
-1. Install .NET SDK
+1. Install the .NET 11 SDK
 2. Either install PostgreSQL OR SQL Server
 3. Create an empty database
 4. Install Entity Framework Core CLI: `dotnet tool install --global dotnet-ef`
@@ -32,7 +32,7 @@ Enter the name of a gin and the app returns a recommended tonic pairing based on
 
 Sample data for the Gins and Tonics tables is included in the _Dependencies project.
 
-**Note:** The application will automatically initialise the database schema on startup if migrations have been applied. The app will be available immediately, with database initialisation completing in the background.
+**Note:** The application calls `EnsureCreated()` during startup, in the background; it does not apply pending migrations or update an existing schema. Use the migration commands above to create or update the schema. API endpoints that require the database return HTTP 503 until startup initialisation completes.
 
 ## Unit Testing
 Unit tests are located in the GinPair.Tests project and are written using xUnit and Shouldly for assertions.
@@ -105,7 +105,7 @@ To run the build pipeline locally using FALLOUT, use the following commands base
 fallout
 ```
 
-The project uses GitHub Actions for continuous integration and continuous deployment.
+The project uses GitHub Actions for continuous integration on pushes and pull requests. Deployment is handled by a separate workflow that must be started manually with `workflow_dispatch`.
 
 To deploy using the Fallout pipeline locally, install the Azure CLI. 
 Add AzureResourceGroup and AzureWebAppName to user secrets.
